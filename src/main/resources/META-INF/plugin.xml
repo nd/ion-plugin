@@ -1,0 +1,16 @@
+<idea-plugin>
+    <id>ion</id>
+    <name>ion</name>
+    <vendor>me</vendor>
+
+    <depends>com.intellij.modules.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileTypeFactory implementation="ion.IonFileType$Factory"/>
+        <lang.syntaxHighlighterFactory language="ion" implementationClass="ion.IonSyntaxHighlighter$Factory"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="cidr.debugger">
+        <lineBreakpointFileTypesProvider implementation="ion.dbg.IonLineBreakpointFileTypesProvider"/>
+    </extensions>
+</idea-plugin>
