@@ -4,20 +4,26 @@ import com.intellij.lexer.LexerBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.ContainerUtil;
+import gnu.trove.TLongObjectHashMap;
 import ion.psi.IonToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-
 import static ion.psi.IonToken.*;
 
 public class IonLexer extends LexerBase {
-  private final static Map<CharSequence, IElementType> KEYWORDS = ContainerUtil.newTroveMap();
+  private final static TLongObjectHashMap<IElementType> KEYWORDS = new TLongObjectHashMap<>();
+  private final static int MAX_KW_LEN = ContainerUtil.map(IonToken.KEYWORDS.getTypes(), it -> it.toString().length())
+          .stream().max(Integer::compareTo).get();
 
   static {
     for (IElementType token : IonToken.KEYWORDS.getTypes()) {
-      KEYWORDS.put(token.toString(), token);
+      String t = token.toString();
+      long hash = hash(t, 0, t.length());
+      if (KEYWORDS.get(hash) != null) {
+        throw new IllegalStateException("Keyword hash collision");
+      }
+      KEYWORDS.put(hash, token);
     }
   }
 
@@ -284,7 +290,7 @@ public class IonLexer extends LexerBase {
     myToken = token;
   }
 
-  private void consumeToken(@NotNull IElementType token1, char c, @NotNull IElementType token2) {
+  private void consumeToken(IElementType token1, char c, IElementType token2) {
     myTokenStart = myPosition;
     myPosition++;
     IElementType token;
@@ -298,7 +304,7 @@ public class IonLexer extends LexerBase {
     myToken = token;
   }
 
-  private void consumeToken(@NotNull IElementType token1, char c2, @NotNull IElementType token2, char c3, @NotNull IElementType token3) {
+  private void consumeToken(IElementType token1, char c2, IElementType token2, char c3, IElementType token3) {
     myTokenStart = myPosition;
     myPosition++;
     IElementType token;
@@ -328,7 +334,24 @@ public class IonLexer extends LexerBase {
     }
 
     myTokenEnd = myPosition;
-    myToken = KEYWORDS.getOrDefault(myBuffer.subSequence(myTokenStart, myTokenEnd).toString(), NAME);
+    myToken = keywordOrName(myBuffer, myTokenStart, myTokenEnd);
+  }
+
+  private static IElementType keywordOrName(CharSequence buf, int start, int end) {
+    if (end - start > MAX_KW_LEN) return NAME;
+    long hash = hash(buf, start, end);
+    IElementType keyword = KEYWORDS.get(hash);
+    return keyword != null ? keyword : NAME;
+  }
+
+  private static long hash(CharSequence buf, int start, int end) {
+    long x = 0xcbf29ce484222325L;
+    for (int i = start; i < end; i++) {
+      x ^= buf.charAt(i);
+      x *= 0x100000001b3L;
+      x ^= x >> 32;
+    }
+    return x;
   }
 
   private void consumeFloat() {
