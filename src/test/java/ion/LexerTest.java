@@ -21,7 +21,7 @@ public class LexerTest extends LexerTestCase {
       }
       assertEquals(10888, count);
     }
-    System.out.println(System.currentTimeMillis() - t0); //19747
+    System.out.println(System.currentTimeMillis() - t0); //17777
   }
 
   @Override

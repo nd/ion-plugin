@@ -1,10 +1,10 @@
 package ion;
 
 import com.intellij.lexer.LexerBase;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.ContainerUtil;
-import gnu.trove.TLongObjectHashMap;
 import ion.psi.IonToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,18 +12,26 @@ import org.jetbrains.annotations.Nullable;
 import static ion.psi.IonToken.*;
 
 public class IonLexer extends LexerBase {
-  private final static TLongObjectHashMap<IElementType> KEYWORDS = new TLongObjectHashMap<>();
+  private final static IntIntTable KWM = new IntIntTable(256);
+  private final static IElementType[] KW = new IElementType[IonToken.KEYWORDS.getTypes().length + 1];
   private final static int MAX_KW_LEN = ContainerUtil.map(IonToken.KEYWORDS.getTypes(), it -> it.toString().length())
           .stream().max(Integer::compareTo).get();
+  private final static char[] KWCHARS = new char[MAX_KW_LEN * (IonToken.KEYWORDS.getTypes().length + 1)];
 
   static {
+    byte i = 1;
     for (IElementType token : IonToken.KEYWORDS.getTypes()) {
       String t = token.toString();
-      long hash = hash(t, 0, t.length());
-      if (KEYWORDS.get(hash) != null) {
+      int hash = hash(t, 0, t.length());
+      if (KWM.get(hash) != 0) {
         throw new IllegalStateException("Keyword hash collision");
       }
-      KEYWORDS.put(hash, token);
+      KWM.put(hash, i);
+      KW[i] = token;
+      for (int j = i * MAX_KW_LEN, k = 0; k < t.length(); j++, k++) {
+        KWCHARS[j] = t.charAt(k);
+      }
+      i++;
     }
   }
 
@@ -218,9 +226,6 @@ public class IonLexer extends LexerBase {
   }
 
   private void scanGt() {
-    char c = myBuffer.charAt(myPosition);
-    assert c == '>';
-
     myTokenStart = myPosition;
     myPosition++;
     if (charAt(0) == '>') {
@@ -322,12 +327,9 @@ public class IonLexer extends LexerBase {
   }
 
   private void consumeName() {
-    char c = myBuffer.charAt(myPosition);
-    assert Character.isLetter(c) || c == '_';
-
     myTokenStart = myPosition;
     while (myPosition < myEndOffset) {
-      c = myBuffer.charAt(myPosition);
+      char c = myBuffer.charAt(myPosition);
       if (!Character.isLetterOrDigit(c) && c != '_')
         break;
       myPosition++;
@@ -339,19 +341,22 @@ public class IonLexer extends LexerBase {
 
   private static IElementType keywordOrName(CharSequence buf, int start, int end) {
     if (end - start > MAX_KW_LEN) return NAME;
-    long hash = hash(buf, start, end);
-    IElementType keyword = KEYWORDS.get(hash);
-    return keyword != null ? keyword : NAME;
+    int hash = hash(buf, start, end);
+    int index = KWM.get(hash);
+    return index != 0 && equals(buf, start, end, index) ? KW[index] : NAME;
   }
 
-  private static long hash(CharSequence buf, int start, int end) {
-    long x = 0xcbf29ce484222325L;
-    for (int i = start; i < end; i++) {
-      x ^= buf.charAt(i);
-      x *= 0x100000001b3L;
-      x ^= x >> 32;
+  private static boolean equals(CharSequence buf, int start, int end, int index) {
+    for (int i = start, j = index * MAX_KW_LEN; i < end; i++, j++) {
+      if (buf.charAt(i) != KWCHARS[j]) {
+        return false;
+      }
     }
-    return x;
+    return true;
+  }
+
+  private static int hash(CharSequence buf, int start, int end) {
+    return StringUtil.stringHashCode(buf, start, end);
   }
 
   private void consumeFloat() {
