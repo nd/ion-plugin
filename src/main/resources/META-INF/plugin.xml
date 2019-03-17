@@ -2,8 +2,19 @@
     <id>ion</id>
     <name>ion</name>
     <vendor email="dmitry.neverov@gmail.com">me</vendor>
+    <description><![CDATA[
+      <a href="https://github.com/pervognsen/bitwise">Ion</a> language support
+    ]]></description>
 
     <version>0.1</version>
+
+    <change-notes><![CDATA[
+    <ul>
+      <li>Ion Lexer</li>
+      <li>Debugger in CLion</li>
+    </ul>
+    ]]>
+    </change-notes>
 
     <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="debugger-only.xml">com.intellij.modules.clion</depends>
