@@ -1,0 +1,6 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="cidr.debugger">
+        <lineBreakpointFileTypesProvider implementation="ion.dbg.IonLineBreakpointFileTypesProvider"/>
+        <languageSupport language="ion" implementationClass="ion.dbg.IonDebuggerLanguageSupport"/>
+    </extensions>
+</idea-plugin>
