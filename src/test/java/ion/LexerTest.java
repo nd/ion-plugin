@@ -3,12 +3,13 @@ package ion;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.testFramework.LexerTestCase;
+import ion.IonLexer;
 
 import java.io.File;
 import java.io.IOException;
 
 public class LexerTest extends LexerTestCase {
-  public void testPerf() throws IOException {
+  private void testPerf() throws IOException {
     String text = new String(FileUtil.loadFileText(new File("/home/nd/p/bitwise/ion/test1/test1.ion")));
     Lexer lexer = createLexer();
     long t0 = System.currentTimeMillis();
