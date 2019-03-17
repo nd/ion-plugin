@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>ion</id>
     <name>ion</name>
-    <vendor>me</vendor>
+    <vendor email="dmitry.neverov@gmail.com">me</vendor>
 
     <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="debugger-only.xml">com.intellij.modules.clion</depends>
