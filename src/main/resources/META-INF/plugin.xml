@@ -3,6 +3,8 @@
     <name>ion</name>
     <vendor email="dmitry.neverov@gmail.com">me</vendor>
 
+    <version>0.1</version>
+
     <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="debugger-only.xml">com.intellij.modules.clion</depends>
 
