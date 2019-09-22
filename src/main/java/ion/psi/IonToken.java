@@ -131,6 +131,10 @@ public class IonToken extends IElementType {
           IonToken.NEG, IonToken.NOT, IonToken.INC, IonToken.DEC
   );
 
+  public final static TokenSet COMMENTS = TokenSet.create(BLOCK_COMMENT, LINE_COMMENT);
+
+  public final static TokenSet STRINGS = TokenSet.create(STRING, MULTILINE_STRING);
+
   private IonToken(@NotNull String debugName) {
     super(debugName, IonLanguage.INSTANCE);
   }
