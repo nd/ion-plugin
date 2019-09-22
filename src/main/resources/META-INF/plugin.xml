@@ -6,7 +6,9 @@
       <a href="https://github.com/pervognsen/bitwise">Ion</a> language support
     ]]></description>
 
-    <version>0.1</version>
+    <idea-version since-build="191.1"/>
+
+    <version>1</version>
 
     <change-notes><![CDATA[
     <ul>

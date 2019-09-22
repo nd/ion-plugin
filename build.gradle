@@ -9,4 +9,5 @@ apply plugin: 'java'
 intellij {
   version 'LATEST-EAP-SNAPSHOT'
   type 'CL'
+  updateSinceUntilBuild false
 }
