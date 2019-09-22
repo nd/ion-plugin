@@ -4,12 +4,36 @@ import com.intellij.lexer.Lexer;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.testFramework.LexerTestCase;
 import ion.IonLexer;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 
 public class LexerTest extends LexerTestCase {
-  private void testPerf() throws IOException {
+  public void testInts() {
+    doTest();
+  }
+
+  @Override
+  protected Lexer createLexer() {
+    return new IonLexer();
+  }
+
+  private void doTest() {
+    doFileTest("ion");
+  }
+
+  @NotNull
+  protected String getPathToTestDataFile(String extension) {
+    return getDirPath() + "/" + getTestName(true) + extension;
+  }
+
+  @Override
+  protected String getDirPath() {
+    return "src/test/data/lexer";
+  }
+
+  public void _testPerf() throws IOException {
     String text = new String(FileUtil.loadFileText(new File("/home/nd/p/bitwise/ion/test1/test1.ion")));
     Lexer lexer = createLexer();
     long t0 = System.currentTimeMillis();
@@ -23,15 +47,5 @@ public class LexerTest extends LexerTestCase {
       assertEquals(10010, count);
     }
     System.out.println(System.currentTimeMillis() - t0); //16887
-  }
-
-  @Override
-  protected Lexer createLexer() {
-    return new IonLexer();
-  }
-
-  @Override
-  protected String getDirPath() {
-    return null;
   }
 }

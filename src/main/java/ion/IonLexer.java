@@ -402,7 +402,8 @@ public class IonLexer extends LexerBase {
     assert Character.isDigit(c);
 
     myTokenStart = myPosition;
-    if (c == '0' && charAt(1) == 'x' || charAt(1) == 'b') {
+    int c1 = charAt(1);
+    if (c == '0' && (c1 == 'x' || c1 == 'X' || c1 == 'b' || c1 == 'B')) {
       myPosition += 2;
     }
     while (myPosition < myEndOffset) {
@@ -415,7 +416,7 @@ public class IonLexer extends LexerBase {
     loop:
     while (true) {
       switch (charAt(0)) {
-        case 'u': case 'l':
+        case 'u': case 'U': case 'l': case 'L':
           myPosition++;
           break;
         default:
