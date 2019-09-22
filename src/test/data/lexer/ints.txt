@@ -1,3 +1,5 @@
+int ('0')
+WHITE_SPACE ('\n')
 int ('123')
 WHITE_SPACE ('\n')
 int ('0xabcd')

@@ -402,17 +402,22 @@ public class IonLexer extends LexerBase {
     assert Character.isDigit(c);
 
     myTokenStart = myPosition;
-    int c1 = charAt(1);
-    if (c == '0' && (c1 == 'x' || c1 == 'X' || c1 == 'b' || c1 == 'B')) {
-      myPosition += 2;
+    if (c == '0') {
+      int c1 = charAt(1);
+      if (c1 == 'x' || c1 == 'X') {
+        myPosition += 2;
+        consumeHex();
+      }
+      else if (c1 == 'b' || c1 == 'B') {
+        myPosition += 2;
+        consumeBin();
+      } else {
+        myPosition++;
+        consumeOct();
+      }
+    } else {
+      consumeDec();
     }
-    while (myPosition < myEndOffset) {
-      c = myBuffer.charAt(myPosition);
-      if (c != '_' && !isDigit(c))
-        break;
-      myPosition++;
-    }
-
     loop:
     while (true) {
       switch (charAt(0)) {
@@ -428,9 +433,54 @@ public class IonLexer extends LexerBase {
     myToken = INT;
   }
 
-  private boolean isDigit(char c) {
+  private void consumeHex() {
+    while (myPosition < myEndOffset) {
+      char c = myBuffer.charAt(myPosition);
+      if (c != '_' && !isHex(c))
+        break;
+      myPosition++;
+    }
+  }
+
+  private void consumeDec() {
+    while (myPosition < myEndOffset) {
+      char c = myBuffer.charAt(myPosition);
+      if (c != '_' && !Character.isDigit(c))
+        break;
+      myPosition++;
+    }
+  }
+
+  private void consumeOct() {
+    while (myPosition < myEndOffset) {
+      char c = myBuffer.charAt(myPosition);
+      if (c != '_' && !isOctal(c))
+        break;
+      myPosition++;
+    }
+  }
+
+  private void consumeBin() {
+    while (myPosition < myEndOffset) {
+      char c = myBuffer.charAt(myPosition);
+      if (c != '_' && c != '0' && c != '1')
+        break;
+      myPosition++;
+    }
+  }
+
+  private static boolean isHex(char c) {
     return Character.isDigit(c) || c == 'A' || c == 'B' || c == 'C' || c == 'D' || c == 'E'|| c == 'F'
             || c == 'a' || c == 'b' || c == 'c' || c == 'd' || c == 'e'|| c == 'f';
+  }
+
+  private static boolean isOctal(char c) {
+    switch (c) {
+      case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7':
+        return true;
+      default:
+        return false;
+    }
   }
 
   private void consumeString() {

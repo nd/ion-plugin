@@ -14,6 +14,10 @@ public class LexerTest extends LexerTestCase {
     doTest();
   }
 
+  public void testFloats() {
+    doTest();
+  }
+
   @Override
   protected Lexer createLexer() {
     return new IonLexer();
