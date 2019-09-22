@@ -398,7 +398,7 @@ public class IonLexer extends LexerBase {
   }
 
   private void consumeInt() {
-    char c = myBuffer.charAt(myPosition);
+    int c = myBuffer.charAt(myPosition);
     assert Character.isDigit(c);
 
     myTokenStart = myPosition;
@@ -418,17 +418,18 @@ public class IonLexer extends LexerBase {
     } else {
       consumeDec();
     }
-    loop:
-    while (true) {
-      switch (charAt(0)) {
-        case 'u': case 'U': case 'l': case 'L':
-          myPosition++;
-          break;
-        default:
-          break loop;
-      }
+    c = charAt(0);
+    if (c == 'u' || c == 'U') {
+      myPosition++;
     }
-
+    c = charAt(0);
+    if (c == 'l' || c == 'L') {
+      myPosition++;
+    }
+    c = charAt(0);
+    if (c == 'l' || c == 'L') {
+      myPosition++;
+    }
     myTokenEnd = myPosition;
     myToken = INT;
   }
