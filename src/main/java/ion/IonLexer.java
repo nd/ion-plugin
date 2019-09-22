@@ -63,12 +63,8 @@ public class IonLexer extends LexerBase {
     char c = myBuffer.charAt(myPosition);
 
     switch (c) {
-      case ' ': case '\t':
+      case ' ': case '\t': case '\n': case '\r':
         consumeWhitespace();
-        break;
-
-      case '\n': case '\r':
-        consumeNewline();
         break;
 
       case '\'':
@@ -516,26 +512,8 @@ public class IonLexer extends LexerBase {
     myToken = TokenType.WHITE_SPACE;
   }
 
-  private void consumeNewline() {
-    char c = myBuffer.charAt(myPosition);
-    assert isNewline(c);
-    myTokenStart = myPosition;
-    while (myPosition < myEndOffset) {
-      c = myBuffer.charAt(myPosition);
-      if (!isNewline(c))
-        break;
-      myPosition++;
-    }
-    myTokenEnd = myPosition;
-    myToken = NL;
-  }
-
   private static boolean isWhitespace(char c) {
-    return c == ' ' || c == '\t';
-  }
-
-  private static boolean isNewline(char c) {
-    return c == '\n' || c == '\r';
+    return c == ' ' || c == '\t' || c == '\n' || c == '\r';
   }
 
   @Override

@@ -6,7 +6,6 @@ import ion.IonLanguage;
 import org.jetbrains.annotations.NotNull;
 
 public class IonToken extends IElementType {
-  public static IonToken NL = new IonToken("NEWLINE");
   public static IonToken LINE_COMMENT = new IonToken("line_comment");
   public static IonToken BLOCK_COMMENT = new IonToken("block_comment");
   public static IonToken COLON = new IonToken(":");
