@@ -9,12 +9,28 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 
-public class LexerTest extends LexerTestCase {
+public class IonLexerTest extends LexerTestCase {
   public void testInts() {
     doTest();
   }
 
   public void testFloats() {
+    doTest();
+  }
+
+  public void testStrings() {
+    doTest();
+  }
+
+  public void testChars() {
+    doTest();
+  }
+
+  public void testExpressions() {
+    doTest();
+  }
+
+  public void testKeywords() {
     doTest();
   }
 
