@@ -1,0 +1,5 @@
+line_comment ('// line')
+WHITE_SPACE ('\n\n')
+block_comment ('/* block\ncomment\n*/')
+WHITE_SPACE ('\n\n')
+block_comment ('/* This is a /* nested */ block comment */')

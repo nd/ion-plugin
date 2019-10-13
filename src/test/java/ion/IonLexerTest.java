@@ -34,6 +34,10 @@ public class IonLexerTest extends LexerTestCase {
     doTest();
   }
 
+  public void testComments() {
+    doTest();
+  }
+
   @Override
   protected Lexer createLexer() {
     return new IonLexer();
