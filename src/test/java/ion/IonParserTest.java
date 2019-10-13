@@ -13,6 +13,14 @@ public class IonParserTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testVars() {
+    doTest();
+  }
+
+  public void testExpressions() {
+    doTest();
+  }
+
   private void doTest() {
     doTest(true);
   }

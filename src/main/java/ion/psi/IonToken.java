@@ -130,6 +130,25 @@ public class IonToken extends IElementType {
           IonToken.NEG, IonToken.NOT, IonToken.INC, IonToken.DEC
   );
 
+  public final static TokenSet UNARY_OP = TokenSet.create(
+          IonToken.ADD, IonToken.SUB, IonToken.MUL, IonToken.AND,
+          IonToken.NEG, IonToken.NOT, IonToken.INC, IonToken.DEC
+  );
+
+  public final static TokenSet MUL_OP = TokenSet.create(
+          IonToken.MUL, IonToken.DIV, IonToken.MOD, IonToken.AND,
+          IonToken.LSHIFT, IonToken.RSHIFT
+  );
+
+  public final static TokenSet ADD_OP = TokenSet.create(
+          IonToken.ADD, IonToken.SUB, IonToken.OR, IonToken.XOR
+  );
+
+  public final static TokenSet CMP_OP = TokenSet.create(
+          IonToken.LT, IonToken.LTEQ, IonToken.GT, IonToken.GTEQ,
+          IonToken.EQ, IonToken.NOTEQ
+  );
+
   public final static TokenSet COMMENTS = TokenSet.create(BLOCK_COMMENT, LINE_COMMENT);
 
   public final static TokenSet STRINGS = TokenSet.create(STRING, MULTILINE_STRING);

@@ -1,0 +1,11 @@
+IonFile
+  IonPsiElement(var)
+    PsiElement(var)('var')
+    PsiWhiteSpace(' ')
+    PsiElement(name)('a')
+    PsiWhiteSpace(' ')
+    PsiElement(=)('=')
+    PsiWhiteSpace(' ')
+    IonPsiElement(expr_literal_int)
+      PsiElement(int)('1')
+    PsiElement(;)(';')
