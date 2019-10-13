@@ -9,7 +9,7 @@ public class IonParserTest extends ParsingTestCase {
     super("parser", "ion", new IonParserDefinition());
   }
 
-  public void testImport() {
+  public void testImports() {
     doTest();
   }
 
