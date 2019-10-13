@@ -1,0 +1,7 @@
+import libc
+import libc {}
+import libc {...}
+import libc {printf}
+import libc {printf, fopen, fclose}
+import libc {p = printf, open = fopen}
+import C=libc

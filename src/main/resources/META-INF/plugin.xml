@@ -24,5 +24,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="ion.IonFileType$Factory"/>
         <lang.syntaxHighlighterFactory language="ion" implementationClass="ion.IonSyntaxHighlighter$Factory"/>
+        <lang.parserDefinition language="ion" implementationClass="ion.IonParserDefinition"/>
     </extensions>
 </idea-plugin>

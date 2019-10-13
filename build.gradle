@@ -7,7 +7,7 @@ apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
  
 intellij {
-  version 'LATEST-EAP-SNAPSHOT'
+  version 'CL-2019.2.4'
   type 'CL'
   updateSinceUntilBuild false
 }
