@@ -5,3 +5,7 @@ import libc {printf}
 import libc {printf, fopen, fclose}
 import libc {p = printf, open = fopen}
 import C=libc
+import pkg1.pkg2
+import p=pkg1.pkg2
+import .relative.pkg
+import p=.relative.pkg

@@ -35,8 +35,13 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == IMPORT;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
+    consume(b, DOT);
     if (expect(b, NAME)) {
       if (consume(b, ASSIGN)) {
+        consume(b, DOT);
+        expect(b, NAME);
+      }
+      while (consume(b, DOT)) {
         expect(b, NAME);
       }
       if (consume(b, LBRACE)) {
