@@ -75,7 +75,12 @@ public class IonParser implements PsiParser {
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
     if (expect(b, NAME)) {
-      //todo type
+      if (consume(b, COLON)) {
+        if (!parseType(b)) {
+          b.error("Exprected type, got " + b.getTokenText());
+          b.advanceLexer();
+        }
+      }
       if (consume(b, ASSIGN)) {
         if (!parseExpr(b)) {
           b.error("Exprected expression, got " + b.getTokenText());
@@ -258,7 +263,9 @@ public class IonParser implements PsiParser {
     }
     if (consume(b, NAME)) {
       if (match(b, LBRACE)) {
-        //todo parse compound literal
+        parseExprCompound(b);
+        m.done(EXPR_LITERAL_COMPOUND_TYPED);
+        return true;
       } else {
         m.done(EXPR_NAME);
         return true;
@@ -279,20 +286,203 @@ public class IonParser implements PsiParser {
       m.done(EXPR_NEW);
       return true;
     }
-    // todo next sizeof
-    // todo alignof
-    // todo typeof
-    // todo offsetof
-    // todo lbrace - compound without type
+    if (consume(b, SIZEOF)) {
+      if (expect(b, LPAREN)) {
+        if (consume(b, COLON)) {
+          parseType(b);
+        } else {
+          parseExpr(b);
+        }
+        expect(b, RPAREN);
+      }
+      m.done(EXPR_CALL);
+      return true;
+    }
+    if (consume(b, ALIGNOF)) {
+      if (expect(b, LPAREN)) {
+        if (consume(b, COLON)) {
+          parseType(b);
+        } else {
+          parseExpr(b);
+        }
+        expect(b, RPAREN);
+      }
+      m.done(EXPR_CALL);
+      return true;
+    }
+    if (consume(b, TYPEOF)) {
+      if (expect(b, LPAREN)) {
+        if (consume(b, COLON)) {
+          parseType(b);
+        } else {
+          parseExpr(b);
+        }
+        expect(b, RPAREN);
+      }
+      m.done(EXPR_CALL);
+      return true;
+    }
+    if (consume(b, OFFSETOF)) {
+      if (expect(b, LPAREN)) {
+        parseType(b);
+        expect(b, COMMA);
+        expect(b, NAME);
+        expect(b, RPAREN);
+      }
+      m.done(EXPR_CALL);
+      return true;
+    }
+    if (match(b, LBRACE)) {
+      parseExprCompound(b);
+    }
     if (consume(b, LPAREN)) {
-      // todo colon - case
+      if (consume(b, COLON)) {
+        parseType(b);
+        expect(b, RPAREN);
+        if (match(b, LBRACE)) {
+          parseExprCompound(b);
+        } else {
+          parseExprUnary(b);
+        }
+        m.done(EXPR_CAST);
+        return true;
+      } else {
+        parseExpr(b);
+        expect(b, RPAREN);
+        m.done(EXPR_PAREN);
+        return true;
+      }
+    }
+    m.drop();
+    return false;
+  }
+
+  private boolean parseExprCompound(@NotNull PsiBuilder b) {
+    PsiBuilder.Marker m = b.mark();
+    expect(b, LBRACE);
+    if (!consume(b, RBRACE)) {
+      parseExprCompoundField(b);
+      while (consume(b, COMMA)) {
+        parseExprCompoundField(b);
+      }
+      expect(b, RBRACE);
+    }
+    m.done(EXPR_LITERAL_COMPOUND);
+    return true;
+  }
+
+  private boolean parseExprCompoundField(@NotNull PsiBuilder b) {
+    PsiBuilder.Marker m = b.mark();
+    if (consume(b, LBRACKET)) {
       parseExpr(b);
+      expect(b, RBRACKET);
+      expect(b, ASSIGN);
+      parseExpr(b);
+      m.done(COMPOUND_FIELD_INDEX);
+      return true;
+    } else {
+      if (match(b, NAME) && lookAhead(b, 1, ASSIGN)) {
+        b.advanceLexer();
+        b.advanceLexer();
+        parseExpr(b);
+        m.done(COMPOUND_FIELD_NAMED);
+        return true;
+      } else {
+        parseExpr(b);
+        m.done(COMPOUND_FIELD);
+        return true;
+      }
+    }
+  }
+
+  private boolean parseType(@NotNull PsiBuilder b) {
+    PsiBuilder.Marker m = b.mark();
+    if (!parseTypeBase(b)) {
+      m.drop();
+      return false;
+    }
+    while (match(b, LBRACKET, CONST, MUL)) {
+      if (consume(b, LBRACKET)) {
+        PsiBuilder.Marker outer = m.precede();
+        if (!match(b, RBRACKET)) {
+          parseExpr(b);
+        }
+        expect(b, RBRACKET);
+        m.done(TYPE_ARRAY);
+        m = outer;
+      } else if (consume(b, CONST)) {
+        PsiBuilder.Marker outer = m.precede();
+        m.done(TYPE_CONST);
+        m = outer;
+
+      } else if (consume(b, MUL)) {
+        PsiBuilder.Marker outer = m.precede();
+        m.done(TYPE_PTR);
+        m = outer;
+      }
+    }
+    m.drop();
+    return true;
+  }
+
+  private boolean parseTypeBase(@NotNull PsiBuilder b) {
+    PsiBuilder.Marker m = b.mark();
+    if (consume(b, NAME)) {
+      while (consume(b, DOT)) {
+        expect(b, NAME);
+      }
+      m.done(TYPE);
+      return true;
+    }
+    if (consume(b, FUNC)) {
+      if (expect(b, LPAREN)) {
+        if (!consume(b, RPAREN)) {
+          parseTypeFuncParam(b);
+          while (consume(b, COMMA)) {
+            parseTypeFuncParam(b);
+          }
+          expect(b, RPAREN);
+        }
+        if (consume(b, COLON)) {
+          parseType(b);
+        }
+      }
+      m.done(TYPE_FUNC);
+      return true;
+    }
+    if (consume(b, LPAREN)) {
+      parseType(b);
       expect(b, RPAREN);
-      m.done(EXPR_PAREN);
+      m.done(TYPE);
+      return true;
+    }
+    if (consume(b, LBRACE)) {
+      if (parseType(b)) {
+        while (consume(b, COMMA)) {
+          parseType(b);
+        }
+      }
+      expect(b, RBRACE);
+      m.done(TYPE_TUPLE);
       return true;
     }
     m.drop();
     return false;
+  }
+
+  private boolean parseTypeFuncParam(@NotNull PsiBuilder b) {
+    PsiBuilder.Marker m = b.mark();
+    if (consume(b, ELLIPSIS)) {
+      m.done(TYPE_FUNC_PARAM);
+      return true;
+    }
+    if (match(b, NAME) && lookAhead(b, 1, COLON)) {
+      b.advanceLexer();
+      b.advanceLexer();
+    }
+    parseType(b);
+    m.done(TYPE_FUNC_PARAM);
+    return true;
   }
 
   private boolean expect(@NotNull PsiBuilder b, @NotNull IElementType token) {
@@ -316,6 +506,16 @@ public class IonParser implements PsiParser {
 
   private boolean match(@NotNull PsiBuilder b, @NotNull IElementType... tokens) {
     IElementType actual = b.getTokenType();
+    for (IElementType token : tokens) {
+      if (token == actual) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean lookAhead(@NotNull PsiBuilder b, int n, @NotNull IElementType... tokens) {
+    IElementType actual = b.lookAhead(n);
     for (IElementType token : tokens) {
       if (token == actual) {
         return true;

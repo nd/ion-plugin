@@ -1,0 +1,14 @@
+var a: int;
+var a: p1.p2.type;
+var a: (p.type);
+var a: int*;
+var a: int const;
+var a: int[];
+var a: int[1<<20];
+var a: {int, int};
+var a: func();
+var a: func(): int*;
+var a: func(int): int;
+var a: func(x: int): int;
+var a: func(int, int);
+var a: func(int, ...): int;
