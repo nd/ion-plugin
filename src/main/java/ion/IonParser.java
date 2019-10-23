@@ -31,6 +31,8 @@ public class IonParser implements PsiParser {
         parseConst(b);
       } else if (token == VAR) {
         parseVar(b);
+      } else if (token == TYPEDEF) {
+        parseTypedef(b);
       } else if (token == SEMICOLON) {
         b.advanceLexer();
       } else {
@@ -204,6 +206,19 @@ public class IonParser implements PsiParser {
       expect(b, SEMICOLON);
     }
     m.done(DECL_VAR);
+  }
+
+  private void parseTypedef(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == TYPEDEF;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    expect(b, NAME);
+    expect(b, ASSIGN);
+    if (!parseType(b)) {
+      b.error("Exprected type, got " + b.getTokenText());
+    }
+    expect(b, SEMICOLON);
+    m.done(DECL_TYPEDEF);
   }
 
   private boolean parseExpr(@NotNull PsiBuilder b) {

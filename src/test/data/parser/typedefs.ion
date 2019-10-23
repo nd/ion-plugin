@@ -1,0 +1,2 @@
+typedef T = int;
+typedef F = func(f: func(int, int): int): int;
