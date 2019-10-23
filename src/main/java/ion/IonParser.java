@@ -56,7 +56,7 @@ public class IonParser implements PsiParser {
         expect(b, RBRACE);
       }
     }
-    m.done(IMPORT_DECL);
+    m.done(DECL_IMPORT);
     return;
   }
 
@@ -91,7 +91,7 @@ public class IonParser implements PsiParser {
       }
       expect(b, SEMICOLON);
     }
-    m.done(CONST_DECL);
+    m.done(DECL_CONST);
   }
 
   private void parseVar(@NotNull PsiBuilder b) {
@@ -113,7 +113,7 @@ public class IonParser implements PsiParser {
       }
       expect(b, SEMICOLON);
     }
-    m.done(VAR_DECL);
+    m.done(DECL_VAR);
   }
 
   private boolean parseExpr(@NotNull PsiBuilder b) {
