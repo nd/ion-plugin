@@ -33,6 +33,8 @@ public class IonParser implements PsiParser {
         parseVar(b);
       } else if (token == TYPEDEF) {
         parseTypedef(b);
+      } else if (token == FUNC) {
+        parseFunc(b);
       } else if (token == SEMICOLON) {
         b.advanceLexer();
       } else {
@@ -219,6 +221,50 @@ public class IonParser implements PsiParser {
     }
     expect(b, SEMICOLON);
     m.done(DECL_TYPEDEF);
+  }
+
+  private void parseFunc(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == FUNC;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    expect(b, NAME);
+    if (expect(b, LPAREN)) {
+      while (!match(b, RPAREN)) {
+        parseFuncParam(b);
+        if (!consume(b, COMMA) && !match(b, RPAREN)) {
+          b.error("Expected ',', or ')', got " + b.getTokenText());
+          b.advanceLexer();
+        }
+      }
+      expect(b, RPAREN);
+    }
+    if (consume(b, COLON)) {
+      if (!parseType(b)) {
+        b.error("Expected type, got " + b.getTokenText());
+      }
+    }
+    if (!consume(b, SEMICOLON)) {
+      if (expect(b, LBRACE)) {
+        // todo parse body
+        expect(b, RBRACE);
+      }
+    }
+    m.done(DECL_FUNC);
+  }
+
+  private void parseFuncParam(@NotNull PsiBuilder b) {
+    boolean name = match(b, NAME);
+    if (name || match(b, ELLIPSIS)) {
+      PsiBuilder.Marker m = b.mark();
+      b.advanceLexer();
+      if (name) {
+        expect(b, COLON);
+        if (!parseType(b)) {
+          b.error("Expected type, got " + b.getTokenText());
+        }
+      }
+      m.done(DECL_FUNC_PARAM);
+    }
   }
 
   private boolean parseExpr(@NotNull PsiBuilder b) {

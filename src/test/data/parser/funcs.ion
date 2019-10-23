@@ -1,0 +1,5 @@
+func x();
+func x(): int;
+func x(x: int);
+func x(x: int, ...);
+func x() {}

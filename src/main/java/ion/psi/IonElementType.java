@@ -17,6 +17,8 @@ public class IonElementType extends IElementType {
   public static final IonElementType DECL_FIELD = new IonElementType("field");
   public static final IonElementType DECL_IMPORT = new IonElementType("import");
   public static final IonElementType DECL_TYPEDEF = new IonElementType("typedef");
+  public static final IonElementType DECL_FUNC = new IonElementType("func");
+  public static final IonElementType DECL_FUNC_PARAM = new IonElementType("param");
   public static final IonElementType IMPORT_ITEM = new IonElementType("import_item");
   public static final IonElementType EXPR_LITERAL_INT = new IonElementType("expr_literal_int");
   public static final IonElementType EXPR_LITERAL_FLOAT = new IonElementType("expr_literal_float");
