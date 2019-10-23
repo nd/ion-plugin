@@ -23,6 +23,8 @@ public class IonParser implements PsiParser {
     while ((token = b.getTokenType()) != null) {
       if (token == IMPORT) {
         parseImport(b);
+      } else if (token == CONST) {
+        parseConst(b);
       } else if (token == VAR) {
         parseVar(b);
       } else {
@@ -68,6 +70,28 @@ public class IonParser implements PsiParser {
       expect(b, ELLIPSIS);
     }
     m.done(IMPORT_ITEM);
+  }
+
+  private void parseConst(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == CONST;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    if (expect(b, NAME)) {
+      if (consume(b, COLON)) {
+        if (!parseType(b)) {
+          b.error("Exprected type, got " + b.getTokenText());
+          b.advanceLexer();
+        }
+      }
+      if (consume(b, ASSIGN)) {
+        if (!parseExpr(b)) {
+          b.error("Exprected expression, got " + b.getTokenText());
+          b.advanceLexer();
+        }
+      }
+      expect(b, SEMICOLON);
+    }
+    m.done(CONST_DECL);
   }
 
   private void parseVar(@NotNull PsiBuilder b) {
