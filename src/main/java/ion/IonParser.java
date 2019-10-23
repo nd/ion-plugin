@@ -35,8 +35,8 @@ public class IonParser implements PsiParser {
         parseTypedef(b);
       } else if (token == FUNC) {
         parseFunc(b);
-      } else if (token == SEMICOLON) {
-        b.advanceLexer();
+      } else if (token == AT || token == POUND) {
+        parseNote(b);
       } else {
         b.error("Exprected declaration or note, got " + b.getTokenText());
         b.advanceLexer();
@@ -265,6 +265,43 @@ public class IonParser implements PsiParser {
       }
       m.done(DECL_FUNC_PARAM);
     }
+  }
+
+  private void parseNote(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == AT || b.getTokenType() == POUND;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    expect(b, NAME);
+    if (consume(b, LPAREN)) {
+      if (!match(b, RPAREN)) {
+        do {
+          if (!parseNoteParam(b)) {
+            b.error("Expected note parameter, got " + b.getTokenText());
+          }
+        } while (consume(b, COMMA));
+      }
+      expect(b, RPAREN);
+    }
+    m.done(NOTE);
+  }
+
+  private boolean parseNoteParam(@NotNull PsiBuilder b) {
+    PsiBuilder.Marker m = b.mark();
+    if (match(b, NAME) && lookAhead(b, 1, ASSIGN)) {
+      b.advanceLexer();
+      b.advanceLexer();
+      if (!parseExpr(b)) {
+        b.error("Expected expression, got " + b.getTokenText());
+      }
+      m.done(NOTE_PARAM);
+      return true;
+    }
+    if (parseExpr(b)) {
+      m.done(NOTE_PARAM);
+      return true;
+    }
+    m.rollbackTo();
+    return false;
   }
 
   private boolean parseExpr(@NotNull PsiBuilder b) {

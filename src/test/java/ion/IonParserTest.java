@@ -45,6 +45,10 @@ public class IonParserTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testNotes() {
+    doTest();
+  }
+
   private void doTest() {
     doTest(true);
   }

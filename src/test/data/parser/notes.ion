@@ -1,0 +1,4 @@
+@foreign
+@foreign()
+@x(a=1, 42)
+#assert(0)
