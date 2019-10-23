@@ -1,0 +1,13 @@
+enum E {}
+enum Color {
+	RED, GREEN, BLUE,
+}
+enum {
+	FOO, BAR,
+}
+enum E = int8 {
+	FOO, BAR
+}
+enum E = int8 {
+	A = 1, B = 3
+}

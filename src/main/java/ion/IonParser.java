@@ -21,7 +21,9 @@ public class IonParser implements PsiParser {
   private void parseFile(@NotNull PsiBuilder b) {
     IElementType token;
     while ((token = b.getTokenType()) != null) {
-      if (token == IMPORT) {
+      if (token == ENUM) {
+        parseEnum(b);
+      } else if (token == IMPORT) {
         parseImport(b);
       } else if (token == CONST) {
         parseConst(b);
@@ -30,6 +32,43 @@ public class IonParser implements PsiParser {
       } else {
         b.advanceLexer();
       }
+    }
+  }
+
+  private void parseEnum(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == ENUM;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    consume(b, NAME);
+    if (consume(b, ASSIGN)) {
+      if (!parseType(b)) {
+        b.error("Exprected type, got " + b.getTokenText());
+        b.advanceLexer();
+      }
+    }
+    if (expect(b, LBRACE)) {
+      while (!match(b, RBRACE)) {
+        parseEnumItem(b);
+        if (!consume(b, COMMA) && !match(b, RBRACE) && !match(b, NAME)) {
+          b.error("Exprected ',', '}', or name, got " + b.getTokenText());
+          b.advanceLexer();
+        }
+      }
+      expect(b, RBRACE);
+    }
+    m.done(DECL_ENUM);
+  }
+
+  private void parseEnumItem(@NotNull PsiBuilder b) {
+    if (match(b, NAME)) {
+      PsiBuilder.Marker m = b.mark();
+      b.advanceLexer();
+      if (consume(b, ASSIGN)) {
+        if (!parseExpr(b)) {
+          b.error("Exprected expression, got " + b.getTokenText());
+        }
+      }
+      m.done(ENUM_ITEM);
     }
   }
 

@@ -29,6 +29,10 @@ public class IonParserTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testEnums() {
+    doTest();
+  }
+
   private void doTest() {
     doTest(true);
   }

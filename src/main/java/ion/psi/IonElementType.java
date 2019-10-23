@@ -11,6 +11,8 @@ import org.jetbrains.annotations.Nullable;
 public class IonElementType extends IElementType {
   public static final IonElementType DECL_CONST = new IonElementType("const");
   public static final IonElementType DECL_VAR = new IonElementType("var");
+  public static final IonElementType DECL_ENUM = new IonElementType("enum");
+  public static final IonElementType ENUM_ITEM = new IonElementType("enum_item");
   public static final IonElementType DECL_IMPORT = new IonElementType("import");
   public static final IonElementType IMPORT_ITEM = new IonElementType("import_item");
   public static final IonElementType EXPR_LITERAL_INT = new IonElementType("expr_literal_int");
