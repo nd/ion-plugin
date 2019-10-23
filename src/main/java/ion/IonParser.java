@@ -23,13 +23,18 @@ public class IonParser implements PsiParser {
     while ((token = b.getTokenType()) != null) {
       if (token == ENUM) {
         parseEnum(b);
+      } else if (token == STRUCT || token == UNION) {
+        parseAggregateDecl(b);
       } else if (token == IMPORT) {
         parseImport(b);
       } else if (token == CONST) {
         parseConst(b);
       } else if (token == VAR) {
         parseVar(b);
+      } else if (token == SEMICOLON) {
+        b.advanceLexer();
       } else {
+        b.error("Exprected declaration or note, got " + b.getTokenText());
         b.advanceLexer();
       }
     }
@@ -69,6 +74,52 @@ public class IonParser implements PsiParser {
         }
       }
       m.done(ENUM_ITEM);
+    }
+  }
+
+  private void parseAggregateDecl(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == STRUCT || b.getTokenType() == UNION;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    consume(b, NAME);
+    if (!consume(b, SEMICOLON)) {
+      parseAggregate(b);
+    }
+    m.done(DECL_AGGREGATE);
+  }
+
+  private void parseAggregate(@NotNull PsiBuilder b) {
+    if (expect(b, LBRACE)) {
+      while (!match(b, RBRACE)) {
+        parseAggregateItem(b);
+        if (!match(b, RBRACE) && !match(b, NAME) && !match(b, STRUCT) && !match(b, UNION)) {
+          b.error("Exprected '}', or aggregate item, got " + b.getTokenText());
+          b.advanceLexer();
+        }
+      }
+      expect(b, RBRACE);
+    }
+  }
+
+  private void parseAggregateItem(@NotNull PsiBuilder b) {
+    if (match(b, STRUCT) || match(b, UNION)) {
+      PsiBuilder.Marker m = b.mark();
+      b.advanceLexer();
+      parseAggregate(b);
+      m.done(DECL_FIELD);
+    }
+    if (match(b, NAME)) {
+      PsiBuilder.Marker m = b.mark();
+      consume(b, NAME);
+      while (consume(b, COMMA)) {
+        expect(b, NAME);
+      }
+      expect(b, COLON);
+      if (!parseType(b)) {
+        b.error("Exprected type, got " + b.getTokenText());
+      }
+      expect(b, SEMICOLON);
+      m.done(DECL_FIELD);
     }
   }
 

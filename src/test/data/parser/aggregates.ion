@@ -1,0 +1,20 @@
+struct S;
+struct S {}
+struct S {
+	a: int;
+	b, c: int;
+}
+union IntOrPtr {
+    i: int;
+    p: int*;
+}
+struct Token {
+    kind: TokenKind;
+    union {
+        struct {
+            val: llong;
+            mod: uint16;
+        }
+        str: char const*;
+    }
+}
