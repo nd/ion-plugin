@@ -8,3 +8,7 @@ func x() {
   if (x) {} else if (y) {}
   if (x) {} else if (y) {} else if (z) {} else {}
 }
+
+func x() {
+  while (x) {}
+}

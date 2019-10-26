@@ -52,6 +52,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType STMT_IF = new IonElementType("if");
   public static final IonElementType STMT_ELSE = new IonElementType("else");
   public static final IonElementType STMT_INIT = new IonElementType("init");
+  public static final IonElementType STMT_WHILE = new IonElementType("while");
 
   public IonElementType(@NotNull String debugName) {
     super(debugName, IonLanguage.INSTANCE);

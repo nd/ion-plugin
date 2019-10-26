@@ -278,6 +278,10 @@ public class IonParser implements PsiParser {
       parseStmtIf(b);
       return true;
     }
+    if (b.getTokenType() == WHILE) {
+      parseStmtWhile(b);
+      return true;
+    }
     return false;
   }
 
@@ -347,6 +351,17 @@ public class IonParser implements PsiParser {
       }
     }
     return false;
+  }
+
+  private void parseStmtWhile(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == WHILE;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    expect(b, LPAREN);
+    expectExpr(b);
+    expect(b, RPAREN);
+    parseStmtBlock(b);
+    m.done(STMT_WHILE);
   }
 
   private void parseNote(@NotNull PsiBuilder b) {
