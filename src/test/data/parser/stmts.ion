@@ -12,3 +12,7 @@ func x() {
 func x() {
   while (x) {}
 }
+
+func x() {
+  do {} while (x);
+}

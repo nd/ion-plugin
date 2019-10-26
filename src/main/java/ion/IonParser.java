@@ -282,6 +282,10 @@ public class IonParser implements PsiParser {
       parseStmtWhile(b);
       return true;
     }
+    if (b.getTokenType() == DO) {
+      parseStmtDo(b);
+      return true;
+    }
     return false;
   }
 
@@ -362,6 +366,19 @@ public class IonParser implements PsiParser {
     expect(b, RPAREN);
     parseStmtBlock(b);
     m.done(STMT_WHILE);
+  }
+
+  private void parseStmtDo(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == DO;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    parseStmtBlock(b);
+    expect(b, WHILE);
+    expect(b, LPAREN);
+    expectExpr(b);
+    expect(b, RPAREN);
+    expect(b, SEMICOLON);
+    m.done(STMT_DO);
   }
 
   private void parseNote(@NotNull PsiBuilder b) {
