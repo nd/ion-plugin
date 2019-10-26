@@ -59,4 +59,6 @@ IonFile
     PsiElement())(')')
     PsiWhiteSpace(' ')
     PsiElement({)('{')
+    IonPsiElement(stmt_list)
+      <empty list>
     PsiElement(})('}')

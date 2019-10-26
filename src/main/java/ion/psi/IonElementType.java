@@ -48,6 +48,10 @@ public class IonElementType extends IElementType {
   public static final IonElementType TYPE_TUPLE = new IonElementType("type_tuple");
   public static final IonElementType TYPE_FUNC = new IonElementType("type_func");
   public static final IonElementType TYPE_FUNC_PARAM = new IonElementType("type_func_param");
+  public static final IonElementType STMT_LIST = new IonElementType("stmt_list");
+  public static final IonElementType STMT_IF = new IonElementType("if");
+  public static final IonElementType STMT_ELSE = new IonElementType("else");
+  public static final IonElementType STMT_INIT = new IonElementType("init");
 
   public IonElementType(@NotNull String debugName) {
     super(debugName, IonLanguage.INSTANCE);

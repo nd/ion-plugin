@@ -1,0 +1,10 @@
+func x() {
+  if (true) {}
+  if (x := 1) {} // strange
+  if (x := 1; x > 0) {}
+  if (x: int = 1) {} // strange
+  if (x: int = 1; x > 0) {}
+  if (x) {} else {}
+  if (x) {} else if (y) {}
+  if (x) {} else if (y) {} else if (z) {} else {}
+}

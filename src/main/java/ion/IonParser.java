@@ -3,8 +3,14 @@ package ion;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.util.containers.ContainerUtil;
+import ion.psi.IonToken;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static ion.psi.IonElementType.*;
 import static ion.psi.IonToken.*;
@@ -50,8 +56,7 @@ public class IonParser implements PsiParser {
     b.advanceLexer();
     consume(b, NAME);
     if (consume(b, ASSIGN)) {
-      if (!parseType(b)) {
-        b.error("Exprected type, got " + b.getTokenText());
+      if (!expectType(b)) {
         b.advanceLexer();
       }
     }
@@ -73,9 +78,7 @@ public class IonParser implements PsiParser {
       PsiBuilder.Marker m = b.mark();
       b.advanceLexer();
       if (consume(b, ASSIGN)) {
-        if (!parseExpr(b)) {
-          b.error("Exprected expression, got " + b.getTokenText());
-        }
+        expectExpr(b);
       }
       m.done(ENUM_ITEM);
     }
@@ -119,9 +122,7 @@ public class IonParser implements PsiParser {
         expect(b, NAME);
       }
       expect(b, COLON);
-      if (!parseType(b)) {
-        b.error("Exprected type, got " + b.getTokenText());
-      }
+      expectType(b);
       expect(b, SEMICOLON);
       m.done(DECL_FIELD);
     }
@@ -172,14 +173,12 @@ public class IonParser implements PsiParser {
     b.advanceLexer();
     if (expect(b, NAME)) {
       if (consume(b, COLON)) {
-        if (!parseType(b)) {
-          b.error("Exprected type, got " + b.getTokenText());
+        if (!expectType(b)) {
           b.advanceLexer();
         }
       }
       if (consume(b, ASSIGN)) {
-        if (!parseExpr(b)) {
-          b.error("Exprected expression, got " + b.getTokenText());
+        if (!expectExpr(b)) {
           b.advanceLexer();
         }
       }
@@ -194,14 +193,12 @@ public class IonParser implements PsiParser {
     b.advanceLexer();
     if (expect(b, NAME)) {
       if (consume(b, COLON)) {
-        if (!parseType(b)) {
-          b.error("Exprected type, got " + b.getTokenText());
+        if (!expectType(b)) {
           b.advanceLexer();
         }
       }
       if (consume(b, ASSIGN)) {
-        if (!parseExpr(b)) {
-          b.error("Exprected expression, got " + b.getTokenText());
+        if (!expectExpr(b)) {
           b.advanceLexer();
         }
       }
@@ -216,9 +213,7 @@ public class IonParser implements PsiParser {
     b.advanceLexer();
     expect(b, NAME);
     expect(b, ASSIGN);
-    if (!parseType(b)) {
-      b.error("Exprected type, got " + b.getTokenText());
-    }
+    expectType(b);
     expect(b, SEMICOLON);
     m.done(DECL_TYPEDEF);
   }
@@ -239,15 +234,10 @@ public class IonParser implements PsiParser {
       expect(b, RPAREN);
     }
     if (consume(b, COLON)) {
-      if (!parseType(b)) {
-        b.error("Expected type, got " + b.getTokenText());
-      }
+      expectType(b);
     }
     if (!consume(b, SEMICOLON)) {
-      if (expect(b, LBRACE)) {
-        // todo parse body
-        expect(b, RBRACE);
-      }
+      parseStmtBlock(b);
     }
     m.done(DECL_FUNC);
   }
@@ -259,12 +249,104 @@ public class IonParser implements PsiParser {
       b.advanceLexer();
       if (name) {
         expect(b, COLON);
-        if (!parseType(b)) {
-          b.error("Expected type, got " + b.getTokenText());
-        }
+        expectType(b);
       }
       m.done(DECL_FUNC_PARAM);
     }
+  }
+
+  private void parseStmtBlock(@NotNull PsiBuilder b) {
+    if (expect(b, LBRACE)) {
+      parseStmtList(b);
+      expect(b, RBRACE);
+    }
+  }
+
+  private void parseStmtList(@NotNull PsiBuilder b) {
+    PsiBuilder.Marker m = b.mark();
+    while (!b.eof() && !match(b, RBRACE)) {
+      if (!parseStmt(b) && !match(b, RBRACE)) {
+        b.error("Expected statement, got " + b.getTokenText());
+        b.advanceLexer();
+      }
+    }
+    m.done(STMT_LIST);
+  }
+
+  private boolean parseStmt(@NotNull PsiBuilder b) {
+    if (b.getTokenType() == IF) {
+      parseStmtIf(b);
+      return true;
+    }
+    return false;
+  }
+
+  private void parseStmtIf(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == IF;
+    PsiBuilder.Marker m = b.mark();
+    parseStmtIfBranch(b);
+    List<Pair<PsiBuilder.Marker, IonToken>> toClose = new ArrayList<>();
+    while (match(b, ELSE)) {
+      toClose.add(Pair.create(b.mark(), ELSE));
+      b.advanceLexer();
+      if (match(b, IF)) {
+        toClose.add(Pair.create(b.mark(), IF));
+        parseStmtIfBranch(b);
+      } else {
+        parseStmtBlock(b);
+        break;
+      }
+    }
+    for (Pair<PsiBuilder.Marker, IonToken> node : ContainerUtil.reverse(toClose)) {
+      if (node.second == IF) {
+        node.first.done(STMT_IF);
+      } else {
+        node.first.done(STMT_ELSE);
+      }
+    }
+    m.done(STMT_IF);
+  }
+
+  private void parseStmtIfBranch(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == IF;
+    b.advanceLexer();
+    expect(b, LPAREN);
+    if (parseStmtInit(b)) {
+      if (consume(b, SEMICOLON)) {
+        expectExpr(b);
+      }
+    } else {
+      expectExpr(b);
+    }
+    expect(b, RPAREN);
+    parseStmtBlock(b);
+  }
+
+  private boolean parseStmtInit(@NotNull PsiBuilder b) {
+    if (match(b, NAME)) {
+      if (lookAhead(b, 1, COLON_ASSIGN)) {
+        PsiBuilder.Marker m = b.mark();
+        b.advanceLexer();
+        b.advanceLexer();
+        expectExpr(b);
+        m.done(STMT_INIT);
+        return true;
+      }
+      if (lookAhead(b, 1, COLON)) {
+        PsiBuilder.Marker m = b.mark();
+        b.advanceLexer();
+        b.advanceLexer();
+        expectType(b);
+        if (consume(b, ASSIGN)) {
+          if (!consume(b, UNDEF)) {
+            expectExpr(b);
+          }
+        }
+        m.done(STMT_INIT);
+        return true;
+      }
+    }
+    return false;
   }
 
   private void parseNote(@NotNull PsiBuilder b) {
@@ -290,9 +372,7 @@ public class IonParser implements PsiParser {
     if (match(b, NAME) && lookAhead(b, 1, ASSIGN)) {
       b.advanceLexer();
       b.advanceLexer();
-      if (!parseExpr(b)) {
-        b.error("Expected expression, got " + b.getTokenText());
-      }
+      expectExpr(b);
       m.done(NOTE_PARAM);
       return true;
     }
@@ -302,6 +382,14 @@ public class IonParser implements PsiParser {
     }
     m.rollbackTo();
     return false;
+  }
+
+  private boolean expectExpr(@NotNull PsiBuilder b) {
+    if (!parseExpr(b)) {
+      b.error("Expected expression, got " + b.getTokenText());
+      return false;
+    }
+    return true;
   }
 
   private boolean parseExpr(@NotNull PsiBuilder b) {
@@ -441,8 +529,7 @@ public class IonParser implements PsiParser {
         expect(b, RPAREN);
         m.done(EXPR_CALL);
       } else if (consume(b, LBRACKET)) {
-        if (!parseExpr(b)) {
-          b.error("Expected expression, got " + b.getTokenText());
+        if (!expectExpr(b)) {
           b.advanceLexer();
         }
         expect(b, RBRACKET);
@@ -605,6 +692,14 @@ public class IonParser implements PsiParser {
         return true;
       }
     }
+  }
+
+  private boolean expectType(@NotNull PsiBuilder b) {
+    if (!parseType(b)) {
+      b.error("Exprected type, got " + b.getTokenText());
+      return false;
+    }
+    return true;
   }
 
   private boolean parseType(@NotNull PsiBuilder b) {
