@@ -286,6 +286,10 @@ public class IonParser implements PsiParser {
       parseStmtDo(b);
       return true;
     }
+    if (b.getTokenType() == FOR) {
+      parseStmtFor(b);
+      return true;
+    }
     return false;
   }
 
@@ -379,6 +383,26 @@ public class IonParser implements PsiParser {
     expect(b, RPAREN);
     expect(b, SEMICOLON);
     m.done(STMT_DO);
+  }
+
+  private void parseStmtFor(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == FOR;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    // 'for' without parens? looks like parse.c supports them
+    expect(b, LPAREN);
+    parseStmtInit(b);
+    expect(b, SEMICOLON);
+    parseExpr(b);
+    expect(b, SEMICOLON);
+    parseStmtSimple(b);
+    expect(b, RPAREN);
+    parseStmtBlock(b);
+    m.done(STMT_FOR);
+  }
+
+  private void parseStmtSimple(@NotNull PsiBuilder b) {
+    parseExpr(b);
   }
 
   private void parseNote(@NotNull PsiBuilder b) {
