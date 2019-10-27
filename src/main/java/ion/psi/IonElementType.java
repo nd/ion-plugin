@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.IReparseableElementType;
 import ion.IonLanguage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -66,6 +67,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType STMT_GOTO = new IonElementType("goto");
   public static final IonElementType STMT_EXPR = new IonElementType("stmt_expr");
   public static final IonElementType STMT_ASSIGN = new IonElementType("stmt_assign");
+  public static final IonBlockElementType STMT_BLOCK = new IonBlockElementType();
 
   public IonElementType(@NotNull String debugName) {
     super(debugName, IonLanguage.INSTANCE);

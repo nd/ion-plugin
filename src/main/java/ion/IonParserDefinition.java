@@ -12,10 +12,7 @@ import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.ObjectUtils;
-import ion.psi.IonElementType;
-import ion.psi.IonFileElementType;
-import ion.psi.IonPsiFile;
-import ion.psi.IonToken;
+import ion.psi.*;
 import org.jetbrains.annotations.NotNull;
 
 public class IonParserDefinition implements ParserDefinition {
@@ -51,7 +48,14 @@ public class IonParserDefinition implements ParserDefinition {
   @Override
   public PsiElement createElement(ASTNode node) {
     IonElementType type = ObjectUtils.tryCast(node.getElementType(), IonElementType.class);
-    return type != null ? type.createPsiElement(node) : PsiUtilCore.NULL_PSI_ELEMENT;
+    if (type != null) {
+      return type.createPsiElement(node);
+    }
+    IonBlockElementType blockType = ObjectUtils.tryCast(node.getElementType(), IonBlockElementType.class);
+    if (blockType != null) {
+      return blockType.createPsiElement(node);
+    }
+    return PsiUtilCore.NULL_PSI_ELEMENT;
   }
 
   @Override

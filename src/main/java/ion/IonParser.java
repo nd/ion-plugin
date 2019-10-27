@@ -239,8 +239,10 @@ public class IonParser implements PsiParser {
     if (consume(b, COLON)) {
       expectType(b);
     }
-    if (!consume(b, SEMICOLON)) {
-      parseStmtBlock(b);
+    if (match(b, LBRACE)) {
+      expectStmtBlock(b);
+    } else if (!consume(b, SEMICOLON)) {
+      b.error("Expected ';' or block, got " + b.getTokenText());
     }
     m.done(DECL_FUNC);
   }
@@ -259,6 +261,18 @@ public class IonParser implements PsiParser {
         }
       }
       m.done(DECL_FUNC_PARAM);
+    }
+  }
+
+  public void expectStmtBlock(@NotNull PsiBuilder b) {
+    if (match(b, LBRACE)) {
+      PsiBuilder.Marker m = b.mark();
+      expect(b, LBRACE);
+      parseStmtList(b);
+      expect(b, RBRACE);
+      m.done(STMT_BLOCK);
+    } else {
+      b.error("Expected block, got " + b.getTokenText());
     }
   }
 
@@ -302,7 +316,7 @@ public class IonParser implements PsiParser {
       return true;
     }
     if (b.getTokenType() == LBRACE) {
-      parseStmtBlock(b);
+      expectStmtBlock(b);
       return true;
     }
     if (b.getTokenType() == BREAK) {
@@ -344,7 +358,7 @@ public class IonParser implements PsiParser {
         toClose.add(Pair.create(b.mark(), IF));
         parseStmtIfBranch(b);
       } else {
-        parseStmtBlock(b);
+        expectStmtBlock(b);
         break;
       }
     }
@@ -370,7 +384,7 @@ public class IonParser implements PsiParser {
       expectExpr(b);
     }
     expect(b, RPAREN);
-    parseStmtBlock(b);
+    expectStmtBlock(b);
   }
 
   private boolean parseStmtInit(@NotNull PsiBuilder b, boolean expectSemi) {
@@ -413,7 +427,7 @@ public class IonParser implements PsiParser {
     expect(b, LPAREN);
     expectExpr(b);
     expect(b, RPAREN);
-    parseStmtBlock(b);
+    expectStmtBlock(b);
     m.done(STMT_WHILE);
   }
 
@@ -421,7 +435,7 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == DO;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    parseStmtBlock(b);
+    expectStmtBlock(b);
     expect(b, WHILE);
     expect(b, LPAREN);
     expectExpr(b);
@@ -442,7 +456,7 @@ public class IonParser implements PsiParser {
     expect(b, SEMICOLON);
     parseStmtSimple(b, false);
     expect(b, RPAREN);
-    parseStmtBlock(b);
+    expectStmtBlock(b);
     m.done(STMT_FOR);
   }
 
@@ -501,13 +515,13 @@ public class IonParser implements PsiParser {
     if (parseExpr(b)) {
       if (consume(b, ASSIGN_OP)) {
         expectExpr(b);
-        if (expectSemi) {
-          expect(b, SEMICOLON);
+        if (expectSemi && !consume(b, SEMICOLON)) {
+          b.error("Expected ';', got " + b.getTokenText());
         }
         m.done(STMT_ASSIGN);
       } else {
-        if (expectSemi) {
-          expect(b, SEMICOLON);
+        if (expectSemi && !consume(b, SEMICOLON)) {
+          b.error("Expected ';', got " + b.getTokenText());
         }
         m.done(STMT_EXPR);
       }
