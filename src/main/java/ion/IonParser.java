@@ -356,7 +356,7 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == IF;
     b.advanceLexer();
     expect(b, LPAREN);
-    if (parseStmtInit(b)) {
+    if (parseStmtInit(b, false)) {
       if (consume(b, SEMICOLON)) {
         expectExpr(b);
       }
@@ -367,13 +367,16 @@ public class IonParser implements PsiParser {
     parseStmtBlock(b);
   }
 
-  private boolean parseStmtInit(@NotNull PsiBuilder b) {
+  private boolean parseStmtInit(@NotNull PsiBuilder b, boolean expectSemi) {
     if (match(b, NAME)) {
       if (lookAhead(b, 1, COLON_ASSIGN)) {
         PsiBuilder.Marker m = b.mark();
         b.advanceLexer();
         b.advanceLexer();
         expectExpr(b);
+        if (expectSemi) {
+          expect(b, SEMICOLON);
+        }
         m.done(STMT_INIT);
         return true;
       }
@@ -386,6 +389,9 @@ public class IonParser implements PsiParser {
           if (!consume(b, UNDEF)) {
             expectExpr(b);
           }
+        }
+        if (expectSemi) {
+          expect(b, SEMICOLON);
         }
         m.done(STMT_INIT);
         return true;
@@ -424,7 +430,7 @@ public class IonParser implements PsiParser {
     b.advanceLexer();
     // 'for' without parens? looks like parse.c supports them
     expect(b, LPAREN);
-    parseStmtInit(b);
+    parseStmtInit(b, false);
     expect(b, SEMICOLON);
     parseExpr(b);
     expect(b, SEMICOLON);
@@ -482,12 +488,26 @@ public class IonParser implements PsiParser {
   }
 
   private boolean parseStmtSimple(@NotNull PsiBuilder b, boolean expectSemi) {
+    if (parseStmtInit(b, expectSemi)) {
+      return true;
+    }
+    PsiBuilder.Marker m = b.mark();
     if (parseExpr(b)) {
-      if (expectSemi) {
-        expect(b, SEMICOLON);
+      if (consume(b, ASSIGN)) {
+        expectExpr(b);
+        if (expectSemi) {
+          expect(b, SEMICOLON);
+        }
+        m.done(STMT_ASSIGN);
+      } else {
+        if (expectSemi) {
+          expect(b, SEMICOLON);
+        }
+        m.done(STMT_EXPR);
       }
       return true;
     }
+    m.drop();
     return false;
   }
 

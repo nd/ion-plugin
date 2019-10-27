@@ -51,7 +51,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType STMT_LIST = new IonElementType("stmt_list");
   public static final IonElementType STMT_IF = new IonElementType("if");
   public static final IonElementType STMT_ELSE = new IonElementType("else");
-  public static final IonElementType STMT_INIT = new IonElementType("init");
+  public static final IonElementType STMT_INIT = new IonElementType("stmt_init");
   public static final IonElementType STMT_WHILE = new IonElementType("while");
   public static final IonElementType STMT_DO = new IonElementType("do");
   public static final IonElementType STMT_FOR = new IonElementType("for");
@@ -63,6 +63,8 @@ public class IonElementType extends IElementType {
   public static final IonElementType STMT_NOTE = new IonElementType("stmt_note");
   public static final IonElementType STMT_LABEL = new IonElementType("label");
   public static final IonElementType STMT_GOTO = new IonElementType("goto");
+  public static final IonElementType STMT_EXPR = new IonElementType("stmt_expr");
+  public static final IonElementType STMT_ASSIGN = new IonElementType("stmt_assign");
 
   public IonElementType(@NotNull String debugName) {
     super(debugName, IonLanguage.INSTANCE);

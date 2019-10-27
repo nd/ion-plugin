@@ -70,3 +70,11 @@ func x() {
   goto end;
   :end
 }
+
+func x() {
+  a := 1;
+  a: int = 1;
+  a = 1;
+  a.b.c = 1;
+  a.b.c;
+}
