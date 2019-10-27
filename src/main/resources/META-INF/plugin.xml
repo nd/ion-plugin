@@ -25,5 +25,6 @@
         <fileTypeFactory implementation="ion.IonFileType$Factory"/>
         <lang.syntaxHighlighterFactory language="ion" implementationClass="ion.IonSyntaxHighlighter$Factory"/>
         <lang.parserDefinition language="ion" implementationClass="ion.IonParserDefinition"/>
+        <lang.braceMatcher language="ion" implementationClass="ion.IonBraceMatcher"/>
     </extensions>
 </idea-plugin>
