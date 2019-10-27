@@ -67,5 +67,6 @@ func x() {
 }
 
 func x() {
+  goto end;
   :end
 }

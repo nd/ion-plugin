@@ -62,6 +62,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType STMT_RETURN = new IonElementType("return");
   public static final IonElementType STMT_NOTE = new IonElementType("stmt_note");
   public static final IonElementType STMT_LABEL = new IonElementType("label");
+  public static final IonElementType STMT_GOTO = new IonElementType("goto");
 
   public IonElementType(@NotNull String debugName) {
     super(debugName, IonLanguage.INSTANCE);

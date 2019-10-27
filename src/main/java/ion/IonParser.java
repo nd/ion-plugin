@@ -319,6 +319,10 @@ public class IonParser implements PsiParser {
       parseStmtLabel(b);
       return true;
     }
+    if (b.getTokenType() == GOTO) {
+      parseStmtGoto(b);
+      return true;
+    }
     return parseStmtSimple(b, true);
   }
 
@@ -528,6 +532,15 @@ public class IonParser implements PsiParser {
     b.advanceLexer();
     expect(b, NAME);
     m.done(STMT_LABEL);
+  }
+
+  private void parseStmtGoto(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == GOTO;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    expect(b, NAME);
+    expect(b, SEMICOLON);
+    m.done(STMT_GOTO);
   }
 
   private void parseNote(@NotNull PsiBuilder b) {
