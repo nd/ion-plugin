@@ -294,6 +294,10 @@ public class IonParser implements PsiParser {
       parseStmtSwitch(b);
       return true;
     }
+    if (b.getTokenType() == LBRACE) {
+      parseStmtBlock(b);
+      return true;
+    }
     return parseStmtSimple(b, true);
   }
 
