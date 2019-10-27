@@ -298,6 +298,14 @@ public class IonParser implements PsiParser {
       parseStmtBlock(b);
       return true;
     }
+    if (b.getTokenType() == BREAK) {
+      parseStmtBreak(b);
+      return true;
+    }
+    if (b.getTokenType() == CONTINUE) {
+      parseStmtContinue(b);
+      return true;
+    }
     return parseStmtSimple(b, true);
   }
 
@@ -464,6 +472,22 @@ public class IonParser implements PsiParser {
       return true;
     }
     return false;
+  }
+
+  private void parseStmtBreak(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == BREAK;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    expect(b, SEMICOLON);
+    m.done(STMT_BREAK);
+  }
+
+  private void parseStmtContinue(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == CONTINUE;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    expect(b, SEMICOLON);
+    m.done(STMT_CONTINUE);
   }
 
   private void parseNote(@NotNull PsiBuilder b) {

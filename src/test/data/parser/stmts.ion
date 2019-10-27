@@ -51,3 +51,8 @@ func x() {
     }
   }
 }
+
+func x() {
+  break;
+  continue;
+}
