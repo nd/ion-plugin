@@ -59,6 +59,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType STMT_SWITCH_PATTERN = new IonElementType("switch_pattern");
   public static final IonElementType STMT_BREAK = new IonElementType("break");
   public static final IonElementType STMT_CONTINUE = new IonElementType("continue");
+  public static final IonElementType STMT_RETURN = new IonElementType("return");
 
   public IonElementType(@NotNull String debugName) {
     super(debugName, IonLanguage.INSTANCE);

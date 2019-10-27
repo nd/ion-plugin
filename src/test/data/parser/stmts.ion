@@ -56,3 +56,8 @@ func x() {
   break;
   continue;
 }
+
+func x() {
+  return;
+  return 1;
+}

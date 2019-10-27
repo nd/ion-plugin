@@ -6,6 +6,7 @@ import com.intellij.lang.PsiParser;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.ContainerUtil;
+import com.sun.org.apache.regexp.internal.RE;
 import ion.psi.IonToken;
 import org.jetbrains.annotations.NotNull;
 
@@ -306,6 +307,10 @@ public class IonParser implements PsiParser {
       parseStmtContinue(b);
       return true;
     }
+    if (b.getTokenType() == RETURN) {
+      parseStmtReturn(b);
+      return true;
+    }
     return parseStmtSimple(b, true);
   }
 
@@ -488,6 +493,17 @@ public class IonParser implements PsiParser {
     b.advanceLexer();
     expect(b, SEMICOLON);
     m.done(STMT_CONTINUE);
+  }
+
+  private void parseStmtReturn(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == RETURN;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    if (!match(b, SEMICOLON)) {
+      expectExpr(b);
+    }
+    expect(b, SEMICOLON);
+    m.done(STMT_RETURN);
   }
 
   private void parseNote(@NotNull PsiBuilder b) {
