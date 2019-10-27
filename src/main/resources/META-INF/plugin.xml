@@ -26,5 +26,6 @@
         <lang.syntaxHighlighterFactory language="ion" implementationClass="ion.IonSyntaxHighlighter$Factory"/>
         <lang.parserDefinition language="ion" implementationClass="ion.IonParserDefinition"/>
         <lang.braceMatcher language="ion" implementationClass="ion.IonBraceMatcher"/>
+        <lang.quoteHandler language="ion" implementationClass="ion.IonQuoteHandler"/>
     </extensions>
 </idea-plugin>
