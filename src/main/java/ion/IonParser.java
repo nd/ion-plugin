@@ -64,7 +64,7 @@ public class IonParser implements PsiParser {
       }
     }
     if (expect(b, LBRACE)) {
-      while (!match(b, RBRACE)) {
+      while (!b.eof() && !match(b, RBRACE)) {
         parseEnumItem(b);
         if (!consume(b, COMMA) && !match(b, RBRACE) && !match(b, NAME)) {
           b.error("Exprected ',', '}', or name, got " + b.getTokenText());
@@ -100,7 +100,7 @@ public class IonParser implements PsiParser {
 
   private void parseAggregate(@NotNull PsiBuilder b) {
     if (expect(b, LBRACE)) {
-      while (!match(b, RBRACE)) {
+      while (!b.eof() && !match(b, RBRACE)) {
         parseAggregateItem(b);
         if (!match(b, RBRACE) && !match(b, NAME) && !match(b, STRUCT) && !match(b, UNION)) {
           b.error("Exprected '}', or aggregate item, got " + b.getTokenText());
@@ -227,7 +227,7 @@ public class IonParser implements PsiParser {
     b.advanceLexer();
     expect(b, NAME);
     if (expect(b, LPAREN)) {
-      while (!match(b, RPAREN)) {
+      while (!b.eof() && !match(b, RPAREN)) {
         parseFuncParam(b);
         if (!consume(b, COMMA) && !match(b, RPAREN)) {
           b.error("Expected ',', or ')', got " + b.getTokenText());
@@ -454,7 +454,7 @@ public class IonParser implements PsiParser {
     expectExpr(b);
     expect(b, RPAREN);
     expect(b, LBRACE);
-    while (!match(b, RBRACE)) {
+    while (!b.eof() && !match(b, RBRACE)) {
       parseStmtSwitchCase(b);
     }
     expect(b, RBRACE);
@@ -473,7 +473,7 @@ public class IonParser implements PsiParser {
     } else {
       b.error("Expected 'case' or 'default', got " + b.getTokenText());
     }
-    while (!match(b, RBRACE) && !match(b, CASE) && !match(b, DEFAULT)) {
+    while (!b.eof() && !match(b, RBRACE) && !match(b, CASE) && !match(b, DEFAULT)) {
       if (!parseStmt(b)) {
         b.error("Expected statement, got " + b.getTokenText());
         b.advanceLexer();
