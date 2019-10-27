@@ -8,11 +8,12 @@
 
     <idea-version since-build="191.1"/>
 
-    <version>1</version>
+    <version>2</version>
 
     <change-notes><![CDATA[
     <ul>
       <li>Ion Lexer</li>
+      <li>Ion Parser</li>
       <li>Debugger in CLion</li>
     </ul>
     ]]>
