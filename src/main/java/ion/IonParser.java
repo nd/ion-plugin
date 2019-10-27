@@ -1,6 +1,5 @@
 package ion;
 
-import a.j.a.A;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
@@ -8,7 +7,6 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.containers.ContainerUtil;
-import com.sun.org.apache.regexp.internal.RE;
 import ion.psi.IonToken;
 import org.jetbrains.annotations.NotNull;
 
