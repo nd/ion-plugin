@@ -290,7 +290,11 @@ public class IonParser implements PsiParser {
       parseStmtFor(b);
       return true;
     }
-    return false;
+    if (b.getTokenType() == SWITCH) {
+      parseStmtSwitch(b);
+      return true;
+    }
+    return parseStmtSimple(b, true);
   }
 
   private void parseStmtIf(@NotNull PsiBuilder b) {
@@ -395,14 +399,67 @@ public class IonParser implements PsiParser {
     expect(b, SEMICOLON);
     parseExpr(b);
     expect(b, SEMICOLON);
-    parseStmtSimple(b);
+    parseStmtSimple(b, false);
     expect(b, RPAREN);
     parseStmtBlock(b);
     m.done(STMT_FOR);
   }
 
-  private void parseStmtSimple(@NotNull PsiBuilder b) {
-    parseExpr(b);
+  private void parseStmtSwitch(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == SWITCH;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    expect(b, LPAREN);
+    expectExpr(b);
+    expect(b, RPAREN);
+    expect(b, LBRACE);
+    while (!match(b, RBRACE)) {
+      parseStmtSwitchCase(b);
+    }
+    expect(b, RBRACE);
+    m.done(STMT_SWITCH);
+  }
+
+  private void parseStmtSwitchCase(@NotNull PsiBuilder b) {
+    if (consume(b, DEFAULT)) {
+      expect(b, COLON);
+    } else if (consume(b, CASE)) {
+      parseStmtSwitchCasePattern(b);
+      while (consume(b, COMMA)) {
+        parseStmtSwitchCasePattern(b);
+      }
+      expect(b, COLON);
+    } else {
+      b.error("Expected 'case' or 'default', got " + b.getTokenText());
+    }
+    while (!match(b, RBRACE) && !match(b, CASE) && !match(b, DEFAULT)) {
+      if (!parseStmt(b)) {
+        b.error("Expected statement, got " + b.getTokenText());
+        b.advanceLexer();
+      }
+    }
+  }
+
+  private void parseStmtSwitchCasePattern(@NotNull PsiBuilder b) {
+    PsiBuilder.Marker m = b.mark();
+    if (expectExpr(b)) {
+      if (consume(b, ELLIPSIS)) {
+        expectExpr(b);
+      }
+      m.done(STMT_SWITCH_PATTERN);
+    } else {
+      m.drop();
+    }
+  }
+
+  private boolean parseStmtSimple(@NotNull PsiBuilder b, boolean expectSemi) {
+    if (parseExpr(b)) {
+      if (expectSemi) {
+        expect(b, SEMICOLON);
+      }
+      return true;
+    }
+    return false;
   }
 
   private void parseNote(@NotNull PsiBuilder b) {

@@ -55,6 +55,8 @@ public class IonElementType extends IElementType {
   public static final IonElementType STMT_WHILE = new IonElementType("while");
   public static final IonElementType STMT_DO = new IonElementType("do");
   public static final IonElementType STMT_FOR = new IonElementType("for");
+  public static final IonElementType STMT_SWITCH = new IonElementType("switch");
+  public static final IonElementType STMT_SWITCH_PATTERN = new IonElementType("switch_pattern");
 
   public IonElementType(@NotNull String debugName) {
     super(debugName, IonLanguage.INSTANCE);

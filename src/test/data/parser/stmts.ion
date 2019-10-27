@@ -24,3 +24,20 @@ func x() {
   for (;;i++) {}
   for (i := 0; i < 10; i++) {}
 }
+
+func x() {
+  switch (0) {
+  }
+  switch (0) {
+  default:
+    i++;
+  }
+  switch (0) {
+  case 1:
+    i++;j++;
+  }
+  switch (0) {
+  case 1...10, 20, 30:
+  case 50, 60:
+  }
+}
