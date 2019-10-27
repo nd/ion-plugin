@@ -149,7 +149,7 @@ public class IonParser implements PsiParser {
             break;
           }
         }
-        expect(b, RBRACE);
+        consumeUntil(b, RBRACE);
       }
     }
     m.done(DECL_IMPORT);
@@ -905,7 +905,7 @@ public class IonParser implements PsiParser {
       while (consume(b, COMMA)) {
         parseExprCompoundField(b);
       }
-      expect(b, RBRACE);
+      consumeUntil(b, RBRACE);
     }
     m.done(EXPR_LITERAL_COMPOUND);
     return true;
@@ -1079,5 +1079,14 @@ public class IonParser implements PsiParser {
       }
     }
     return false;
+  }
+
+  private void consumeUntil(@NotNull PsiBuilder b, @NotNull IElementType token) {
+    if (!consume(b, token)) {
+      b.error("Expected '" + token.toString() + "', got: " + b.getTokenText());
+      while (!b.eof() && !consume(b, token)) {
+        b.advanceLexer();
+      }
+    }
   }
 }
