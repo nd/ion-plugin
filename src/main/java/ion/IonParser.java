@@ -311,6 +311,10 @@ public class IonParser implements PsiParser {
       parseStmtReturn(b);
       return true;
     }
+    if (b.getTokenType() == POUND) {
+      parseStmtNote(b);
+      return true;
+    }
     return parseStmtSimple(b, true);
   }
 
@@ -504,6 +508,14 @@ public class IonParser implements PsiParser {
     }
     expect(b, SEMICOLON);
     m.done(STMT_RETURN);
+  }
+
+  private void parseStmtNote(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == POUND;
+    PsiBuilder.Marker m = b.mark();
+    parseNote(b);
+    expect(b, SEMICOLON);
+    m.done(STMT_NOTE);
   }
 
   private void parseNote(@NotNull PsiBuilder b) {

@@ -61,3 +61,7 @@ func x() {
   return;
   return 1;
 }
+
+func x() {
+  #assert(0);
+}

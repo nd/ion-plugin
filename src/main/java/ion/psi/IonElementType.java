@@ -60,6 +60,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType STMT_BREAK = new IonElementType("break");
   public static final IonElementType STMT_CONTINUE = new IonElementType("continue");
   public static final IonElementType STMT_RETURN = new IonElementType("return");
+  public static final IonElementType STMT_NOTE = new IonElementType("stmt_note");
 
   public IonElementType(@NotNull String debugName) {
     super(debugName, IonLanguage.INSTANCE);
