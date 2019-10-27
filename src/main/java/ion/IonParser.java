@@ -315,6 +315,10 @@ public class IonParser implements PsiParser {
       parseStmtNote(b);
       return true;
     }
+    if (b.getTokenType() == COLON) {
+      parseStmtLabel(b);
+      return true;
+    }
     return parseStmtSimple(b, true);
   }
 
@@ -516,6 +520,14 @@ public class IonParser implements PsiParser {
     parseNote(b);
     expect(b, SEMICOLON);
     m.done(STMT_NOTE);
+  }
+
+  private void parseStmtLabel(@NotNull PsiBuilder b) {
+    assert b.getTokenType() == COLON;
+    PsiBuilder.Marker m = b.mark();
+    b.advanceLexer();
+    expect(b, NAME);
+    m.done(STMT_LABEL);
   }
 
   private void parseNote(@NotNull PsiBuilder b) {

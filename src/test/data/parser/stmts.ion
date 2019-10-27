@@ -65,3 +65,7 @@ func x() {
 func x() {
   #assert(0);
 }
+
+func x() {
+  :end
+}
