@@ -153,6 +153,11 @@ public class IonToken extends IElementType {
 
   public final static TokenSet STRINGS = TokenSet.create(STRING, MULTILINE_STRING);
 
+  public final static TokenSet ASSIGN_OP = TokenSet.create(
+          ASSIGN, ADD_ASSIGN, SUB_ASSIGN, OR_ASSIGN, AND_ASSIGN, XOR_ASSIGN,
+          MUL_ASSIGN, DIV_ASSIGN, MOD_ASSIGN, LSHIFT_ASSIGN, RSHIFT_ASSIGN
+  );
+
   private IonToken(@NotNull String debugName) {
     super(debugName, IonLanguage.INSTANCE);
   }

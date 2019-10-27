@@ -25,6 +25,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType EXPR_LITERAL_INT = new IonElementType("expr_literal_int");
   public static final IonElementType EXPR_LITERAL_FLOAT = new IonElementType("expr_literal_float");
   public static final IonElementType EXPR_LITERAL_STR = new IonElementType("expr_literal_str");
+  public static final IonElementType EXPR_LITERAL_CHAR = new IonElementType("expr_literal_char");
   public static final IonElementType EXPR_LITERAL_COMPOUND = new IonElementType("expr_literal_compound");
   public static final IonElementType EXPR_LITERAL_COMPOUND_TYPED = new IonElementType("expr_literal_compound_typed");
   public static final IonElementType COMPOUND_FIELD = new IonElementType("compound_field");

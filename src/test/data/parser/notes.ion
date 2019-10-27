@@ -2,3 +2,4 @@
 @foreign()
 @x(a=1, 42)
 #assert(0)
+#static_assert('\xFF' == 255)

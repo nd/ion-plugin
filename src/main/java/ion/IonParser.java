@@ -1,10 +1,12 @@
 package ion;
 
+import a.j.a.A;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.containers.ContainerUtil;
 import com.sun.org.apache.regexp.internal.RE;
 import ion.psi.IonToken;
@@ -251,6 +253,10 @@ public class IonParser implements PsiParser {
       if (name) {
         expect(b, COLON);
         expectType(b);
+      } else {
+        if (!match(b, RPAREN) && !match(b, COMMA)) {
+          expectType(b);
+        }
       }
       m.done(DECL_FUNC_PARAM);
     }
@@ -311,7 +317,7 @@ public class IonParser implements PsiParser {
       parseStmtReturn(b);
       return true;
     }
-    if (b.getTokenType() == POUND) {
+    if (b.getTokenType() == POUND || b.getTokenType() == AT) {
       parseStmtNote(b);
       return true;
     }
@@ -493,7 +499,7 @@ public class IonParser implements PsiParser {
     }
     PsiBuilder.Marker m = b.mark();
     if (parseExpr(b)) {
-      if (consume(b, ASSIGN)) {
+      if (consume(b, ASSIGN_OP)) {
         expectExpr(b);
         if (expectSemi) {
           expect(b, SEMICOLON);
@@ -539,10 +545,13 @@ public class IonParser implements PsiParser {
   }
 
   private void parseStmtNote(@NotNull PsiBuilder b) {
-    assert b.getTokenType() == POUND;
+    assert b.getTokenType() == POUND || b.getTokenType() == AT;
+    boolean requiresSemi = b.getTokenType() == POUND;
     PsiBuilder.Marker m = b.mark();
     parseNote(b);
-    expect(b, SEMICOLON);
+    if (requiresSemi) {
+      expect(b, SEMICOLON);
+    }
     m.done(STMT_NOTE);
   }
 
@@ -770,8 +779,12 @@ public class IonParser implements PsiParser {
       m.done(EXPR_LITERAL_FLOAT);
       return true;
     }
-    if (consume(b, STRING)) {
+    if (consume(b, STRING) || consume(b, MULTILINE_STRING)) {
       m.done(EXPR_LITERAL_STR);
+      return true;
+    }
+    if (consume(b, CHAR)) {
+      m.done(EXPR_LITERAL_CHAR);
       return true;
     }
     if (consume(b, NAME)) {
@@ -847,6 +860,8 @@ public class IonParser implements PsiParser {
     }
     if (match(b, LBRACE)) {
       parseExprCompound(b);
+      m.drop();
+      return true;
     }
     if (consume(b, LPAREN)) {
       if (consume(b, COLON)) {
@@ -1018,6 +1033,15 @@ public class IonParser implements PsiParser {
 
   private boolean consume(@NotNull PsiBuilder b, @NotNull IElementType token) {
     if (b.getTokenType() == token) {
+      b.advanceLexer();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private boolean consume(@NotNull PsiBuilder b, @NotNull TokenSet tokens) {
+    if (tokens.contains(b.getTokenType())) {
       b.advanceLexer();
       return true;
     } else {
