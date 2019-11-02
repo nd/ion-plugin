@@ -1,13 +1,10 @@
 package ion.psi;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.lang.Language;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.IReparseableElementType;
 import ion.IonLanguage;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class IonElementType extends IElementType {
   public static final IonElementType DECL_CONST = new IonElementType("const");
@@ -18,7 +15,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType DECL_FIELD = new IonElementType("field");
   public static final IonElementType DECL_IMPORT = new IonElementType("import");
   public static final IonElementType DECL_TYPEDEF = new IonElementType("typedef");
-  public static final IonElementType DECL_FUNC = new IonElementType("func");
+  public static final IonElementType DECL_FUNC = new IonElementType("func", TypeId.DECL_FUNC);
   public static final IonElementType DECL_FUNC_PARAM = new IonElementType("param");
   public static final IonElementType NOTE = new IonElementType("note");
   public static final IonElementType NOTE_PARAM = new IonElementType("note_param");
@@ -69,8 +66,82 @@ public class IonElementType extends IElementType {
   public static final IonElementType STMT_ASSIGN = new IonElementType("stmt_assign");
   public static final IonBlockElementType STMT_BLOCK = new IonBlockElementType();
 
+  // to be able to write switch over element types
+  public enum TypeId {
+    UNKNOWN,
+    DECL_CONST,
+    DECL_VAR,
+    DECL_ENUM,
+    ENUM_ITEM,
+    DECL_AGGREGATE,
+    DECL_FIELD,
+    DECL_IMPORT,
+    DECL_TYPEDEF,
+    DECL_FUNC,
+    DECL_FUNC_PARAM,
+    NOTE,
+    NOTE_PARAM,
+    IMPORT_ITEM,
+    EXPR_LITERAL_INT,
+    EXPR_LITERAL_FLOAT,
+    EXPR_LITERAL_STR,
+    EXPR_LITERAL_CHAR,
+    EXPR_LITERAL_COMPOUND,
+    EXPR_LITERAL_COMPOUND_TYPED,
+    COMPOUND_FIELD,
+    COMPOUND_FIELD_NAMED,
+    COMPOUND_FIELD_INDEX,
+    EXPR_NAME,
+    EXPR_NEW,
+    EXPR_PAREN,
+    EXPR_CAST,
+    EXPR_POSTFIX,
+    EXPR_INDEX,
+    EXPR_FIELD,
+    EXPR_CALL,
+    EXPR_UNARY,
+    EXPR_BINARY,
+    EXPR_TERNARY,
+    TYPE,
+    TYPE_PTR,
+    TYPE_CONST,
+    TYPE_ARRAY,
+    TYPE_TUPLE,
+    TYPE_FUNC,
+    TYPE_FUNC_PARAM,
+    STMT_LIST,
+    STMT_IF,
+    STMT_ELSE,
+    STMT_INIT,
+    STMT_WHILE,
+    STMT_DO,
+    STMT_FOR,
+    STMT_SWITCH,
+    STMT_SWITCH_PATTERN,
+    STMT_BREAK,
+    STMT_CONTINUE,
+    STMT_RETURN,
+    STMT_NOTE,
+    STMT_LABEL,
+    STMT_GOTO,
+    STMT_EXPR,
+    STMT_ASSIGN,
+    STMT_BLOCK,
+  }
+
+  private final TypeId myTypeId;
+
   public IonElementType(@NotNull String debugName) {
+    this(debugName, TypeId.UNKNOWN);
+  }
+
+  public IonElementType(@NotNull String debugName, TypeId id) {
     super(debugName, IonLanguage.INSTANCE);
+    myTypeId = id;
+  }
+
+  public TypeId getTypeId() {
+    return myTypeId;
   }
 
   @NotNull
