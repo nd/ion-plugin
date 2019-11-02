@@ -770,7 +770,13 @@ public class IonParser implements PsiParser {
         expect(b, RBRACKET);
         m.done(EXPR_INDEX);
       } else if (consume(b, DOT)) {
-        expect(b, NAME);
+        if (match(b, NAME)) {
+          PsiBuilder.Marker nameExprMark = b.mark();
+          consume(b, NAME);
+          nameExprMark.done(EXPR_NAME);
+        } else {
+          b.error("Exprected name, got " + b.getTokenText());
+        }
         m.done(EXPR_FIELD);
       } else if (consume(b, INC) || consume(b, DEC)) {
         m.done(EXPR_POSTFIX);
