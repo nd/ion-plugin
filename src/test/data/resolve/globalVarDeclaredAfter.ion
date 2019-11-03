@@ -1,0 +1,7 @@
+var x: int;
+
+func x() {
+  /*start*/a;
+}
+
+var <caret>a: int;

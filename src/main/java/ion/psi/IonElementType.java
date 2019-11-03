@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class IonElementType extends IElementType {
   public static final IonElementType DECL_CONST = new IonElementType("const");
-  public static final IonElementType DECL_VAR = new IonElementType("var");
+  public static final IonElementType DECL_VAR = new IonElementType("var", TypeId.DECL_VAR);
   public static final IonElementType DECL_ENUM = new IonElementType("enum");
   public static final IonElementType ENUM_ITEM = new IonElementType("enum_item");
   public static final IonElementType DECL_AGGREGATE = new IonElementType("aggregate");
@@ -29,7 +29,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType COMPOUND_FIELD = new IonElementType("compound_field");
   public static final IonElementType COMPOUND_FIELD_NAMED = new IonElementType("compound_field_named");
   public static final IonElementType COMPOUND_FIELD_INDEX = new IonElementType("compound_field_index");
-  public static final IonElementType EXPR_NAME = new IonElementType("expr_name");
+  public static final IonElementType EXPR_NAME = new IonElementType("expr_name", TypeId.EXPR_NAME);
   public static final IonElementType EXPR_NEW = new IonElementType("expr_new");
   public static final IonElementType EXPR_PAREN = new IonElementType("expr_paren");
   public static final IonElementType EXPR_CAST = new IonElementType("expr_cast");
@@ -50,7 +50,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType STMT_LIST = new IonElementType("stmt_list");
   public static final IonElementType STMT_IF = new IonElementType("if");
   public static final IonElementType STMT_ELSE = new IonElementType("else");
-  public static final IonElementType STMT_INIT = new IonElementType("stmt_init");
+  public static final IonElementType STMT_INIT = new IonElementType("stmt_init", TypeId.STMT_INIT);
   public static final IonElementType STMT_WHILE = new IonElementType("while");
   public static final IonElementType STMT_DO = new IonElementType("do");
   public static final IonElementType STMT_FOR = new IonElementType("for");

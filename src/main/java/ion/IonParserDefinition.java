@@ -49,6 +49,14 @@ public class IonParserDefinition implements ParserDefinition {
   public PsiElement createElement(ASTNode node) {
     IonElementType type = ObjectUtils.tryCast(node.getElementType(), IonElementType.class);
     if (type != null) {
+      switch (type.getTypeId()) {
+        case EXPR_NAME:
+          return new IonExprName(node);
+        case DECL_VAR:
+          return new IonDeclVar(node);
+        case STMT_INIT:
+          return new IonStmtInit(node);
+      }
       return type.createPsiElement(node);
     }
     IonBlockElementType blockType = ObjectUtils.tryCast(node.getElementType(), IonBlockElementType.class);

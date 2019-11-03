@@ -1,5 +1,5 @@
 IonFile
-  IonPsiElement(var)
+  IonDeclVar(var)
     PsiElement(var)('var')
     PsiWhiteSpace(' ')
     PsiElement(name)('a')

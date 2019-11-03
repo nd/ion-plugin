@@ -1,0 +1,7 @@
+func x() {
+  <caret>a := 1;
+  {
+    b := /*start*/a;
+    a := 2;
+  }
+}
