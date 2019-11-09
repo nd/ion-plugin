@@ -981,11 +981,24 @@ public class IonParser implements PsiParser {
 
   private boolean parseTypeBase(@NotNull PsiBuilder b) {
     PsiBuilder.Marker m = b.mark();
-    if (consume(b, NAME)) {
-      while (consume(b, DOT)) {
-        expect(b, NAME);
+    if (match(b, NAME)) {
+      PsiBuilder.Marker name1 = b.mark();
+      consume(b, NAME);
+      name1.done(EXPR_NAME);
+      while (match(b, DOT)) {
+        consume(b, DOT);
+        if (match(b, NAME)) {
+          PsiBuilder.Marker name2 = b.mark();
+          consume(b, NAME);
+          name2.done(EXPR_NAME);
+        } else {
+          b.error("Expected name, got " + b.getTokenText());
+          b.advanceLexer();
+        }
+        m.done(EXPR_FIELD);
+        m = m.precede();
       }
-      m.done(TYPE);
+      m.drop();
       return true;
     }
     if (consume(b, FUNC)) {
@@ -1007,7 +1020,7 @@ public class IonParser implements PsiParser {
     if (consume(b, LPAREN)) {
       parseType(b);
       expect(b, RPAREN);
-      m.done(TYPE);
+      m.done(TYPE_PAR);
       return true;
     }
     if (consume(b, LBRACE)) {

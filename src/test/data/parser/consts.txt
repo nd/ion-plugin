@@ -16,7 +16,7 @@ IonFile
     PsiElement(name)('a')
     PsiElement(:)(':')
     PsiWhiteSpace(' ')
-    IonPsiElement(type)
+    IonExprName(expr_name)
       PsiElement(name)('uint8')
     PsiWhiteSpace(' ')
     PsiElement(=)('=')

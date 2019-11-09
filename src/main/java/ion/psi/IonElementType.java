@@ -11,7 +11,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType DECL_VAR = new IonElementType("var", TypeId.DECL_VAR);
   public static final IonElementType DECL_ENUM = new IonElementType("enum");
   public static final IonElementType ENUM_ITEM = new IonElementType("enum_item");
-  public static final IonElementType DECL_AGGREGATE = new IonElementType("aggregate");
+  public static final IonElementType DECL_AGGREGATE = new IonElementType("aggregate", TypeId.DECL_AGGREGATE);
   public static final IonElementType DECL_FIELD = new IonElementType("field");
   public static final IonElementType DECL_IMPORT = new IonElementType("import");
   public static final IonElementType DECL_TYPEDEF = new IonElementType("typedef");
@@ -40,7 +40,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType EXPR_UNARY = new IonElementType("expr_unary");
   public static final IonElementType EXPR_BINARY = new IonElementType("expr_binary");
   public static final IonElementType EXPR_TERNARY = new IonElementType("expr_ternary");
-  public static final IonElementType TYPE = new IonElementType("type");
+  public static final IonElementType TYPE_PAR = new IonElementType("type_par");
   public static final IonElementType TYPE_PTR = new IonElementType("type_ptr");
   public static final IonElementType TYPE_CONST = new IonElementType("type_const");
   public static final IonElementType TYPE_ARRAY = new IonElementType("type_array");
@@ -102,7 +102,7 @@ public class IonElementType extends IElementType {
     EXPR_UNARY,
     EXPR_BINARY,
     EXPR_TERNARY,
-    TYPE,
+    TYPE_PAR,
     TYPE_PTR,
     TYPE_CONST,
     TYPE_ARRAY,

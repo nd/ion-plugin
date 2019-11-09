@@ -1,0 +1,6 @@
+struct <caret>S {
+}
+
+func x() {
+  s: /*resolve*/S;
+}
