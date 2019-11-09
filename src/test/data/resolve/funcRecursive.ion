@@ -1,0 +1,3 @@
+func <caret>x() {
+  /*resolve*/x();
+}

@@ -1,0 +1,6 @@
+func x() {
+  /*resolve*/y();
+}
+
+func <caret>y() {
+}

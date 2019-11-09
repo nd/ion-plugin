@@ -54,6 +54,8 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonExprName(node);
         case DECL_VAR:
           return new IonDeclVar(node);
+        case DECL_FUNC:
+          return new IonDeclFunc(node);
         case STMT_INIT:
           return new IonStmtInit(node);
       }
