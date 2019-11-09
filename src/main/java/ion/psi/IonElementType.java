@@ -40,6 +40,8 @@ public class IonElementType extends IElementType {
   public static final IonElementType EXPR_UNARY = new IonElementType("expr_unary");
   public static final IonElementType EXPR_BINARY = new IonElementType("expr_binary");
   public static final IonElementType EXPR_TERNARY = new IonElementType("expr_ternary");
+  public static final IonElementType TYPE_NAME = new IonElementType("type_name", TypeId.TYPE_NAME);
+  public static final IonElementType TYPE_QNAME = new IonElementType("type_qname", TypeId.TYPE_QNAME);
   public static final IonElementType TYPE_PAR = new IonElementType("type_par");
   public static final IonElementType TYPE_PTR = new IonElementType("type_ptr");
   public static final IonElementType TYPE_CONST = new IonElementType("type_const");
@@ -102,6 +104,8 @@ public class IonElementType extends IElementType {
     EXPR_UNARY,
     EXPR_BINARY,
     EXPR_TERNARY,
+    TYPE_NAME,
+    TYPE_QNAME,
     TYPE_PAR,
     TYPE_PTR,
     TYPE_CONST,

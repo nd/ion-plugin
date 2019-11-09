@@ -984,18 +984,18 @@ public class IonParser implements PsiParser {
     if (match(b, NAME)) {
       PsiBuilder.Marker name1 = b.mark();
       consume(b, NAME);
-      name1.done(EXPR_NAME);
+      name1.done(TYPE_NAME);
       while (match(b, DOT)) {
         consume(b, DOT);
         if (match(b, NAME)) {
           PsiBuilder.Marker name2 = b.mark();
           consume(b, NAME);
-          name2.done(EXPR_NAME);
+          name2.done(TYPE_NAME);
         } else {
           b.error("Expected name, got " + b.getTokenText());
           b.advanceLexer();
         }
-        m.done(EXPR_FIELD);
+        m.done(TYPE_QNAME);
         m = m.precede();
       }
       m.drop();

@@ -52,6 +52,8 @@ public class IonParserDefinition implements ParserDefinition {
       switch (type.getTypeId()) {
         case EXPR_NAME:
           return new IonExprName(node);
+        case TYPE_NAME:
+          return new IonTypeName(node);
         case DECL_VAR:
           return new IonDeclVar(node);
         case DECL_CONST:
