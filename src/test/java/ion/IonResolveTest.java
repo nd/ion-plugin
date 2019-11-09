@@ -23,6 +23,18 @@ public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
     doTest();
   }
 
+  public void testFor() {
+    doTest();
+  }
+
+  public void testIf() {
+    doTest();
+  }
+
+  public void testElse() {
+    doTest();
+  }
+
   @Override
   protected String getTestDataPath() {
     return "src/test/data/resolve";

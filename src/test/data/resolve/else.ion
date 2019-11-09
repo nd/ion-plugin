@@ -1,0 +1,6 @@
+func x() {
+  if (<caret>i := 0; i < 100) {
+  } else {
+    x := /*resolve*/i;
+  }
+}
