@@ -1,0 +1,5 @@
+typedef <caret>T = int;
+
+func x() {
+  t: /*resolve*/T;
+}

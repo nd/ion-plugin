@@ -1,5 +1,5 @@
 IonFile
-  IonPsiElement(typedef)
+  IonDeclTypedef(typedef)
     PsiElement(typedef)('typedef')
     PsiWhiteSpace(' ')
     PsiElement(name)('T')
@@ -10,7 +10,7 @@ IonFile
       PsiElement(name)('int')
     PsiElement(;)(';')
   PsiWhiteSpace('\n')
-  IonPsiElement(typedef)
+  IonDeclTypedef(typedef)
     PsiElement(typedef)('typedef')
     PsiWhiteSpace(' ')
     PsiElement(name)('F')

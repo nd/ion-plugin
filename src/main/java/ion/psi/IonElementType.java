@@ -14,7 +14,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType DECL_AGGREGATE = new IonElementType("aggregate", TypeId.DECL_AGGREGATE);
   public static final IonElementType DECL_FIELD = new IonElementType("field");
   public static final IonElementType DECL_IMPORT = new IonElementType("import");
-  public static final IonElementType DECL_TYPEDEF = new IonElementType("typedef");
+  public static final IonElementType DECL_TYPEDEF = new IonElementType("typedef", TypeId.DECL_TYPEDEF);
   public static final IonElementType DECL_FUNC = new IonElementType("func", TypeId.DECL_FUNC);
   public static final IonElementType DECL_FUNC_PARAM = new IonElementType("param");
   public static final IonElementType NOTE = new IonElementType("note");
