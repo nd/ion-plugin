@@ -7,7 +7,7 @@ import ion.IonLanguage;
 import org.jetbrains.annotations.NotNull;
 
 public class IonElementType extends IElementType {
-  public static final IonElementType DECL_CONST = new IonElementType("const");
+  public static final IonElementType DECL_CONST = new IonElementType("const", TypeId.DECL_CONST);
   public static final IonElementType DECL_VAR = new IonElementType("var", TypeId.DECL_VAR);
   public static final IonElementType DECL_ENUM = new IonElementType("enum");
   public static final IonElementType ENUM_ITEM = new IonElementType("enum_item");

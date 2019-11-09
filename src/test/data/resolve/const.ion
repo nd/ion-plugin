@@ -1,0 +1,5 @@
+const <caret>A = 1;
+
+func x() {
+  /*resolve*/A;
+}

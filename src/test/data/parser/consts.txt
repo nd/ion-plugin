@@ -1,5 +1,5 @@
 IonFile
-  IonPsiElement(const)
+  IonDeclConst(const)
     PsiElement(const)('const')
     PsiWhiteSpace(' ')
     PsiElement(name)('PI')
@@ -10,7 +10,7 @@ IonFile
       PsiElement(float)('3.14')
     PsiElement(;)(';')
   PsiWhiteSpace('\n')
-  IonPsiElement(const)
+  IonDeclConst(const)
     PsiElement(const)('const')
     PsiWhiteSpace(' ')
     PsiElement(name)('a')
