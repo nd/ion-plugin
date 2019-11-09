@@ -31,7 +31,7 @@ public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
   public void doTest() {
     String fileName = getTestName(true) + ".ion";
     PsiFile psiFile = myFixture.configureByFile(fileName);
-    String initialCaretToken = "/*start*/";
+    String initialCaretToken = "/*resolve*/";
     int initialOffset = psiFile.getText().indexOf(initialCaretToken);
     assertTrue(initialCaretToken + " is missing", initialOffset != -1);
     myFixture.getEditor().getCaretModel().moveToOffset(initialOffset + initialCaretToken.length());

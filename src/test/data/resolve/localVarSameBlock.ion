@@ -3,6 +3,6 @@ func x() {
   {
     a := 1;
     <caret>b := 1;
-    c := /*start*/b;
+    c := /*resolve*/b;
   }
 }

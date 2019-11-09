@@ -3,5 +3,5 @@ var x: int;
 var <caret>a: int;
 
 func x() {
-  /*start*/a;
+  /*resolve*/a;
 }

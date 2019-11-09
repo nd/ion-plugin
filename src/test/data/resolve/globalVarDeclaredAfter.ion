@@ -1,7 +1,7 @@
 var x: int;
 
 func x() {
-  /*start*/a;
+  /*resolve*/a;
 }
 
 var <caret>a: int;
