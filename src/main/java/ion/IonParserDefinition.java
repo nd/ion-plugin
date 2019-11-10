@@ -64,6 +64,8 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonDeclFunc(node);
         case DECL_AGGREGATE:
           return new IonDeclAggregate(node);
+        case DECL_FUNC_PARAM:
+          return new IonDeclFuncParam(node);
         case DECL_TYPEDEF:
           return new IonDeclTypedef(node);
         case STMT_INIT:

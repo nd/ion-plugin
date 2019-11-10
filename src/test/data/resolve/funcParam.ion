@@ -1,0 +1,3 @@
+func x(<caret>a: int) {
+  /*resolve*/a;
+}

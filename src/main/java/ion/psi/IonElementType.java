@@ -16,7 +16,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType DECL_IMPORT = new IonElementType("import");
   public static final IonElementType DECL_TYPEDEF = new IonElementType("typedef", TypeId.DECL_TYPEDEF);
   public static final IonElementType DECL_FUNC = new IonElementType("func", TypeId.DECL_FUNC);
-  public static final IonElementType DECL_FUNC_PARAM = new IonElementType("param");
+  public static final IonElementType DECL_FUNC_PARAM = new IonElementType("param", TypeId.DECL_FUNC_PARAM);
   public static final IonElementType NOTE = new IonElementType("note");
   public static final IonElementType NOTE_PARAM = new IonElementType("note_param");
   public static final IonElementType IMPORT_ITEM = new IonElementType("import_item");
