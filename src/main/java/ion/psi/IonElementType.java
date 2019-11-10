@@ -12,7 +12,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType DECL_ENUM = new IonElementType("enum");
   public static final IonElementType ENUM_ITEM = new IonElementType("enum_item");
   public static final IonElementType DECL_AGGREGATE = new IonElementType("aggregate", TypeId.DECL_AGGREGATE);
-  public static final IonElementType DECL_FIELD = new IonElementType("field");
+  public static final IonElementType DECL_FIELD = new IonElementType("field", TypeId.DECL_FIELD);
   public static final IonElementType DECL_IMPORT = new IonElementType("import");
   public static final IonElementType DECL_TYPEDEF = new IonElementType("typedef", TypeId.DECL_TYPEDEF);
   public static final IonElementType DECL_FUNC = new IonElementType("func", TypeId.DECL_FUNC);
@@ -35,8 +35,8 @@ public class IonElementType extends IElementType {
   public static final IonElementType EXPR_CAST = new IonElementType("expr_cast");
   public static final IonElementType EXPR_POSTFIX = new IonElementType("expr_postfix");
   public static final IonElementType EXPR_INDEX = new IonElementType("expr_index");
-  public static final IonElementType EXPR_FIELD = new IonElementType("expr_field");
-  public static final IonElementType EXPR_CALL = new IonElementType("expr_call");
+  public static final IonElementType EXPR_FIELD = new IonElementType("expr_field", TypeId.EXPR_FIELD);
+  public static final IonElementType EXPR_CALL = new IonElementType("expr_call", TypeId.EXPR_CALL);
   public static final IonElementType EXPR_UNARY = new IonElementType("expr_unary");
   public static final IonElementType EXPR_BINARY = new IonElementType("expr_binary");
   public static final IonElementType EXPR_TERNARY = new IonElementType("expr_ternary");

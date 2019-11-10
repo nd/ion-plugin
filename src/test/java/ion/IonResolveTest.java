@@ -39,6 +39,10 @@ public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
     doTest();
   }
 
+  public void testFuncParam() {
+    doTest();
+  }
+
   public void testFuncRecursive() {
     doTest();
   }
@@ -60,6 +64,22 @@ public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
   }
 
   public void testLabel() {
+    doTest();
+  }
+
+  public void testStructField() {
+    doTest();
+  }
+
+  public void testStructFieldChain() {
+    doTest();
+  }
+
+  public void testStructFieldFuncParam() {
+    doTest();
+  }
+
+  public void testStructFieldFuncCall() {
     doTest();
   }
 

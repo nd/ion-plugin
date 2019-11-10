@@ -52,6 +52,10 @@ public class IonParserDefinition implements ParserDefinition {
       switch (type.getTypeId()) {
         case EXPR_NAME:
           return new IonExprName(node);
+        case EXPR_FIELD:
+          return new IonExprField(node);
+        case EXPR_CALL:
+          return new IonExprCall(node);
         case TYPE_NAME:
           return new IonTypeName(node);
         case LABEL_NAME:
@@ -62,10 +66,12 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonDeclConst(node);
         case DECL_FUNC:
           return new IonDeclFunc(node);
-        case DECL_AGGREGATE:
-          return new IonDeclAggregate(node);
         case DECL_FUNC_PARAM:
           return new IonDeclFuncParam(node);
+        case DECL_AGGREGATE:
+          return new IonDeclAggregate(node);
+        case DECL_FIELD:
+          return new IonDeclField(node);
         case DECL_TYPEDEF:
           return new IonDeclTypedef(node);
         case STMT_INIT:

@@ -1,0 +1,7 @@
+struct T {
+  <caret>f: int;
+}
+
+func x(t: T) {
+  t./*resolve*/f;
+}
