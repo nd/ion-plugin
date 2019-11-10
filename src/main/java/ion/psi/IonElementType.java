@@ -62,8 +62,9 @@ public class IonElementType extends IElementType {
   public static final IonElementType STMT_CONTINUE = new IonElementType("continue");
   public static final IonElementType STMT_RETURN = new IonElementType("return");
   public static final IonElementType STMT_NOTE = new IonElementType("stmt_note");
-  public static final IonElementType STMT_LABEL = new IonElementType("label");
+  public static final IonElementType STMT_LABEL = new IonElementType("label", TypeId.STMT_LABEL);
   public static final IonElementType STMT_GOTO = new IonElementType("goto");
+  public static final IonElementType LABEL_NAME = new IonElementType("label_name", TypeId.LABEL_NAME);
   public static final IonElementType STMT_EXPR = new IonElementType("stmt_expr");
   public static final IonElementType STMT_ASSIGN = new IonElementType("stmt_assign");
   public static final IonBlockElementType STMT_BLOCK = new IonBlockElementType();
@@ -128,6 +129,7 @@ public class IonElementType extends IElementType {
     STMT_NOTE,
     STMT_LABEL,
     STMT_GOTO,
+    LABEL_NAME,
     STMT_EXPR,
     STMT_ASSIGN,
     STMT_BLOCK,

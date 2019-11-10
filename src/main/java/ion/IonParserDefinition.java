@@ -54,6 +54,8 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonExprName(node);
         case TYPE_NAME:
           return new IonTypeName(node);
+        case LABEL_NAME:
+          return new IonLabelName(node);
         case DECL_VAR:
           return new IonDeclVar(node);
         case DECL_CONST:
@@ -66,6 +68,8 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonDeclTypedef(node);
         case STMT_INIT:
           return new IonStmtInit(node);
+        case STMT_LABEL:
+          return new IonStmtLabel(node);
       }
       return type.createPsiElement(node);
     }

@@ -579,7 +579,9 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == GOTO;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
+    PsiBuilder.Marker nameMark = b.mark();
     expect(b, NAME);
+    nameMark.done(LABEL_NAME);
     expect(b, SEMICOLON);
     m.done(STMT_GOTO);
   }
