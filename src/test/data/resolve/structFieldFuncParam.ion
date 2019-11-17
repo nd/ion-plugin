@@ -5,3 +5,7 @@ struct T {
 func x(t: T) {
   t./*resolve*/f;
 }
+
+func x(t: T*) {
+  t./*resolve*/f;
+}

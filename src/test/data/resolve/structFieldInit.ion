@@ -1,0 +1,23 @@
+struct T {
+  <caret>f: int;
+}
+
+struct T2 {
+  t1: T;
+  t2: T;
+}
+
+func b() {
+  t: T = {/*resolve*/f = 1};
+}
+
+func b() {
+  t: T* = &{/*resolve*/f = 1};
+}
+
+func b() {
+  t: T2 = {
+    {/*resolve*/f = 1},
+    {/*resolve*/f = 1},
+  };
+}

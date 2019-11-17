@@ -83,6 +83,26 @@ public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
     doTest();
   }
 
+  public void testStructFieldCompoundLiteral() {
+    doTest();
+  }
+
+  public void testStructFieldFuncArg() {
+    doTest();
+  }
+
+  public void testStructFieldInit() {
+    doTest();
+  }
+
+  public void testStructFieldAssign() {
+    doTest();
+  }
+
+  public void testStructFieldAssignChain() {
+    doTest();
+  }
+
   @Override
   protected String getTestDataPath() {
     return "src/test/data/resolve";
@@ -91,11 +111,23 @@ public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
   public void doTest() {
     String fileName = getTestName(true) + ".ion";
     PsiFile psiFile = myFixture.configureByFile(fileName);
-    String initialCaretToken = "/*resolve*/";
-    int initialOffset = psiFile.getText().indexOf(initialCaretToken);
-    assertTrue(initialCaretToken + " is missing", initialOffset != -1);
-    myFixture.getEditor().getCaretModel().moveToOffset(initialOffset + initialCaretToken.length());
-    myFixture.performEditorAction(IdeActions.ACTION_GOTO_DECLARATION);
-    myFixture.checkResultByFile(fileName);
+    String text = psiFile.getText();
+    String singleResolveToken = "/*!resolve*/";
+    if (text.contains(singleResolveToken)) {
+      int offset = text.indexOf(singleResolveToken);
+      myFixture.getEditor().getCaretModel().moveToOffset(offset + singleResolveToken.length());
+      myFixture.performEditorAction(IdeActions.ACTION_GOTO_DECLARATION);
+      myFixture.checkResultByFile(fileName);
+    } else {
+      String initialCaretToken = "/*resolve*/";
+      int offset = text.indexOf(initialCaretToken);
+      assertTrue(initialCaretToken + " is missing", offset != -1);
+      while (offset != -1) {
+        myFixture.getEditor().getCaretModel().moveToOffset(offset + initialCaretToken.length());
+        myFixture.performEditorAction(IdeActions.ACTION_GOTO_DECLARATION);
+        myFixture.checkResultByFile(fileName);
+        offset = text.indexOf(initialCaretToken, offset + 1);
+      }
+    }
   }
 }

@@ -6,7 +6,16 @@ struct T2 {
   <caret>f2: int;
 }
 
+struct T3 {
+  f1: T2* const;
+}
+
 func x() {
-  t: T1;
+  t: (((T1)));
+  t.f1./*resolve*/f2;
+}
+
+func ptr() {
+  t: T3;
   t.f1./*resolve*/f2;
 }

@@ -1,0 +1,10 @@
+struct T {
+  <caret>f: int;
+}
+
+func a(t: T) {
+}
+
+func b() {
+  a({/*resolve*/f = 1});
+}

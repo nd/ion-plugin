@@ -56,8 +56,20 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonExprField(node);
         case EXPR_CALL:
           return new IonExprCall(node);
+        case EXPR_CALL_ARG:
+          return new IonExprCallArg(node);
+        case EXPR_UNARY:
+          return new IonExprUnary(node);
         case TYPE_NAME:
           return new IonTypeName(node);
+        case TYPE_PAR:
+          return new IonTypePar(node);
+        case TYPE_PTR:
+          return new IonTypePtr(node);
+        case TYPE_CONST:
+          return new IonTypeConst(node);
+        case TYPE_ARRAY:
+          return new IonTypeArray(node);
         case LABEL_NAME:
           return new IonLabelName(node);
         case DECL_VAR:
@@ -76,8 +88,18 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonDeclTypedef(node);
         case STMT_INIT:
           return new IonStmtInit(node);
+        case STMT_ASSIGN:
+          return new IonStmtAssign(node);
         case STMT_LABEL:
           return new IonStmtLabel(node);
+        case COMPOUND_FIELD:
+          return new IonCompoundField(node);
+        case COMPOUND_FIELD_NAMED:
+          return new IonCompoundFieldNamed(node);
+        case EXPR_LITERAL_COMPOUND:
+          return new IonExprLitCompound(node);
+        case EXPR_LITERAL_COMPOUND_TYPED:
+          return new IonExprLitCompoundTyped(node);
       }
       return type.createPsiElement(node);
     }

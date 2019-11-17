@@ -1,0 +1,12 @@
+struct T1 {
+  f1: T2;
+}
+
+struct T2 {
+  <caret>f2: int;
+}
+
+func x() {
+  t: T1;
+  t.f1 = {/*resolve*/f2 = 1};
+}

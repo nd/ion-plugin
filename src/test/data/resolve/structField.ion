@@ -6,3 +6,13 @@ func x() {
   t: T;
   t./*resolve*/f;
 }
+
+func ptr() {
+  t: T*;
+  t./*resolve*/f;
+}
+
+func ptr_ptr() {
+  t: T**;
+  t./*resolve*/f;
+}
