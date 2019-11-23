@@ -2,15 +2,23 @@ package ion.psi;
 
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.util.registry.Registry;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceBase;
+import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValuesManager;
+import com.intellij.psi.util.PsiModificationTracker;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.ObjectUtils;
 import com.intellij.util.Processor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class IonReference extends PsiReferenceBase<IonPsiElement> {
   public IonReference(@NotNull IonPsiElement element, TextRange rangeInElement) {
@@ -20,6 +28,15 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   @Override
   @Nullable
   public PsiElement resolve() {
+    ConcurrentMap<PsiElement, PsiElement> resolveCache = null;
+    if (true) {// Registry.is("ion.resolve.cache.enabled") doesn't work
+      resolveCache = getResolveCache(myElement.getContainingFile());
+      PsiElement result = resolveCache != null ? resolveCache.get(myElement) : null;
+      if (result != null) {
+        return result;
+      }
+    }
+
     if (myElement instanceof IonLabelName) {
       return resolveLabel((IonLabelName) myElement);
     }
@@ -37,14 +54,14 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       return resolveCompoundField(compoundField);
     }
 
-    Ref<PsiElement> result = Ref.create();
+    Ref<PsiElement> ref = Ref.create();
     CharSequence name = getRangeInElement().subSequence(myElement.getText());
     PsiElement processedChild = myElement;
     while (parent != null) {
       boolean stop = !processDeclarations(parent, processedChild, decl -> {
         PsiElement nameElement = decl.getNameIdentifier();
         if (nameElement != null && nameElement.textMatches(name)) {
-          result.set(decl);
+          ref.set(decl);
           return false;
         }
         return true;
@@ -55,7 +72,11 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       processedChild = parent;
       parent = parent.getParent();
     }
-    return result.get();
+    PsiElement result = ref.get();
+    if (result != null && resolveCache != null) {
+      resolveCache.putIfAbsent(myElement, result);
+    }
+    return result;
   }
 
   @Nullable
@@ -485,5 +506,16 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   @NotNull
   private static PsiElement getOperator(@NotNull IonExprUnary expr) {
     return expr.getFirstChild();
+  }
+
+  @Nullable
+  private static ConcurrentMap<PsiElement, PsiElement> getResolveCache(@Nullable PsiFile file) {
+    if (file == null) {
+      return null;
+    }
+    return CachedValuesManager.getCachedValue(file, () -> {
+      ConcurrentHashMap<PsiElement, PsiElement> cache = new ConcurrentHashMap<>();
+      return CachedValueProvider.Result.create(cache, file, PsiModificationTracker.MODIFICATION_COUNT);
+    });
   }
 }
