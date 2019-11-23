@@ -118,9 +118,17 @@ public class IonParser implements PsiParser {
     }
     if (match(b, NAME)) {
       PsiBuilder.Marker m = b.mark();
+      PsiBuilder.Marker name = b.mark();
       consume(b, NAME);
+      name.done(DECL_FIELD_NAME);
       while (consume(b, COMMA)) {
-        expect(b, NAME);
+        if (match(b, NAME)) {
+          name = b.mark();
+          consume(b, NAME);
+          name.done(DECL_FIELD_NAME);
+        } else {
+          break;
+        }
       }
       expect(b, COLON);
       expectType(b);

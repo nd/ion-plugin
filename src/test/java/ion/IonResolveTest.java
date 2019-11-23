@@ -71,6 +71,10 @@ public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
     doTest();
   }
 
+  public void testStructFieldManyNames() {
+    doTest();
+  }
+
   public void testStructFieldChain() {
     doTest();
   }

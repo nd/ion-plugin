@@ -13,6 +13,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType ENUM_ITEM = new IonElementType("enum_item");
   public static final IonElementType DECL_AGGREGATE = new IonElementType("aggregate", TypeId.DECL_AGGREGATE);
   public static final IonElementType DECL_FIELD = new IonElementType("field", TypeId.DECL_FIELD);
+  public static final IonElementType DECL_FIELD_NAME = new IonElementType("field_name", TypeId.DECL_FIELD_NAME);
   public static final IonElementType DECL_IMPORT = new IonElementType("import");
   public static final IonElementType DECL_TYPEDEF = new IonElementType("typedef", TypeId.DECL_TYPEDEF);
   public static final IonElementType DECL_FUNC = new IonElementType("func", TypeId.DECL_FUNC);
@@ -79,6 +80,7 @@ public class IonElementType extends IElementType {
     ENUM_ITEM,
     DECL_AGGREGATE,
     DECL_FIELD,
+    DECL_FIELD_NAME,
     DECL_IMPORT,
     DECL_TYPEDEF,
     DECL_FUNC,

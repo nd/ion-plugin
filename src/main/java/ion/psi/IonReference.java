@@ -42,7 +42,8 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     PsiElement processedChild = myElement;
     while (parent != null) {
       boolean stop = !processDeclarations(parent, processedChild, decl -> {
-        if (decl.getNameIdentifier().textMatches(name)) {
+        PsiElement nameElement = decl.getNameIdentifier();
+        if (nameElement != null && nameElement.textMatches(name)) {
           result.set(decl);
           return false;
         }
@@ -80,8 +81,14 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       String name = nameElement.getText();
       for (PsiElement child : type.getChildren()) {
         if (child instanceof IonDeclField) {
-          if (((IonDeclField) child).getNameIdentifier().textMatches(name)) {
-            return child;
+          IonDeclFieldName[] fieldNames = PsiTreeUtil.getChildrenOfType(child, IonDeclFieldName.class);
+          if (fieldNames != null) {
+            for (IonDeclFieldName fieldName : fieldNames) {
+              PsiElement nameIdentifier = fieldName.getNameIdentifier();
+              if (nameIdentifier != null && nameIdentifier.textMatches(name)) {
+                return fieldName;
+              }
+            }
           }
         }
       }
@@ -104,8 +111,14 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       String name = nameElement.getText();
       for (PsiElement child : type.getChildren()) {
         if (child instanceof IonDeclField) {
-          if (((IonDeclField) child).getNameIdentifier().textMatches(name)) {
-            return child;
+          IonDeclFieldName[] fieldNames = PsiTreeUtil.getChildrenOfType(child, IonDeclFieldName.class);
+          if (fieldNames != null) {
+            for (IonDeclFieldName fieldName : fieldNames) {
+              PsiElement nameIdentifier = fieldName.getNameIdentifier();
+              if (nameIdentifier != null && nameIdentifier.textMatches(name)) {
+                return fieldName;
+              }
+            }
           }
         }
       }
@@ -204,6 +217,12 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       PsiReference reference = type != null ? type.getReference() : null;
       return reference != null ? reference.resolve() : type;
     }
+    if (element instanceof IonDeclFieldName) {
+      IonDeclField field = ObjectUtils.tryCast(element.getParent(), IonDeclField.class);
+      PsiElement type = field != null ? getDeclFieldType(field) : null;
+      PsiReference reference = type != null ? type.getReference() : null;
+      return reference != null ? reference.resolve() : type;
+    }
     if (element instanceof IonDeclFuncParam) {
       PsiElement type = getDeclFuncParamType((IonDeclFuncParam) element);
       PsiReference reference = type != null ? type.getReference() : null;
@@ -272,7 +291,8 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     PsiTreeUtil.processElements(func, it -> {
       IonStmtLabel label = ObjectUtils.tryCast(it, IonStmtLabel.class);
       if (label != null) {
-        if (label.getNameIdentifier().textMatches(name)) {
+        PsiElement nameIdentifier = label.getNameIdentifier();
+        if (nameIdentifier != null && nameIdentifier.textMatches(name)) {
           result.set(label);
           return false;
         }
@@ -425,7 +445,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   }
 
   @Nullable
-  private static PsiElement getUnderlyingType(@NotNull PsiElement type) {
+  private static PsiElement getUnderlyingType(@Nullable PsiElement type) {
     if (type instanceof IonTypePtr) {
       return getUnderlyingPtrType((IonTypePtr) type);
     } else if (type instanceof IonTypeArray) {
