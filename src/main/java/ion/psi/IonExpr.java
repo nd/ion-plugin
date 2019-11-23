@@ -3,8 +3,8 @@ package ion.psi;
 import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
 
-public class IonExprCall extends IonExpr {
-  public IonExprCall(@NotNull ASTNode node) {
+public class IonExpr extends IonPsiElement {
+  public IonExpr(@NotNull ASTNode node) {
     super(node);
   }
 }

@@ -14,5 +14,13 @@ func ptr() {
 
 func ptr_ptr() {
   t: T**;
-  t./*resolve*/f;
+  t./*-resolve*/f;
+}
+
+var a: T = {};
+var b = T{};
+
+func global_var_field() {
+  a./*resolve*/f;
+  b./*resolve*/f;
 }

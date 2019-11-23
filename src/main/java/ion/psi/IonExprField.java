@@ -6,7 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 
-public class IonExprField extends IonPsiElement {
+public class IonExprField extends IonExpr {
   public IonExprField(@NotNull ASTNode node) {
     super(node);
   }

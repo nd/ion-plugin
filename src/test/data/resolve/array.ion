@@ -1,0 +1,29 @@
+struct T {
+  <caret>f: int;
+}
+
+func a() {
+  t: T[10];
+  t[1]./*resolve*/f;
+}
+
+func b() {
+  t: T[10][10];
+  t[1][2]./*resolve*/f;
+}
+
+func c() {
+  t: T*;
+  t[1]./*resolve*/f;
+}
+
+func d() {
+  t: T**;
+  t[1][2]./*resolve*/f;
+}
+
+func e() {
+  t: T[10];
+  t1 := t[0];
+  t1./*resolve*/f;
+}

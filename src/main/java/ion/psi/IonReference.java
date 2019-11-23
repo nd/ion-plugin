@@ -24,12 +24,12 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       return resolveLabel((IonLabelName) myElement);
     }
     if (myElement instanceof IonExprField) {
-      return resolveField((IonExprField) myElement);
+      return resolveExprField((IonExprField) myElement);
     }
     PsiElement parent = myElement.getParent();
     IonExprField field = ObjectUtils.tryCast(parent, IonExprField.class);
     if (field != null && myElement == getFieldName(field)) {
-      return resolveField(field);
+      return resolveExprField(field);
     }
 
     IonCompoundFieldNamed compoundField = ObjectUtils.tryCast(parent, IonCompoundFieldNamed.class);
@@ -58,29 +58,19 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   }
 
   @Nullable
-  public static PsiElement resolveField(@NotNull IonExprField fieldExpr) {
+  public static PsiElement resolveExprField(@NotNull IonExprField fieldExpr) {
     PsiElement qualifier = getQualifier(fieldExpr);
     if (qualifier == null) {
       return null;
     }
-    PsiElement resolvedQualifer = null;
-    if (qualifier instanceof IonExprField) {
-      resolvedQualifer = resolveField((IonExprField) qualifier);
-    } else if (qualifier instanceof IonExprCall) {
-      PsiElement name = ArrayUtil.getFirstElement(qualifier.getChildren());
-      PsiReference reference = name != null ? name.getReference() : null;
-      resolvedQualifer = reference.resolve();
-    } else {
-      PsiReference reference = qualifier.getReference();
-      resolvedQualifer = reference != null ? reference.resolve() : null;
+    PsiElement type = resolveType(qualifier);
+    PsiElement unwrapped = unwrapParAndConstType(type);
+    if (unwrapped instanceof IonTypePtr) {
+      PsiElement underlying = getUnderlyingPtrType((IonTypePtr) unwrapped);
+      unwrapped = unwrapParAndConstType(underlying);
     }
-    if (resolvedQualifer == null) {
-      return null;
-    }
-    PsiElement type = resolveType(resolvedQualifer);
-    PsiElement baseType = getBaseType(type);
-    if (baseType != type) {
-      type = resolveType(baseType);
+    if (unwrapped != type) {
+      type = resolveType(unwrapped);
     }
     if (type instanceof IonDeclAggregate) {
       PsiElement nameElement = getFieldName(fieldExpr);
@@ -159,7 +149,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
         int n = ArrayUtil.indexOf(fields, parent);
         if (n >= 0) {
           if (parentType instanceof IonTypeArray) {
-            PsiElement baseType = getUnderlyingType((IonTypeArray) parentType);
+            PsiElement baseType = getUnderlyingType(parentType);
             PsiReference reference = baseType != null ? baseType.getReference() : null;
             return reference != null ? reference.resolve() : baseType;
           }
@@ -185,8 +175,13 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     }
     if (element instanceof IonStmtInit) {
       PsiElement type = getStmtInitType((IonStmtInit) element);
-      PsiReference reference = type != null ? type.getReference() : null;
-      return reference != null ? reference.resolve() : type;
+      if (type != null) {
+        PsiElement resolved = resolveType(type);
+        return resolved != null ? resolved : type;
+      } else {
+        PsiElement expr = getStmtInitExpr((IonStmtInit) element);
+        return resolveType(expr);
+      }
     }
     if (element instanceof IonStmtAssign) {
       PsiElement lhs = getStmtAssignLhs((IonStmtAssign) element);
@@ -194,6 +189,16 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       PsiElement resolvedLhs = reference != null ? reference.resolve() : null;
       return resolveType(resolvedLhs);
     }
+    if (element instanceof IonDeclVar) {
+      PsiElement type = getDeclVarType((IonDeclVar) element);
+      if (type != null) {
+        return resolveType(type);
+      } else {
+        PsiElement expr = getDeclVarExpr((IonDeclVar) element);
+        return resolveType(expr);
+      }
+    }
+    // todo IonDeclConst
     if (element instanceof IonDeclField) {
       PsiElement type = getDeclFieldType((IonDeclField) element);
       PsiReference reference = type != null ? type.getReference() : null;
@@ -229,7 +234,31 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
         }
       }
     }
-    return null;
+    if (element instanceof IonExprName) {
+      PsiReference reference = element.getReference();
+      PsiElement resolved = reference != null ? reference.resolve() : null;
+      return resolveType(resolved);
+    }
+    if (element instanceof IonExprField) {
+      PsiElement resolved = resolveExprField((IonExprField) element);
+      return resolveType(resolved);
+    }
+    if (element instanceof IonExprCall) {
+      PsiElement name = ArrayUtil.getFirstElement(element.getChildren());
+      PsiReference reference = name != null ? name.getReference() : null;
+      return resolveType(reference.resolve());
+    }
+    if (element instanceof IonExprIndex) {
+      PsiElement indexedExpr = getExprIndexExpr((IonExprIndex) element);
+      PsiElement type = resolveType(indexedExpr);
+      if (type instanceof IonTypeArray || type instanceof IonTypePtr) {
+        PsiElement underlyingType = getUnderlyingType(type);
+        PsiElement underlyingResolved = resolveType(underlyingType);
+        return underlyingResolved != null ? underlyingResolved : underlyingType;
+      }
+    }
+    PsiReference reference = element.getReference();
+    return resolveType(reference != null ? reference.resolve() : null);
   }
 
   @Nullable
@@ -301,6 +330,34 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   }
 
   @Nullable
+  private static PsiElement getStmtInitExpr(@NotNull IonStmtInit stmt) {
+    IonExpr[] exprs = PsiTreeUtil.getChildrenOfType(stmt, IonExpr.class);
+    return exprs != null && exprs.length > 0 ? exprs[0] : null;
+  }
+
+  @Nullable
+  private static PsiElement getDeclVarType(@NotNull IonDeclVar decl) {
+    PsiElement var = decl.getFirstChild();
+    PsiElement name = PsiTreeUtil.skipWhitespacesAndCommentsForward(var);
+    PsiElement element = PsiTreeUtil.skipWhitespacesAndCommentsForward(name);
+    if (element != null && element.getNode().getElementType() == IonToken.COLON) {
+      return PsiTreeUtil.skipWhitespacesAndCommentsForward(element);
+    }
+    return null;
+  }
+
+  @Nullable
+  private static PsiElement getDeclVarExpr(@NotNull IonDeclVar decl) {
+    return PsiTreeUtil.getChildOfType(decl, IonExpr.class);
+  }
+
+  @Nullable
+  private static PsiElement getExprIndexExpr(@NotNull IonExprIndex element) {
+    IonExpr[] children = PsiTreeUtil.getChildrenOfType(element, IonExpr.class);
+    return children != null && children.length > 0 ? children[0] : null;
+  }
+
+  @Nullable
   private static PsiElement getDeclFieldType(@NotNull IonDeclField field) {
     PsiElement name = field.getFirstChild();
     PsiElement element = PsiTreeUtil.skipWhitespacesAndCommentsForward(name);
@@ -338,17 +395,14 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   }
 
   @Nullable
-  private static PsiElement getBaseType(@Nullable PsiElement type) {
+  private static PsiElement unwrapParAndConstType(@Nullable PsiElement type) {
     while (true) {
       PsiElement base = null;
-      if (type instanceof IonTypePtr) {
-        base = getUnderlyingType((IonTypePtr) type);
-      } else if (type instanceof IonTypeArray) {
-        base = getUnderlyingType((IonTypeArray) type);
-      } else if (type instanceof IonTypeConst) {
-        base = getUnderlyingType((IonTypeConst) type);
-      } else if (type instanceof IonTypePar) {
-        base = getUnderlyingType((IonTypePar) type);
+      if (type instanceof IonTypeConst) {
+        base = getUnderlyingConstType((IonTypeConst) type);
+      }
+      if (type instanceof IonTypePar) {
+        base = getUnderlyingParType((IonTypePar) type);
       }
       if (base == null) {
         return type;
@@ -358,24 +412,49 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     }
   }
 
+  @Nullable
+  private static PsiElement getBaseType(@Nullable PsiElement type) {
+    while (true) {
+      PsiElement base = getUnderlyingType(type);
+      if (base == null) {
+        return type;
+      } else {
+        type = base;
+      }
+    }
+  }
 
   @Nullable
-  private static PsiElement getUnderlyingType(@NotNull IonTypePtr type) {
+  private static PsiElement getUnderlyingType(@NotNull PsiElement type) {
+    if (type instanceof IonTypePtr) {
+      return getUnderlyingPtrType((IonTypePtr) type);
+    } else if (type instanceof IonTypeArray) {
+      return getUnderlyingArrayType((IonTypeArray) type);
+    } else if (type instanceof IonTypeConst) {
+      return getUnderlyingConstType((IonTypeConst) type);
+    } else if (type instanceof IonTypePar) {
+      return getUnderlyingParType((IonTypePar) type);
+    }
+    return null;
+  }
+
+  @Nullable
+  private static PsiElement getUnderlyingPtrType(@NotNull IonTypePtr type) {
     return type.getChildren()[0];
   }
 
   @Nullable
-  private static PsiElement getUnderlyingType(@NotNull IonTypeArray type) {
+  private static PsiElement getUnderlyingArrayType(@NotNull IonTypeArray type) {
     return type.getChildren()[0];
   }
 
   @Nullable
-  private static PsiElement getUnderlyingType(@NotNull IonTypeConst type) {
+  private static PsiElement getUnderlyingConstType(@NotNull IonTypeConst type) {
     return type.getChildren()[0];
   }
 
   @Nullable
-  private static PsiElement getUnderlyingType(@NotNull IonTypePar type) {
+  private static PsiElement getUnderlyingParType(@NotNull IonTypePar type) {
     return type.getChildren()[0];
   }
 

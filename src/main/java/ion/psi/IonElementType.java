@@ -34,7 +34,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType EXPR_PAREN = new IonElementType("expr_paren");
   public static final IonElementType EXPR_CAST = new IonElementType("expr_cast");
   public static final IonElementType EXPR_POSTFIX = new IonElementType("expr_postfix");
-  public static final IonElementType EXPR_INDEX = new IonElementType("expr_index");
+  public static final IonElementType EXPR_INDEX = new IonElementType("expr_index", TypeId.EXPR_INDEX);
   public static final IonElementType EXPR_FIELD = new IonElementType("expr_field", TypeId.EXPR_FIELD);
   public static final IonElementType EXPR_CALL = new IonElementType("expr_call", TypeId.EXPR_CALL);
   public static final IonElementType EXPR_CALL_ARG = new IonElementType("expr_call_arg", TypeId.EXPR_CALL_ARG);

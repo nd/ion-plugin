@@ -105,7 +105,7 @@ IonFile
     PsiWhiteSpace(' ')
     PsiElement(=)('=')
     PsiWhiteSpace(' ')
-    IonPsiElement(expr_index)
+    IonExprIndex(expr_index)
       IonExprName(expr_name)
         PsiElement(name)('b')
       PsiElement([)('[')

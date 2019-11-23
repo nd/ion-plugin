@@ -5,7 +5,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 
-public class IonExprName extends IonPsiElement {
+public class IonExprName extends IonExpr {
   public IonExprName(@NotNull ASTNode node) {
     super(node);
   }
