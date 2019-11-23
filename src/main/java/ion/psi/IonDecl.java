@@ -20,6 +20,12 @@ public class IonDecl extends IonPsiElement implements PsiNameIdentifierOwner {
   }
 
   @Override
+  public String getName() {
+    PsiElement name = getNameIdentifier();
+    return name != null ? name.getText() : super.getName();
+  }
+
+  @Override
   @Nullable
   public PsiElement getNameIdentifier() {
     ASTNode nameNode = getNode().findChildByType(IonToken.NAME);

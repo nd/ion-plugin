@@ -30,5 +30,8 @@
         <lang.braceMatcher language="ion" implementationClass="ion.IonBraceMatcher"/>
         <lang.quoteHandler language="ion" implementationClass="ion.IonQuoteHandler"/>
         <lineIndentProvider implementation="ion.IonLineIndentProvider"/>
+        <lang.findUsagesProvider language="ion" implementationClass="ion.IonFindUsagesProvider"/>
+
+        <!--<registryKey key="ion.resolve.cache.enabled" defaultValue="true"/>-->
     </extensions>
 </idea-plugin>
