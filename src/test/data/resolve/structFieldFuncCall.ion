@@ -7,5 +7,14 @@ func x() {
 }
 
 func y(a: int): T {
-  return {};
+  return {/*resolve*/f = a};
+}
+
+struct T2 {
+  one: T;
+  two: T;
+}
+
+func z(): T2 {
+  return {{f = 1}, {/*resolve*/f = 2}};
 }

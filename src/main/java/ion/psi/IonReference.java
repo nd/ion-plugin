@@ -174,6 +174,10 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
         }
       }
     }
+    if (parent instanceof IonStmtReturn) {
+      IonDeclFunc func = PsiTreeUtil.getParentOfType(parent, IonDeclFunc.class);
+      return resolveType(func);
+    }
     return null;
   }
 

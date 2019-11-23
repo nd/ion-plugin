@@ -62,7 +62,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType STMT_SWITCH_PATTERN = new IonElementType("switch_pattern");
   public static final IonElementType STMT_BREAK = new IonElementType("break");
   public static final IonElementType STMT_CONTINUE = new IonElementType("continue");
-  public static final IonElementType STMT_RETURN = new IonElementType("return");
+  public static final IonElementType STMT_RETURN = new IonElementType("return", TypeId.STMT_RETURN);
   public static final IonElementType STMT_NOTE = new IonElementType("stmt_note");
   public static final IonElementType STMT_LABEL = new IonElementType("label", TypeId.STMT_LABEL);
   public static final IonElementType STMT_GOTO = new IonElementType("goto");
