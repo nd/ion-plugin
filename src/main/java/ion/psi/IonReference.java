@@ -1,7 +1,10 @@
 package ion.psi;
 
+import com.google.common.primitives.Chars;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
@@ -27,9 +30,10 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   @Override
   @Nullable
   public PsiElement resolve() {
+    PsiFile file = myElement.getContainingFile();
     ConcurrentMap<PsiElement, PsiElement> resolveCache = null;
     if (true) {// Registry.is("ion.resolve.cache.enabled") doesn't work
-      resolveCache = getResolveCache(myElement.getContainingFile());
+      resolveCache = getResolveCache(file);
       PsiElement result = resolveCache != null ? resolveCache.get(myElement) : null;
       if (result != null) {
         return result;
@@ -56,6 +60,8 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     Ref<PsiElement> ref = Ref.create();
     CharSequence name = getRangeInElement().subSequence(myElement.getText());
     PsiElement processedChild = myElement;
+    IonBlock nearestBlock = null;
+    Ref<Pair<CharSequence, PsiElement>> blockCache = null;
     while (parent != null) {
       boolean stop = !processDeclarations(parent, processedChild, decl -> {
         PsiElement nameElement = decl.getNameIdentifier();
@@ -68,12 +74,25 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       if (stop) {
         break;
       }
+      if (nearestBlock == null && parent instanceof IonBlock) {
+        nearestBlock = (IonBlock) parent;
+        blockCache = getBlockResolveCache(file, nearestBlock);
+        Pair<CharSequence, PsiElement> cached = blockCache != null ? blockCache.get() : null;
+        if (cached != null && StringUtil.equals(name, cached.first)) {
+          return cached.second;
+        }
+      }
       processedChild = parent;
       parent = parent.getParent();
     }
     PsiElement result = ref.get();
-    if (result != null && resolveCache != null) {
-      resolveCache.putIfAbsent(myElement, result);
+    if (result != null) {
+      if (resolveCache != null) {
+        resolveCache.putIfAbsent(myElement, result);
+      }
+      if (blockCache != null) {
+        blockCache.setIfNull(Pair.create(name, result));
+      }
     }
     return result;
   }
@@ -541,6 +560,16 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     return CachedValuesManager.getCachedValue(file, () -> {
       ConcurrentHashMap<PsiElement, PsiElement> cache = new ConcurrentHashMap<>();
       return CachedValueProvider.Result.create(cache, file, PsiModificationTracker.MODIFICATION_COUNT);
+    });
+  }
+
+  @Nullable
+  private static Ref<Pair<CharSequence, PsiElement>> getBlockResolveCache(@Nullable PsiFile file, @Nullable IonBlock block) {
+    if (file == null || block == null) {
+      return null;
+    }
+    return CachedValuesManager.getCachedValue(block, () -> {
+      return CachedValueProvider.Result.create(Ref.create(), file, PsiModificationTracker.MODIFICATION_COUNT);
     });
   }
 }

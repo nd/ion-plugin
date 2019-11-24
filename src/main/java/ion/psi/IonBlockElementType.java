@@ -45,6 +45,6 @@ public class IonBlockElementType extends IReparseableElementType {
 
   @NotNull
   public PsiElement createPsiElement(ASTNode node) {
-    return new IonPsiElement(node);
+    return new IonBlock(node);
   }
 }
