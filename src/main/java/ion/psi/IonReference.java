@@ -101,14 +101,34 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       String name = nameElement.getText();
       for (PsiElement child : type.getChildren()) {
         if (child instanceof IonDeclField) {
-          IonDeclFieldName[] fieldNames = PsiTreeUtil.getChildrenOfType(child, IonDeclFieldName.class);
-          if (fieldNames != null) {
-            for (IonDeclFieldName fieldName : fieldNames) {
-              PsiElement nameIdentifier = fieldName.getNameIdentifier();
-              if (nameIdentifier != null && nameIdentifier.textMatches(name)) {
-                return fieldName;
-              }
-            }
+          PsiElement result = processDeclField((IonDeclField) child, name);
+          if (result != null) {
+            return result;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  @Nullable
+  private static PsiElement processDeclField(@NotNull IonDeclField field, @NotNull String name) {
+    IonDeclFieldName[] fieldNames = PsiTreeUtil.getChildrenOfType(field, IonDeclFieldName.class);
+    if (fieldNames != null) {
+      for (IonDeclFieldName fieldName : fieldNames) {
+        PsiElement nameIdentifier = fieldName.getNameIdentifier();
+        if (nameIdentifier != null && nameIdentifier.textMatches(name)) {
+          return fieldName;
+        }
+      }
+    } else {
+      // anonymous field
+      IonDeclField[] innerFields = PsiTreeUtil.getChildrenOfType(field, IonDeclField.class);
+      if (innerFields != null) {
+        for (IonDeclField f : innerFields) {
+          PsiElement result = processDeclField(f, name);
+          if (result != null) {
+            return result;
           }
         }
       }
@@ -131,14 +151,9 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       String name = nameElement.getText();
       for (PsiElement child : type.getChildren()) {
         if (child instanceof IonDeclField) {
-          IonDeclFieldName[] fieldNames = PsiTreeUtil.getChildrenOfType(child, IonDeclFieldName.class);
-          if (fieldNames != null) {
-            for (IonDeclFieldName fieldName : fieldNames) {
-              PsiElement nameIdentifier = fieldName.getNameIdentifier();
-              if (nameIdentifier != null && nameIdentifier.textMatches(name)) {
-                return fieldName;
-              }
-            }
+          PsiElement result = processDeclField((IonDeclField) child, name);
+          if (result != null) {
+            return result;
           }
         }
       }

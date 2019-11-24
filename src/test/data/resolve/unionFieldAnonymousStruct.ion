@@ -1,0 +1,19 @@
+struct T {
+  type: int;
+  union {
+    struct {
+      f1: int;
+      <caret>f2: int;
+    }
+    f3: char;
+  }
+}
+
+func x() {
+  t: T;
+  t./*resolve*/f2;
+}
+
+func y() {
+  T{type = 1, /*!resolve*/f2 = 2};
+}

@@ -1,0 +1,9 @@
+union U {
+  f1: int;
+  <caret>f2: char;
+}
+
+func x() {
+  u: U;
+  u./*resolve*/f2;
+}

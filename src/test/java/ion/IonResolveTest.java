@@ -59,6 +59,18 @@ public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
     doTest();
   }
 
+  public void testUnionField() {
+    doTest();
+  }
+
+  public void testUnionFieldAnonymous() {
+    doTest();
+  }
+
+  public void testUnionFieldAnonymousStruct() {
+    doTest();
+  }
+
   public void testTypedef() {
     doTest();
   }
