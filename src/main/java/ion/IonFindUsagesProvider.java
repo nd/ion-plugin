@@ -36,6 +36,8 @@ public class IonFindUsagesProvider implements FindUsagesProvider {
           return "const";
         case DECL_ENUM:
           return "enum";
+        case DECL_ENUM_ITEM:
+          return "enum item";
         case DECL_FIELD:
         case DECL_FIELD_NAME:
           return "field";
@@ -47,6 +49,8 @@ public class IonFindUsagesProvider implements FindUsagesProvider {
           return "typedef";
         case STMT_INIT:
           return "local";
+        case STMT_LABEL:
+          return "label";
       }
     }
     return "unknown";

@@ -2,7 +2,6 @@ package ion.psi;
 
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.util.registry.Registry;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
@@ -330,13 +329,24 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   public static boolean processDeclarations(@NotNull PsiElement element,
                                             @Nullable PsiElement processedChild,
                                             @NotNull Processor<IonDecl> processor) {
+    boolean isFile = element instanceof IonPsiFile;
     for (PsiElement child : element.getChildren()) {
-      if (!(element instanceof IonPsiFile) && child.equals(processedChild)) {
+      if (!isFile && child.equals(processedChild)) {
         break;
       }
       if (child instanceof IonDecl && !(child instanceof IonStmtLabel)) {
         if (!processor.process((IonDecl) child)) {
           return false;
+        }
+        if (isFile && child instanceof IonDeclEnum) {
+          IonDeclEnumItem[] enumItems = PsiTreeUtil.getChildrenOfType(child, IonDeclEnumItem.class);
+          if (enumItems != null) {
+            for (IonDeclEnumItem enumItem : enumItems) {
+              if (!processor.process(enumItem)) {
+                return false;
+              }
+            }
+          }
         }
       }
     }

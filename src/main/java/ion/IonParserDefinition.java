@@ -90,6 +90,10 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonDeclFieldName(node);
         case DECL_TYPEDEF:
           return new IonDeclTypedef(node);
+        case DECL_ENUM:
+          return new IonDeclEnum(node);
+        case DECL_ENUM_ITEM:
+          return new IonDeclEnumItem(node);
         case STMT_INIT:
           return new IonStmtInit(node);
         case STMT_ASSIGN:

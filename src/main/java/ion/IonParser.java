@@ -81,7 +81,7 @@ public class IonParser implements PsiParser {
       if (consume(b, ASSIGN)) {
         expectExpr(b);
       }
-      m.done(ENUM_ITEM);
+      m.done(DECL_ENUM_ITEM);
     }
   }
 

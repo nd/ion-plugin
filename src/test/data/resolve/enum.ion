@@ -1,0 +1,9 @@
+enum E {
+  E1 = 256,
+  <caret>E2,
+  E3,
+}
+
+func x() {
+  /*resolve*/E2;
+}

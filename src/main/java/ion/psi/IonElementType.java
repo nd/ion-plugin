@@ -9,8 +9,8 @@ import org.jetbrains.annotations.NotNull;
 public class IonElementType extends IElementType {
   public static final IonElementType DECL_CONST = new IonElementType("const", TypeId.DECL_CONST);
   public static final IonElementType DECL_VAR = new IonElementType("var", TypeId.DECL_VAR);
-  public static final IonElementType DECL_ENUM = new IonElementType("enum");
-  public static final IonElementType ENUM_ITEM = new IonElementType("enum_item");
+  public static final IonElementType DECL_ENUM = new IonElementType("enum", TypeId.DECL_ENUM);
+  public static final IonElementType DECL_ENUM_ITEM = new IonElementType("enum_item", TypeId.DECL_ENUM_ITEM);
   public static final IonElementType DECL_AGGREGATE = new IonElementType("aggregate", TypeId.DECL_AGGREGATE);
   public static final IonElementType DECL_FIELD = new IonElementType("field", TypeId.DECL_FIELD);
   public static final IonElementType DECL_FIELD_NAME = new IonElementType("field_name", TypeId.DECL_FIELD_NAME);
@@ -77,7 +77,7 @@ public class IonElementType extends IElementType {
     DECL_CONST,
     DECL_VAR,
     DECL_ENUM,
-    ENUM_ITEM,
+    DECL_ENUM_ITEM,
     DECL_AGGREGATE,
     DECL_FIELD,
     DECL_FIELD_NAME,
