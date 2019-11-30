@@ -6,6 +6,6 @@ IonFile
     PsiWhiteSpace(' ')
     PsiElement(=)('=')
     PsiWhiteSpace(' ')
-    IonPsiElement(expr_literal_int)
+    IonExprLitInt(expr_literal_int)
       PsiElement(int)('1')
     PsiElement(;)(';')

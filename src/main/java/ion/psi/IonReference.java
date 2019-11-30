@@ -1,6 +1,5 @@
 package ion.psi;
 
-import com.google.common.primitives.Chars;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.TextRange;
@@ -332,6 +331,22 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
         PsiElement underlyingType = getUnderlyingType(type);
         PsiElement underlyingResolved = resolveType(underlyingType);
         return underlyingResolved != null ? underlyingResolved : underlyingType;
+      }
+      if (type instanceof IonTypeTuple) {
+        IonExprLitInt index = PsiTreeUtil.getNextSiblingOfType(indexedExpr, IonExprLitInt.class);
+        if (index != null) {
+          String text = index.getText();
+          try {
+            int idx = Integer.parseInt(text);
+            IonType[] tupleItems = PsiTreeUtil.getChildrenOfType(type, IonType.class);
+            if (tupleItems != null && idx < tupleItems.length) {
+              IonType itemType = tupleItems[idx];
+              PsiElement resolved = resolveType(itemType);
+              return resolved != null ? resolved : itemType;
+            }
+          } catch (NumberFormatException e) {
+          }
+        }
       }
     }
     PsiReference reference = element.getReference();

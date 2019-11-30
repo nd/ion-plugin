@@ -21,7 +21,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType NOTE = new IonElementType("note");
   public static final IonElementType NOTE_PARAM = new IonElementType("note_param");
   public static final IonElementType IMPORT_ITEM = new IonElementType("import_item");
-  public static final IonElementType EXPR_LITERAL_INT = new IonElementType("expr_literal_int");
+  public static final IonElementType EXPR_LITERAL_INT = new IonElementType("expr_literal_int", TypeId.EXPR_LITERAL_INT);
   public static final IonElementType EXPR_LITERAL_FLOAT = new IonElementType("expr_literal_float");
   public static final IonElementType EXPR_LITERAL_STR = new IonElementType("expr_literal_str");
   public static final IonElementType EXPR_LITERAL_CHAR = new IonElementType("expr_literal_char");
@@ -48,7 +48,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType TYPE_PTR = new IonElementType("type_ptr", TypeId.TYPE_PTR);
   public static final IonElementType TYPE_CONST = new IonElementType("type_const", TypeId.TYPE_CONST);
   public static final IonElementType TYPE_ARRAY = new IonElementType("type_array", TypeId.TYPE_ARRAY);
-  public static final IonElementType TYPE_TUPLE = new IonElementType("type_tuple");
+  public static final IonElementType TYPE_TUPLE = new IonElementType("type_tuple", TypeId.TYPE_TUPLE);
   public static final IonElementType TYPE_FUNC = new IonElementType("type_func");
   public static final IonElementType TYPE_FUNC_PARAM = new IonElementType("type_func_param");
   public static final IonElementType STMT_LIST = new IonElementType("stmt_list");

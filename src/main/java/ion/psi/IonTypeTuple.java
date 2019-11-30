@@ -3,8 +3,8 @@ package ion.psi;
 import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
 
-public class IonTypeConst extends IonType {
-  public IonTypeConst(@NotNull ASTNode node) {
+public class IonTypeTuple extends IonType {
+  public IonTypeTuple(@NotNull ASTNode node) {
     super(node);
   }
 }

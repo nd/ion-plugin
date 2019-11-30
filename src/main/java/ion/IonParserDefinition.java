@@ -72,6 +72,8 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonTypeConst(node);
         case TYPE_ARRAY:
           return new IonTypeArray(node);
+        case TYPE_TUPLE:
+          return new IonTypeTuple(node);
         case LABEL_NAME:
           return new IonLabelName(node);
         case DECL_VAR:
@@ -108,6 +110,8 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonCompoundFieldNamed(node);
         case EXPR_LITERAL_COMPOUND:
           return new IonExprLitCompound(node);
+        case EXPR_LITERAL_INT:
+          return new IonExprLitInt(node);
         case EXPR_LITERAL_COMPOUND_TYPED:
           return new IonExprLitCompoundTyped(node);
       }

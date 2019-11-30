@@ -24,3 +24,13 @@ func global_var_field() {
   a./*resolve*/f;
   b./*resolve*/f;
 }
+
+func tuple() {
+  x: {T, T};
+  x[1]./*resolve*/f;
+}
+
+func tuple_ptr() {
+  x: {T, T*};
+  x[1]./*resolve*/f;
+}
