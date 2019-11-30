@@ -1,0 +1,8 @@
+func a() {
+}
+
+func <caret>g() {
+}
+
+func b() {
+}

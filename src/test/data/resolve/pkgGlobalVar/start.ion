@@ -1,0 +1,5 @@
+var a: int = /*resolve*/x;
+
+func f() {
+  /*resolve*/x;
+}

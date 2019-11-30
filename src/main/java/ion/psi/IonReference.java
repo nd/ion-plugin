@@ -4,10 +4,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiReference;
-import com.intellij.psi.PsiReferenceBase;
+import com.intellij.psi.*;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiModificationTracker;
@@ -63,6 +60,9 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     Ref<Pair<CharSequence, PsiElement>> blockCache = null;
     while (parent != null) {
       boolean stop = !processDeclarations(parent, processedChild, decl -> {
+        if (decl instanceof IonStmtLabel) {
+          return true;
+        }
         PsiElement nameElement = decl.getNameIdentifier();
         if (nameElement != null && nameElement.textMatches(name)) {
           ref.set(decl);
@@ -379,21 +379,39 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
                                             @Nullable PsiElement processedChild,
                                             @NotNull Processor<IonDecl> processor) {
     boolean isFile = element instanceof IonPsiFile;
+    boolean isDir = element instanceof PsiDirectory;
     for (PsiElement child : element.getChildren()) {
-      if (!isFile && child.equals(processedChild)) {
+      if (!isFile && !isDir && child.equals(processedChild)) {
         break;
       }
-      if (child instanceof IonDecl && !(child instanceof IonStmtLabel)) {
-        if (!processor.process((IonDecl) child)) {
-          return false;
+      if (!processDecl(child, processor)) {
+        return false;
+      }
+      if (child instanceof IonPsiFile && child != processedChild) {
+        PsiElement[] topLevelElements = child.getChildren();
+        if (topLevelElements != null) {
+          for (PsiElement topLevelChild : topLevelElements) {
+            if (!processDecl(topLevelChild, processor)) {
+              return false;
+            }
+          }
         }
-        if (isFile && child instanceof IonDeclEnum) {
-          IonDeclEnumItem[] enumItems = PsiTreeUtil.getChildrenOfType(child, IonDeclEnumItem.class);
-          if (enumItems != null) {
-            for (IonDeclEnumItem enumItem : enumItems) {
-              if (!processor.process(enumItem)) {
-                return false;
-              }
+      }
+    }
+    return true;
+  }
+
+  private static boolean processDecl(@Nullable PsiElement child, @NotNull Processor<IonDecl> processor) {
+    if (child instanceof IonDecl) {
+      if (!processor.process((IonDecl) child)) {
+        return false;
+      }
+      if (child instanceof IonDeclEnum) {
+        IonDeclEnumItem[] enumItems = PsiTreeUtil.getChildrenOfType(child, IonDeclEnumItem.class);
+        if (enumItems != null) {
+          for (IonDeclEnumItem enumItem : enumItems) {
+            if (!processor.process(enumItem)) {
+              return false;
             }
           }
         }
