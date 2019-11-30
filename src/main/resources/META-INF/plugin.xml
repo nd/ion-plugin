@@ -8,14 +8,11 @@
 
     <idea-version since-build="191.1"/>
 
-    <version>3</version>
+    <version>4</version>
 
     <change-notes><![CDATA[
     <ul>
-      <li>Ion Lexer</li>
-      <li>Ion Parser</li>
-      <li>Debugger in CLion</li>
-      <li>Basic indentation on enter</li>
+      <li>Resolve inside a package</li>
     </ul>
     ]]>
     </change-notes>
