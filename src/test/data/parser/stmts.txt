@@ -264,7 +264,7 @@ IonFile
             PsiElement(name)('x')
           PsiElement())(')')
           PsiWhiteSpace(' ')
-          IonPsiElement(block)
+          IonBlock(block)
             PsiElement({)('{')
             IonPsiElement(stmt_list)
               <empty list>
