@@ -12,3 +12,5 @@ var a: func(int): int;
 var a: func(x: int): int;
 var a: func(int, int);
 var a: func(int, ...): int;
+var a: {float, float};
+var a: {float, float*};
