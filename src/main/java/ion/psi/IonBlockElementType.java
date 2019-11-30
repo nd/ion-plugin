@@ -39,7 +39,7 @@ public class IonBlockElementType extends IReparseableElementType {
     ParserDefinition parserDefinition = LanguageParserDefinitions.INSTANCE.forLanguage(lang);
     IonParser parser = ObjectUtils.tryCast(parserDefinition.createParser(project), IonParser.class);
     parser.expectStmtBlock(builder);
-    ASTNode tree = builder.getTreeBuilt();
+    ASTNode tree = builder.getTreeBuilt(); // throws ReparsedSuccessfullyException exception to signal success
     return tree.getFirstChildNode();
   }
 
