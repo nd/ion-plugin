@@ -1,0 +1,137 @@
+func x() {
+  ]
+}
+
+func x() {
+  while;
+}
+func x() {
+  while(;
+}
+func x() {
+  while();
+}
+func x() {
+  while(true)
+}
+
+func x() {
+  if
+}
+func x() {
+  if (
+}
+func x() {
+  if (=
+}
+func x() {
+  if (1)
+}
+func x() {
+  if (1;)
+}
+func x() {
+  if (a:=1;)
+}
+
+func x() {
+  do;
+}
+func x() {
+  do {
+  };
+}
+func x() {
+  do {
+  }while;
+}
+func x() {
+  do {
+  }while(;
+}
+func x() {
+  do {
+  }while(1;
+}
+
+func x() {
+  for;
+}
+func x() {
+  for (;
+}
+func x() {
+  for (;;
+}
+func x() {
+  for (;;)
+}
+
+func x() {
+  switch
+}
+func x() {
+  switch(
+}
+func x() {
+  switch()
+}
+func x() {
+  switch(1) {
+  default
+  }
+}
+func x() {
+  switch(1) {
+  case
+  }
+}
+func x() {
+  switch(1) {
+  case ,:
+  }
+}
+
+func x() {
+  break
+}
+func x() {
+  continue
+}
+func x() {
+  return
+}
+
+func x() {
+  #ok
+}
+
+func x() {
+:
+}
+
+func x() {
+  goto
+}
+func x() {
+  goto x
+}
+
+func x() {
+  x := 1
+}
+
+func x() {
+  1 ? 1;
+}
+
+func x() {
+  x(;
+}
+func x() {
+  x(1;
+}
+
+func x() {
+  x[1;
+}
