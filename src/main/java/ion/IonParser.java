@@ -7,6 +7,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.containers.ContainerUtil;
+import ion.psi.IonElementType;
 import ion.psi.IonToken;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,8 +19,13 @@ import static ion.psi.IonToken.*;
 
 public class IonParser implements PsiParser {
   private final static TokenSet TOP_LEVEL_TOKENS = TokenSet.create(
-          ENUM, FUNC, TYPEDEF, VAR, CONST, UNION, IMPORT, SEMICOLON
+          ENUM, FUNC, TYPEDEF, VAR, CONST, UNION, IMPORT, SEMICOLON, AT, POUND
   );
+
+  private final static TokenSet FUNC_PARAMS_STOP = TokenSet.create(
+          LBRACE, SEMICOLON
+  );
+
 
   @Override
   public @NotNull ASTNode parse(@NotNull IElementType root, @NotNull PsiBuilder b) {
@@ -39,9 +45,9 @@ public class IonParser implements PsiParser {
       } else if (token == IMPORT) {
         parseImport(b);
       } else if (token == CONST) {
-        parseConst(b);
+        parseVarOrConst(b, CONST, DECL_CONST);
       } else if (token == VAR) {
-        parseVar(b);
+        parseVarOrConst(b, VAR, DECL_VAR);
       } else if (token == TYPEDEF) {
         parseTypedef(b);
       } else if (token == FUNC) {
@@ -109,15 +115,15 @@ public class IonParser implements PsiParser {
   }
 
   private void parseAggregate(@NotNull PsiBuilder b) {
-    if (expect(b, LBRACE)) {
+    if (consumeOrError(b, LBRACE)) {
       while (!b.eof() && !match(b, RBRACE)) {
         parseAggregateItem(b);
         if (!match(b, RBRACE) && !match(b, NAME) && !match(b, STRUCT) && !match(b, UNION)) {
           b.error("Exprected '}', or aggregate item, got " + b.getTokenText());
-          b.advanceLexer();
+          break;
         }
       }
-      expect(b, RBRACE);
+      consumeUntil(b, RBRACE, TOP_LEVEL_TOKENS);
     }
   }
 
@@ -139,12 +145,13 @@ public class IonParser implements PsiParser {
           consume(b, NAME);
           name.done(DECL_FIELD_NAME);
         } else {
+          b.error("Expected name, got " + b.getTokenText());
           break;
         }
       }
-      expect(b, COLON);
+      consumeOrError(b, COLON);
       expectType(b);
-      expect(b, SEMICOLON);
+      consumeOrError(b, SEMICOLON);
       m.done(DECL_FIELD);
     }
   }
@@ -188,54 +195,32 @@ public class IonParser implements PsiParser {
     m.done(IMPORT_ITEM);
   }
 
-  private void parseConst(@NotNull PsiBuilder b) {
-    assert b.getTokenType() == CONST;
+  private void parseVarOrConst(@NotNull PsiBuilder b,
+                               @NotNull IonToken varOrConst,
+                               @NotNull IonElementType elementType) {
+    assert (varOrConst == CONST || varOrConst == VAR) && b.getTokenType() == varOrConst;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    if (expect(b, NAME)) {
+    if (consumeOrError(b, NAME)) {
       if (consume(b, COLON)) {
-        if (!expectType(b)) {
-          b.advanceLexer();
-        }
+        expectType(b);
       }
       if (consume(b, ASSIGN)) {
-        if (!expectExpr(b)) {
-          b.advanceLexer();
-        }
+        expectExpr(b);
       }
-      expect(b, SEMICOLON);
     }
-    m.done(DECL_CONST);
-  }
-
-  private void parseVar(@NotNull PsiBuilder b) {
-    assert b.getTokenType() == VAR;
-    PsiBuilder.Marker m = b.mark();
-    b.advanceLexer();
-    if (expect(b, NAME)) {
-      if (consume(b, COLON)) {
-        if (!expectType(b)) {
-          b.advanceLexer();
-        }
-      }
-      if (consume(b, ASSIGN)) {
-        if (!expectExpr(b)) {
-          b.advanceLexer();
-        }
-      }
-      consumeUntil(b, SEMICOLON);
-    }
-    m.done(DECL_VAR);
+    consumeUntil(b, SEMICOLON, TOP_LEVEL_TOKENS);
+    m.done(elementType);
   }
 
   private void parseTypedef(@NotNull PsiBuilder b) {
     assert b.getTokenType() == TYPEDEF;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    expect(b, NAME);
-    expect(b, ASSIGN);
+    consumeOrError(b, NAME);
+    consumeOrError(b, ASSIGN);
     expectType(b);
-    expect(b, SEMICOLON);
+    consumeUntil(b, SEMICOLON, TOP_LEVEL_TOKENS);
     m.done(DECL_TYPEDEF);
   }
 
@@ -243,16 +228,23 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == FUNC;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    expect(b, NAME);
-    if (expect(b, LPAREN)) {
-      while (!b.eof() && !match(b, RPAREN)) {
-        parseFuncParam(b);
-        if (!consume(b, COMMA) && !match(b, RPAREN)) {
-          b.error("Expected ',', or ')', got " + b.getTokenText());
-          b.advanceLexer();
-        }
+    consumeOrError(b, NAME);
+    if (consumeOrError(b, LPAREN)) {
+      if (!b.eof() && !match(b, RPAREN)) {
+        do {
+          if (!parseFuncParam(b)) {
+            b.error("Expected function paramter, got " + b.getTokenText());
+            break;
+          }
+          if (!consume(b, COMMA)) {
+            if (!match(b, RPAREN)) {
+              b.error("Expected ',', or ')', got " + b.getTokenText());
+            }
+            break;
+          }
+        } while (true);
       }
-      expect(b, RPAREN);
+      consumeUntil(b, RPAREN, FUNC_PARAMS_STOP);
     }
     if (consume(b, COLON)) {
       expectType(b);
@@ -265,13 +257,13 @@ public class IonParser implements PsiParser {
     m.done(DECL_FUNC);
   }
 
-  private void parseFuncParam(@NotNull PsiBuilder b) {
+  private boolean parseFuncParam(@NotNull PsiBuilder b) {
     boolean name = match(b, NAME);
     if (name || match(b, ELLIPSIS)) {
       PsiBuilder.Marker m = b.mark();
       b.advanceLexer();
       if (name) {
-        expect(b, COLON);
+        consumeOrError(b, COLON);
         expectType(b);
       } else {
         if (!match(b, RPAREN) && !match(b, COMMA)) {
@@ -279,6 +271,9 @@ public class IonParser implements PsiParser {
         }
       }
       m.done(DECL_FUNC_PARAM);
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -610,16 +605,17 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == AT || b.getTokenType() == POUND;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    expect(b, NAME);
+    consumeOrError(b, NAME);
     if (consume(b, LPAREN)) {
       if (!match(b, RPAREN)) {
         do {
           if (!parseNoteParam(b)) {
             b.error("Expected note parameter, got " + b.getTokenText());
+            break;
           }
         } while (consume(b, COMMA));
       }
-      expect(b, RPAREN);
+      consumeUntil(b, RPAREN, TOP_LEVEL_TOKENS);
     }
     m.done(NOTE);
   }
@@ -1163,6 +1159,10 @@ public class IonParser implements PsiParser {
     return false;
   }
 
+  private boolean match(@NotNull PsiBuilder b, @NotNull TokenSet tokens) {
+    return tokens.contains(b.getTokenType());
+  }
+
   private boolean lookAhead(@NotNull PsiBuilder b, int n, @NotNull IElementType... tokens) {
     IElementType actual = b.lookAhead(n);
     for (IElementType token : tokens) {
@@ -1185,7 +1185,7 @@ public class IonParser implements PsiParser {
   private void consumeUntil(@NotNull PsiBuilder b, @NotNull IElementType token, @NotNull TokenSet tokens) {
     if (!consume(b, token)) {
       b.error("Expected '" + token.toString() + "', got: " + b.getTokenText());
-      while (!b.eof() && !consume(b, token) && !consume(b, tokens)) {
+      while (!b.eof() && !consume(b, token) && !match(b, tokens)) {
         b.advanceLexer();
       }
     }

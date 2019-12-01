@@ -6,3 +6,41 @@ enum {
 enum {
   ok ok
 }
+
+struct S [
+struct S {
+  x
+}
+struct S {
+  x:
+}
+struct S {
+  x,:
+}
+
+const 1;
+const a: ;
+const a: int =;
+
+var;
+var x:;
+var x: = 1;
+var x =;
+
+typedef;
+typedef x;
+typedef x int;
+typedef x int int;
+typedef x =;
+
+func x;
+func x(;
+func x(a: int,);
+func x(...1);
+func x(a int);
+
+@1
+@x(
+@x[
+@x(=)
+@x(a=)
