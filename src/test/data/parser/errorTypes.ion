@@ -1,0 +1,11 @@
+var x: {*int};
+var x: {int, *int};
+var x: {int int};
+var x: a.;
+var x: a..;
+var x: func(;
+var x: func(int;
+var x: func(int, );
+var x: (int;
+var x: int[;
+var x: int[1;

@@ -211,7 +211,7 @@ public class IonParser implements PsiParser {
           b.advanceLexer();
         }
       }
-      expect(b, SEMICOLON);
+      consumeUntil(b, SEMICOLON);
     }
     m.done(DECL_VAR);
   }
@@ -417,7 +417,7 @@ public class IonParser implements PsiParser {
           }
         }
         if (expectSemi) {
-          expect(b, SEMICOLON);
+          consumeUntil(b, SEMICOLON);
         }
         m.done(STMT_INIT);
         return true;
@@ -981,14 +981,16 @@ public class IonParser implements PsiParser {
         if (!match(b, RBRACKET)) {
           parseExpr(b);
         }
-        expect(b, RBRACKET);
+        boolean ok = consumeOrError(b, RBRACKET);
         m.done(TYPE_ARRAY);
         m = outer;
+        if (!ok) {
+          break;
+        }
       } else if (consume(b, CONST)) {
         PsiBuilder.Marker outer = m.precede();
         m.done(TYPE_CONST);
         m = outer;
-
       } else if (consume(b, MUL)) {
         PsiBuilder.Marker outer = m.precede();
         m.done(TYPE_PTR);
@@ -1005,15 +1007,15 @@ public class IonParser implements PsiParser {
       PsiBuilder.Marker name1 = b.mark();
       consume(b, NAME);
       name1.done(TYPE_NAME);
-      while (match(b, DOT)) {
-        consume(b, DOT);
+      boolean ok = true;
+      while (ok && consume(b, DOT)) {
         if (match(b, NAME)) {
           PsiBuilder.Marker name2 = b.mark();
           consume(b, NAME);
           name2.done(TYPE_NAME);
         } else {
           b.error("Expected name, got " + b.getTokenText());
-          b.advanceLexer();
+          ok = false;
         }
         m.done(TYPE_QNAME);
         m = m.precede();
@@ -1022,16 +1024,24 @@ public class IonParser implements PsiParser {
       return true;
     }
     if (consume(b, FUNC)) {
-      if (expect(b, LPAREN)) {
+      if (consumeOrError(b, LPAREN)) {
         if (!consume(b, RPAREN)) {
-          parseTypeFuncParam(b);
-          while (consume(b, COMMA)) {
-            parseTypeFuncParam(b);
+          if (parseTypeFuncParam(b)) {
+            while (consume(b, COMMA)) {
+              if (!parseTypeFuncParam(b)) {
+                b.error("Expected parameter, got " + b.getTokenText());
+                break;
+              }
+            }
+          } else {
+            b.error("Expected parameter, got " + b.getTokenText());
           }
-          expect(b, RPAREN);
+          consumeOrError(b, RPAREN);
         }
         if (consume(b, COLON)) {
-          parseType(b);
+          if (!parseType(b)) {
+            b.error("Expected type, got " + b.getTokenText());
+          }
         }
       }
       m.done(TYPE_FUNC);
@@ -1039,7 +1049,7 @@ public class IonParser implements PsiParser {
     }
     if (consume(b, LPAREN)) {
       parseType(b);
-      expect(b, RPAREN);
+      consumeOrError(b, RPAREN);
       m.done(TYPE_PAR);
       return true;
     }
@@ -1075,10 +1085,21 @@ public class IonParser implements PsiParser {
     if (match(b, NAME) && lookAhead(b, 1, COLON)) {
       b.advanceLexer();
       b.advanceLexer();
+      if (!parseType(b)) {
+        b.error("Expected type, got: " + b.getTokenText());
+      }
+      m.done(TYPE_FUNC_PARAM);
+      return true;
+    } else {
+      if (parseType(b)) {
+        m.done(TYPE_FUNC_PARAM);
+        return true;
+      } else {
+        b.error("Expected type, got: " + b.getTokenText());
+        m.drop();
+        return false;
+      }
     }
-    parseType(b);
-    m.done(TYPE_FUNC_PARAM);
-    return true;
   }
 
   private boolean expect(@NotNull PsiBuilder b, @NotNull IElementType token) {
@@ -1089,6 +1110,16 @@ public class IonParser implements PsiParser {
     }
     b.advanceLexer();
     return matched;
+  }
+
+  private boolean consumeOrError(@NotNull PsiBuilder b, @NotNull IElementType token) {
+    if (b.getTokenType() == token) {
+      b.advanceLexer();
+      return true;
+    } else {
+      b.error("Expected " + token.toString() + ", got " + b.getTokenText());
+      return false;
+    }
   }
 
   private boolean consume(@NotNull PsiBuilder b, @NotNull IElementType token) {
