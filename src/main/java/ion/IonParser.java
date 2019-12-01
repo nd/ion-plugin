@@ -1046,10 +1046,19 @@ public class IonParser implements PsiParser {
     if (consume(b, LBRACE)) {
       if (parseType(b)) {
         while (consume(b, COMMA)) {
-          parseType(b);
+          if (!parseType(b)) {
+            b.error("Expected type, got: " + b.getTokenText());
+            break;
+          }
+        }
+      } else {
+        // either tuple without any field (valid) or a broken type if
+        // the current symbol is not '}', show error in the latter case
+        if (!match(b, RBRACE)) {
+          b.error("Expected type, got: " + b.getTokenText());
         }
       }
-      expect(b, RBRACE);
+      consumeUntil(b, RBRACE);
       m.done(TYPE_TUPLE);
       return true;
     }
