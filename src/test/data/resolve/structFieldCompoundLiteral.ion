@@ -35,3 +35,5 @@ func ptr_array() {
     &{/*resolve*/f = 2},
   };
 }
+
+var t: T2 = {t1 = {/*!resolve*/f = 1}};

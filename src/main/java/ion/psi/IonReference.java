@@ -203,6 +203,9 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     if (parent instanceof IonStmtAssign) {
       return resolveType(parent);
     }
+    if (parent instanceof IonDeclVar) {
+      return resolveType(parent);
+    }
     if (parent instanceof IonCompoundFieldNamed) {
       PsiElement resolvedField = resolveCompoundField((IonCompoundFieldNamed) parent);
       return resolveType(resolvedField);
