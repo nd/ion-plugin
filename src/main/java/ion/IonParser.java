@@ -71,7 +71,7 @@ public class IonParser implements PsiParser {
         b.advanceLexer();
       }
     }
-    if (consumeOrError(b, LBRACE)) {
+    if (expect(b, LBRACE)) {
       while (!b.eof() && !match(b, RBRACE)) {
         if (!parseEnumItem(b)) {
           b.error("Expected name, got " + b.getTokenText());
@@ -115,7 +115,7 @@ public class IonParser implements PsiParser {
   }
 
   private void parseAggregate(@NotNull PsiBuilder b) {
-    if (consumeOrError(b, LBRACE)) {
+    if (expect(b, LBRACE)) {
       while (!b.eof() && !match(b, RBRACE)) {
         parseAggregateItem(b);
         if (!match(b, RBRACE) && !match(b, NAME) && !match(b, STRUCT) && !match(b, UNION)) {
@@ -149,9 +149,9 @@ public class IonParser implements PsiParser {
           break;
         }
       }
-      consumeOrError(b, COLON);
+      expect(b, COLON);
       expectType(b);
-      consumeOrError(b, SEMICOLON);
+      expect(b, SEMICOLON);
       m.done(DECL_FIELD);
     }
   }
@@ -161,13 +161,13 @@ public class IonParser implements PsiParser {
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
     consume(b, DOT);
-    if (consumeOrError(b, NAME)) {
+    if (expect(b, NAME)) {
       if (consume(b, ASSIGN)) {
         consume(b, DOT);
-        consumeOrError(b, NAME);
+        expect(b, NAME);
       }
       while (consume(b, DOT)) {
-        consumeOrError(b, NAME);
+        expect(b, NAME);
       }
       if (consume(b, LBRACE)) {
         while (match(b, ELLIPSIS, NAME)) {
@@ -187,10 +187,10 @@ public class IonParser implements PsiParser {
     PsiBuilder.Marker m = b.mark();
     if (consume(b, NAME)) {
       if (consume(b, ASSIGN)) {
-        consumeOrError(b, NAME);
+        expect(b, NAME);
       }
     } else {
-      consumeOrError(b, ELLIPSIS);
+      expect(b, ELLIPSIS);
     }
     m.done(IMPORT_ITEM);
   }
@@ -201,7 +201,7 @@ public class IonParser implements PsiParser {
     assert (varOrConst == CONST || varOrConst == VAR) && b.getTokenType() == varOrConst;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    if (consumeOrError(b, NAME)) {
+    if (expect(b, NAME)) {
       if (consume(b, COLON)) {
         expectType(b);
       }
@@ -217,8 +217,8 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == TYPEDEF;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    consumeOrError(b, NAME);
-    consumeOrError(b, ASSIGN);
+    expect(b, NAME);
+    expect(b, ASSIGN);
     expectType(b);
     consumeUntil(b, SEMICOLON, TOP_LEVEL_TOKENS);
     m.done(DECL_TYPEDEF);
@@ -228,8 +228,8 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == FUNC;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    consumeOrError(b, NAME);
-    if (consumeOrError(b, LPAREN)) {
+    expect(b, NAME);
+    if (expect(b, LPAREN)) {
       if (!b.eof() && !match(b, RPAREN)) {
         do {
           if (!parseFuncParam(b)) {
@@ -263,7 +263,7 @@ public class IonParser implements PsiParser {
       PsiBuilder.Marker m = b.mark();
       b.advanceLexer();
       if (name) {
-        consumeOrError(b, COLON);
+        expect(b, COLON);
         expectType(b);
       } else {
         if (!match(b, RPAREN) && !match(b, COMMA)) {
@@ -282,7 +282,7 @@ public class IonParser implements PsiParser {
       PsiBuilder.Marker m = b.mark();
       consume(b, LBRACE);
       parseStmtList(b);
-      consumeOrError(b, RBRACE);
+      expect(b, RBRACE);
       m.done(STMT_BLOCK);
     } else {
       b.error("Expected block, got " + b.getTokenText());
@@ -381,7 +381,7 @@ public class IonParser implements PsiParser {
   private void parseStmtIfBranch(@NotNull PsiBuilder b) {
     assert b.getTokenType() == IF;
     b.advanceLexer();
-    if (consumeOrError(b, LPAREN)) {
+    if (expect(b, LPAREN)) {
       if (parseStmtInit(b, false)) {
         if (consume(b, SEMICOLON)) {
           expectExpr(b);
@@ -390,7 +390,7 @@ public class IonParser implements PsiParser {
         expectExpr(b);
       }
     }
-    consumeOrError(b, RPAREN);
+    expect(b, RPAREN);
     expectStmtBlock(b);
   }
 
@@ -402,7 +402,7 @@ public class IonParser implements PsiParser {
         b.advanceLexer();
         expectExpr(b);
         if (expectSemi) {
-          consumeOrError(b, SEMICOLON);
+          expect(b, SEMICOLON);
         }
         m.done(STMT_INIT);
         return true;
@@ -431,9 +431,9 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == WHILE;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    if (consumeOrError(b, LPAREN)) {
+    if (expect(b, LPAREN)) {
       expectExpr(b);
-      consumeOrError(b, RPAREN);
+      expect(b, RPAREN);
       expectStmtBlock(b);
     }
     m.done(STMT_WHILE);
@@ -444,10 +444,10 @@ public class IonParser implements PsiParser {
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
     expectStmtBlock(b);
-    if (consumeOrError(b, WHILE)) {
-      if (consumeOrError(b, LPAREN)) {
+    if (expect(b, WHILE)) {
+      if (expect(b, LPAREN)) {
         expectExpr(b);
-        consumeOrError(b, RPAREN);
+        expect(b, RPAREN);
       }
       consumeUntil(b, SEMICOLON);
     }
@@ -459,13 +459,13 @@ public class IonParser implements PsiParser {
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
     // 'for' without parens? looks like parse.c supports them
-    if (consumeOrError(b, LPAREN)) {
+    if (expect(b, LPAREN)) {
       parseStmtInit(b, false);
-      consumeOrError(b, SEMICOLON);
+      expect(b, SEMICOLON);
       parseExpr(b);
-      consumeOrError(b, SEMICOLON);
+      expect(b, SEMICOLON);
       parseStmtSimple(b, false);
-      consumeOrError(b, RPAREN);
+      expect(b, RPAREN);
       expectStmtBlock(b);
     }
     m.done(STMT_FOR);
@@ -475,27 +475,27 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == SWITCH;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    consumeOrError(b, LPAREN);
+    expect(b, LPAREN);
     expectExpr(b);
-    consumeOrError(b, RPAREN);
-    if (consumeOrError(b, LBRACE)) {
+    expect(b, RPAREN);
+    if (expect(b, LBRACE)) {
       while (!b.eof() && !match(b, RBRACE)) {
         parseStmtSwitchCase(b);
       }
-      consumeOrError(b, RBRACE);
+      expect(b, RBRACE);
     }
     m.done(STMT_SWITCH);
   }
 
   private void parseStmtSwitchCase(@NotNull PsiBuilder b) {
     if (consume(b, DEFAULT)) {
-      consumeOrError(b, COLON);
+      expect(b, COLON);
     } else if (consume(b, CASE)) {
       parseStmtSwitchCasePattern(b);
       while (consume(b, COMMA)) {
         parseStmtSwitchCasePattern(b);
       }
-      consumeOrError(b, COLON);
+      expect(b, COLON);
     } else {
       b.error("Expected 'case' or 'default', got " + b.getTokenText());
     }
@@ -547,7 +547,7 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == BREAK;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    consumeOrError(b, SEMICOLON);
+    expect(b, SEMICOLON);
     m.done(STMT_BREAK);
   }
 
@@ -555,7 +555,7 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == CONTINUE;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    consumeOrError(b, SEMICOLON);
+    expect(b, SEMICOLON);
     m.done(STMT_CONTINUE);
   }
 
@@ -566,7 +566,7 @@ public class IonParser implements PsiParser {
     if (!match(b, SEMICOLON)) {
       expectExpr(b);
     }
-    consumeOrError(b, SEMICOLON);
+    expect(b, SEMICOLON);
     m.done(STMT_RETURN);
   }
 
@@ -576,7 +576,7 @@ public class IonParser implements PsiParser {
     PsiBuilder.Marker m = b.mark();
     parseNote(b);
     if (requiresSemi) {
-      consumeOrError(b, SEMICOLON);
+      expect(b, SEMICOLON);
     }
     m.done(STMT_NOTE);
   }
@@ -585,7 +585,7 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == COLON;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    consumeOrError(b, NAME);
+    expect(b, NAME);
     m.done(STMT_LABEL);
   }
 
@@ -594,9 +594,9 @@ public class IonParser implements PsiParser {
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
     PsiBuilder.Marker nameMark = b.mark();
-    consumeOrError(b, NAME);
+    expect(b, NAME);
     nameMark.done(LABEL_NAME);
-    consumeOrError(b, SEMICOLON);
+    expect(b, SEMICOLON);
     m.done(STMT_GOTO);
   }
 
@@ -604,7 +604,7 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == AT || b.getTokenType() == POUND;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    consumeOrError(b, NAME);
+    expect(b, NAME);
     if (consume(b, LPAREN)) {
       if (!match(b, RPAREN)) {
         do {
@@ -656,7 +656,7 @@ public class IonParser implements PsiParser {
     }
     if (consume(b, QUESTION)) {
       parseExprTernary(b);
-      consumeOrError(b, COLON);
+      expect(b, COLON);
       parseExprTernary(b);
       m.done(EXPR_TERNARY);
       return true;
@@ -782,13 +782,13 @@ public class IonParser implements PsiParser {
             arg.done(EXPR_CALL_ARG);
           }
         }
-        consumeOrError(b, RPAREN);
+        expect(b, RPAREN);
         m.done(EXPR_CALL);
       } else if (consume(b, LBRACKET)) {
         if (!expectExpr(b)) {
           b.advanceLexer();
         }
-        consumeOrError(b, RBRACKET);
+        expect(b, RBRACKET);
         m.done(EXPR_INDEX);
       } else if (consume(b, DOT)) {
         if (match(b, NAME)) {
@@ -843,11 +843,11 @@ public class IonParser implements PsiParser {
     if (consume(b, NEW)) {
       if (consume(b, LPAREN)) {
         expectExpr(b);
-        consumeOrError(b, RPAREN);
+        expect(b, RPAREN);
       }
       if (consume(b, LBRACKET)) {
         expectExpr(b);
-        consumeOrError(b, RBRACKET);
+        expect(b, RBRACKET);
       }
       if (!consume(b, UNDEF)) {
         parseExpr(b);
@@ -856,25 +856,25 @@ public class IonParser implements PsiParser {
       return true;
     }
     if (consume(b, SIZEOF)) {
-      if (consumeOrError(b, LPAREN)) {
+      if (expect(b, LPAREN)) {
         if (consume(b, COLON)) {
           expectType(b);
         } else {
           expectExpr(b);
         }
-        consumeOrError(b, RPAREN);
+        expect(b, RPAREN);
       }
       m.done(EXPR_CALL);
       return true;
     }
     if (consume(b, ALIGNOF)) {
-      if (consumeOrError(b, LPAREN)) {
+      if (expect(b, LPAREN)) {
         if (consume(b, COLON)) {
           expectType(b);
         } else {
           expectExpr(b);
         }
-        consumeOrError(b, RPAREN);
+        expect(b, RPAREN);
       }
       m.done(EXPR_CALL);
       return true;
@@ -886,17 +886,17 @@ public class IonParser implements PsiParser {
         } else {
           expectExpr(b);
         }
-        consumeOrError(b, RPAREN);
+        expect(b, RPAREN);
       }
       m.done(EXPR_CALL);
       return true;
     }
     if (consume(b, OFFSETOF)) {
-      if (consumeOrError(b, LPAREN)) {
+      if (expect(b, LPAREN)) {
         expectType(b);
-        consumeOrError(b, COMMA);
-        consumeOrError(b, NAME);
-        consumeOrError(b, RPAREN);
+        expect(b, COMMA);
+        expect(b, NAME);
+        expect(b, RPAREN);
       }
       m.done(EXPR_CALL);
       return true;
@@ -909,7 +909,7 @@ public class IonParser implements PsiParser {
     if (consume(b, LPAREN)) {
       if (consume(b, COLON)) {
         parseType(b);
-        consumeOrError(b, RPAREN);
+        expect(b, RPAREN);
         if (match(b, LBRACE)) {
           parseExprCompound(b);
         } else {
@@ -919,7 +919,7 @@ public class IonParser implements PsiParser {
         return true;
       } else {
         parseExpr(b);
-        consumeOrError(b, RPAREN);
+        expect(b, RPAREN);
         m.done(EXPR_PAREN);
         return true;
       }
@@ -930,7 +930,7 @@ public class IonParser implements PsiParser {
 
   private boolean parseExprCompound(@NotNull PsiBuilder b) {
     PsiBuilder.Marker m = b.mark();
-    if (consumeOrError(b, LBRACE)) {
+    if (expect(b, LBRACE)) {
       if (!consume(b, RBRACE)) {
         parseExprCompoundField(b);
         while (consume(b, COMMA)) {
@@ -949,8 +949,8 @@ public class IonParser implements PsiParser {
     PsiBuilder.Marker m = b.mark();
     if (consume(b, LBRACKET)) {
       parseExpr(b);
-      consumeOrError(b, RBRACKET);
-      consumeOrError(b, ASSIGN);
+      expect(b, RBRACKET);
+      expect(b, ASSIGN);
       parseExpr(b);
       m.done(COMPOUND_FIELD_INDEX);
       return true;
@@ -991,7 +991,7 @@ public class IonParser implements PsiParser {
         if (!match(b, RBRACKET)) {
           parseExpr(b);
         }
-        boolean ok = consumeOrError(b, RBRACKET);
+        boolean ok = expect(b, RBRACKET);
         m.done(TYPE_ARRAY);
         m = outer;
         if (!ok) {
@@ -1034,7 +1034,7 @@ public class IonParser implements PsiParser {
       return true;
     }
     if (consume(b, FUNC)) {
-      if (consumeOrError(b, LPAREN)) {
+      if (expect(b, LPAREN)) {
         if (!consume(b, RPAREN)) {
           if (parseTypeFuncParam(b)) {
             while (consume(b, COMMA)) {
@@ -1046,7 +1046,7 @@ public class IonParser implements PsiParser {
           } else {
             b.error("Expected parameter, got " + b.getTokenText());
           }
-          consumeOrError(b, RPAREN);
+          expect(b, RPAREN);
         }
         if (consume(b, COLON)) {
           if (!parseType(b)) {
@@ -1059,7 +1059,7 @@ public class IonParser implements PsiParser {
     }
     if (consume(b, LPAREN)) {
       parseType(b);
-      consumeOrError(b, RPAREN);
+      expect(b, RPAREN);
       m.done(TYPE_PAR);
       return true;
     }
@@ -1112,7 +1112,7 @@ public class IonParser implements PsiParser {
     }
   }
 
-  private boolean consumeOrError(@NotNull PsiBuilder b, @NotNull IElementType token) {
+  private boolean expect(@NotNull PsiBuilder b, @NotNull IElementType token) {
     if (b.getTokenType() == token) {
       b.advanceLexer();
       return true;
