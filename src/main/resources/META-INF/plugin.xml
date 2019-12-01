@@ -8,10 +8,11 @@
 
     <idea-version since-build="191.1"/>
 
-    <version>4</version>
+    <version>5</version>
 
     <change-notes><![CDATA[
     <ul>
+      <li>Better parse error recovery</li>
       <li>Resolve inside a package</li>
     </ul>
     ]]>
