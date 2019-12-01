@@ -1,0 +1,39 @@
+IonFile
+  IonDeclEnum(enum)
+    PsiElement(enum)('enum')
+    PsiErrorElement:Expected {, got ;
+      <empty list>
+  PsiElement(;)(';')
+  PsiWhiteSpace('\n')
+  IonDeclEnum(enum)
+    PsiElement(enum)('enum')
+    PsiWhiteSpace(' ')
+    PsiElement({)('{')
+    PsiErrorElement:Expected name, got ;
+      <empty list>
+    PsiElement(;)(';')
+  PsiWhiteSpace('\n')
+  IonDeclEnum(enum)
+    PsiElement(enum)('enum')
+    PsiWhiteSpace(' ')
+    PsiElement({)('{')
+    PsiErrorElement:Expected name, got [
+      <empty list>
+    PsiWhiteSpace('\n  ')
+    PsiElement([)('[')
+    PsiWhiteSpace('\n')
+    PsiElement(})('}')
+  PsiWhiteSpace('\n')
+  IonDeclEnum(enum)
+    PsiElement(enum)('enum')
+    PsiWhiteSpace(' ')
+    PsiElement({)('{')
+    PsiWhiteSpace('\n  ')
+    IonDeclEnumItem(enum_item)
+      PsiElement(name)('ok')
+    PsiErrorElement:Exprected ',', got ok
+      <empty list>
+    PsiWhiteSpace(' ')
+    PsiElement(name)('ok')
+    PsiWhiteSpace('\n')
+    PsiElement(})('}')

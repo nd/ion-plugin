@@ -17,6 +17,10 @@ import static ion.psi.IonElementType.*;
 import static ion.psi.IonToken.*;
 
 public class IonParser implements PsiParser {
+  private final static TokenSet TOP_LEVEL_TOKENS = TokenSet.create(
+          ENUM, FUNC, TYPEDEF, VAR, CONST, UNION, IMPORT, SEMICOLON
+  );
+
   @Override
   public @NotNull ASTNode parse(@NotNull IElementType root, @NotNull PsiBuilder b) {
     PsiBuilder.Marker m = b.mark();
@@ -61,20 +65,25 @@ public class IonParser implements PsiParser {
         b.advanceLexer();
       }
     }
-    if (expect(b, LBRACE)) {
+    if (consumeOrError(b, LBRACE)) {
       while (!b.eof() && !match(b, RBRACE)) {
-        parseEnumItem(b);
-        if (!consume(b, COMMA) && !match(b, RBRACE) && !match(b, NAME)) {
-          b.error("Exprected ',', '}', or name, got " + b.getTokenText());
-          b.advanceLexer();
+        if (!parseEnumItem(b)) {
+          b.error("Expected name, got " + b.getTokenText());
+          break;
+        }
+        if (!consume(b, COMMA)) {
+          if (!match(b, RBRACE)) {
+            b.error("Exprected ',', got " + b.getTokenText());
+          }
+          break;
         }
       }
-      expect(b, RBRACE);
+      consumeUntil(b, RBRACE, TOP_LEVEL_TOKENS);
     }
     m.done(DECL_ENUM);
   }
 
-  private void parseEnumItem(@NotNull PsiBuilder b) {
+  private boolean parseEnumItem(@NotNull PsiBuilder b) {
     if (match(b, NAME)) {
       PsiBuilder.Marker m = b.mark();
       b.advanceLexer();
@@ -82,6 +91,9 @@ public class IonParser implements PsiParser {
         expectExpr(b);
       }
       m.done(DECL_ENUM_ITEM);
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -1117,7 +1129,8 @@ public class IonParser implements PsiParser {
       b.advanceLexer();
       return true;
     } else {
-      b.error("Expected " + token.toString() + ", got " + b.getTokenText());
+      String actual = b.eof() ? "eof" : b.getTokenText();
+      b.error("Expected " + token.toString() + ", got " + actual);
       return false;
     }
   }
@@ -1164,6 +1177,15 @@ public class IonParser implements PsiParser {
     if (!consume(b, token)) {
       b.error("Expected '" + token.toString() + "', got: " + b.getTokenText());
       while (!b.eof() && !consume(b, token)) {
+        b.advanceLexer();
+      }
+    }
+  }
+
+  private void consumeUntil(@NotNull PsiBuilder b, @NotNull IElementType token, @NotNull TokenSet tokens) {
+    if (!consume(b, token)) {
+      b.error("Expected '" + token.toString() + "', got: " + b.getTokenText());
+      while (!b.eof() && !consume(b, token) && !consume(b, tokens)) {
         b.advanceLexer();
       }
     }
