@@ -1,0 +1,9 @@
+import .p1.p2.p3 {...};
+import pkg = .p1.p2.p3 {...};
+import pkg2 = .p1.p2.p3 {f};
+
+func x() {
+  p3./*resolve*/f();
+  pkg./*resolve*/f();
+  pkg2./*resolve*/f();
+}

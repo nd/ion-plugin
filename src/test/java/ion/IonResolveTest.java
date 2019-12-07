@@ -11,6 +11,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.rt.execution.junit.FileComparisonFailure;
 import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
+import org.jetbrains.annotations.NotNull;
 
 public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
   public void testLocalVarSameBlock() {
@@ -149,10 +150,6 @@ public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
     doTest();
   }
 
-  public void testImportItem() {
-    doTest();
-  }
-
   public void testImportItemAlias() {
     doTest();
   }
@@ -169,14 +166,26 @@ public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
     doPackageTest();
   }
 
+  public void testPkgImportRelative() {
+    doPackageTest("p1/p2/p3/expected.ion");
+  }
+
+  public void testPkgImportRelativeAliased() {
+    doPackageTest("p1/p2/p3/expected.ion");
+  }
+
   @Override
   protected String getTestDataPath() {
     return "src/test/data/resolve";
   }
 
   public void doPackageTest() {
+    doPackageTest("expected.ion");
+  }
+
+  public void doPackageTest(@NotNull String expectedFilePath) {
     String dirName = getTestName(true);
-    PsiFile expectedPsiFile = myFixture.configureByFile(dirName + "/expected.ion");
+    PsiFile expectedPsiFile = myFixture.configureByFile(dirName + "/" + expectedFilePath);
     int expectedOffset = myFixture.getEditor().getCaretModel().getOffset();
     PsiFile psiFile = myFixture.configureByFile(dirName + "/start.ion");
     String text = psiFile.getText();
@@ -188,7 +197,7 @@ public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
       myFixture.performEditorAction(IdeActions.ACTION_GOTO_DECLARATION);
       TextEditor selectedEditor = (TextEditor) FileEditorManager.getInstance(myFixture.getProject()).getSelectedEditor();
       VirtualFile file = selectedEditor.getFile();
-      assertEquals("expected.ion", file.getName());
+      assertEquals(expectedPsiFile.getVirtualFile().getName(), file.getName());
       assertEquals(expectedOffset, selectedEditor.getEditor().getCaretModel().getOffset());
     } else {
       String initialCaretToken = "/*resolve*/";
@@ -200,7 +209,7 @@ public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
         myFixture.performEditorAction(IdeActions.ACTION_GOTO_DECLARATION);
         TextEditor selectedEditor = (TextEditor) FileEditorManager.getInstance(myFixture.getProject()).getSelectedEditor();
         VirtualFile file = selectedEditor.getFile();
-        assertEquals("expected.ion", file.getName());
+        assertEquals(expectedPsiFile.getVirtualFile().getName(), file.getName());
         assertEquals(expectedOffset, selectedEditor.getEditor().getCaretModel().getOffset());
         offset = text.indexOf(initialCaretToken, offset + 1);
       }

@@ -1,0 +1,9 @@
+struct T {
+  <caret>f: int;
+}
+
+var a: T;
+
+func f(): T {
+  return T{};
+}

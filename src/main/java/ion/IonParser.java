@@ -160,12 +160,11 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == IMPORT;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    consume(b, DOT);
-    if (match(b, NAME)) {
-      if (lookAhead(b, 1, ASSIGN)) {
-        consume(b, NAME);
-        consume(b, ASSIGN);
-      }
+    if (match(b, NAME) && lookAhead(b, 1, ASSIGN)) {
+      consume(b, NAME);
+      consume(b, ASSIGN);
+    }
+    if (match(b, NAME, DOT)) {
       PsiBuilder.Marker path = b.mark();
       consume(b, DOT);
       while (expect(b, NAME)) {
@@ -196,12 +195,20 @@ public class IonParser implements PsiParser {
 
   private void parseImportItem(@NotNull PsiBuilder b) {
     PsiBuilder.Marker m = b.mark();
-    if (consume(b, NAME)) {
-      if (consume(b, ASSIGN)) {
-        expect(b, NAME);
+    if (match(b, NAME)) {
+      if (lookAhead(b, 1, ASSIGN)) {
+        consume(b, NAME);
+        consume(b, ASSIGN);
       }
-    } else {
-      expect(b, ELLIPSIS);
+      if (match(b, NAME)) {
+        PsiBuilder.Marker nameExprMark = b.mark();
+        consume(b, NAME);
+        nameExprMark.done(EXPR_NAME);
+      } else {
+        b.error("Expected name, got " + b.getTokenText());
+      }
+    } else if (!consume(b, ELLIPSIS)) {
+      b.error("Expected name or ..., got " + b.getTokenText());
     }
     m.done(DECL_IMPORT_ITEM);
   }

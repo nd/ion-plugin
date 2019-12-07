@@ -1,0 +1,7 @@
+import .p1.p2.p3 {b = a, f, g = f};
+
+func x() {
+  p3.b./*!resolve*/f;
+  p3.f()./*resolve*/f;
+  p3.g()./*resolve*/f;
+}
