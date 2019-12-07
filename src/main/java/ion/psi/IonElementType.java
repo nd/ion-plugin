@@ -14,13 +14,14 @@ public class IonElementType extends IElementType {
   public static final IonElementType DECL_AGGREGATE = new IonElementType("aggregate", TypeId.DECL_AGGREGATE);
   public static final IonElementType DECL_FIELD = new IonElementType("field", TypeId.DECL_FIELD);
   public static final IonElementType DECL_FIELD_NAME = new IonElementType("field_name", TypeId.DECL_FIELD_NAME);
-  public static final IonElementType DECL_IMPORT = new IonElementType("import");
+  public static final IonElementType DECL_IMPORT = new IonElementType("import", TypeId.DECL_IMPORT);
   public static final IonElementType DECL_TYPEDEF = new IonElementType("typedef", TypeId.DECL_TYPEDEF);
   public static final IonElementType DECL_FUNC = new IonElementType("func", TypeId.DECL_FUNC);
   public static final IonElementType DECL_FUNC_PARAM = new IonElementType("param", TypeId.DECL_FUNC_PARAM);
   public static final IonElementType NOTE = new IonElementType("note");
   public static final IonElementType NOTE_PARAM = new IonElementType("note_param");
-  public static final IonElementType IMPORT_ITEM = new IonElementType("import_item");
+  public static final IonElementType DECL_IMPORT_ITEM = new IonElementType("import_item", TypeId.DECL_IMPORT_ITEM);
+  public static final IonElementType IMPORT_PATH = new IonElementType("import_path", TypeId.IMPORT_PATH);
   public static final IonElementType EXPR_LITERAL_INT = new IonElementType("expr_literal_int", TypeId.EXPR_LITERAL_INT);
   public static final IonElementType EXPR_LITERAL_FLOAT = new IonElementType("expr_literal_float");
   public static final IonElementType EXPR_LITERAL_STR = new IonElementType("expr_literal_str");
@@ -82,12 +83,13 @@ public class IonElementType extends IElementType {
     DECL_FIELD,
     DECL_FIELD_NAME,
     DECL_IMPORT,
+    DECL_IMPORT_ITEM,
     DECL_TYPEDEF,
     DECL_FUNC,
     DECL_FUNC_PARAM,
     NOTE,
     NOTE_PARAM,
-    IMPORT_ITEM,
+    IMPORT_PATH,
     EXPR_LITERAL_INT,
     EXPR_LITERAL_FLOAT,
     EXPR_LITERAL_STR,

@@ -1,0 +1,5 @@
+import a.b.libc {sprintf, <caret>p = printf, atoi}
+
+func x() {
+  libc./*resolve*/p();
+}

@@ -161,14 +161,25 @@ public class IonParser implements PsiParser {
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
     consume(b, DOT);
-    if (expect(b, NAME)) {
-      if (consume(b, ASSIGN)) {
-        consume(b, DOT);
-        expect(b, NAME);
+    if (match(b, NAME)) {
+      if (lookAhead(b, 1, ASSIGN)) {
+        consume(b, NAME);
+        consume(b, ASSIGN);
       }
-      while (consume(b, DOT)) {
-        expect(b, NAME);
+      PsiBuilder.Marker path = b.mark();
+      consume(b, DOT);
+      while (expect(b, NAME)) {
+        if (match(b, DOT)) {
+          PsiBuilder.Marker outer = path.precede();
+          path.done(IMPORT_PATH);
+          path = outer;
+          consume(b, DOT);
+        } else {
+          break;
+        }
       }
+      path.done(IMPORT_PATH);
+
       if (consume(b, LBRACE)) {
         while (match(b, ELLIPSIS, NAME)) {
           parseImportItem(b);
@@ -192,7 +203,7 @@ public class IonParser implements PsiParser {
     } else {
       expect(b, ELLIPSIS);
     }
-    m.done(IMPORT_ITEM);
+    m.done(DECL_IMPORT_ITEM);
   }
 
   private void parseVarOrConst(@NotNull PsiBuilder b,

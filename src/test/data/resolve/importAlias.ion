@@ -1,0 +1,5 @@
+import <caret>C = libc
+
+func x() {
+  /*resolve*/C.printf();
+}

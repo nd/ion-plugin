@@ -1,5 +1,6 @@
 package ion.psi;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.TextRange;
@@ -68,6 +69,15 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
           ref.set(decl);
           return false;
         }
+        if (decl instanceof IonDeclImport) {
+          IonImportPath importPath = PsiTreeUtil.getChildOfType(decl, IonImportPath.class);
+          ASTNode nameNode = importPath.getNode().findChildByType(IonToken.NAME);
+          nameElement = nameNode != null ? nameNode.getPsi() : null;
+          if (nameElement != null && nameElement.textMatches(name)) {
+            ref.set(nameElement);
+            return false;
+          }
+        }
         return true;
       });
       if (stop) {
@@ -111,17 +121,33 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     if (unwrapped != type) {
       type = resolveType(unwrapped);
     }
+    PsiElement nameElement = getFieldName(fieldExpr);
+    if (nameElement == null) {
+      return null;
+    }
+    String name = nameElement.getText();
     if (type instanceof IonDeclAggregate) {
-      PsiElement nameElement = getFieldName(fieldExpr);
-      if (nameElement == null) {
-        return null;
-      }
-      String name = nameElement.getText();
       for (PsiElement child : type.getChildren()) {
         if (child instanceof IonDeclField) {
           PsiElement result = processDeclField((IonDeclField) child, name);
           if (result != null) {
             return result;
+          }
+        }
+      }
+    }
+    if (type == null) {
+      PsiReference reference = qualifier.getReference();
+      PsiElement resolvedQualifier = reference != null ? reference.resolve() : null;
+      if (resolvedQualifier instanceof IonDeclImport || resolvedQualifier != null && resolvedQualifier.getParent() instanceof IonImportPath) {
+        IonDeclImport importDecl = PsiTreeUtil.getParentOfType(resolvedQualifier, IonDeclImport.class, false);
+        IonDeclImportItem[] importItems = PsiTreeUtil.getChildrenOfType(importDecl, IonDeclImportItem.class);
+        if (importItems != null) {
+          for (IonDeclImportItem item : importItems) {
+            PsiElement importItemName = item.getNameIdentifier();
+            if (importItemName != null && importItemName.textMatches(name)) {
+              return item;
+            }
           }
         }
       }

@@ -1,0 +1,5 @@
+import C = libc {sprintf, <caret>printf, atoi}
+
+func x() {
+  C./*resolve*/printf();
+}

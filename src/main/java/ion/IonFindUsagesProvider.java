@@ -47,6 +47,10 @@ public class IonFindUsagesProvider implements FindUsagesProvider {
           return "function parameter";
         case DECL_TYPEDEF:
           return "typedef";
+        case DECL_IMPORT:
+          return "import";
+        case DECL_IMPORT_ITEM:
+          return "import item";
         case STMT_INIT:
           return "local";
         case STMT_LABEL:

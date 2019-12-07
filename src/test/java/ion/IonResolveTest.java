@@ -133,6 +133,30 @@ public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
     doTest();
   }
 
+  public void testImport() {
+    doTest();
+  }
+
+  public void testImportAlias() {
+    doTest();
+  }
+
+  public void testImportPath() {
+    doTest();
+  }
+
+  public void testImportPathRelative() {
+    doTest();
+  }
+
+  public void testImportItem() {
+    doTest();
+  }
+
+  public void testImportItemAlias() {
+    doTest();
+  }
+
   public void testPkgGlobalVar() {
     doPackageTest();
   }

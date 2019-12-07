@@ -114,6 +114,12 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonExprLitInt(node);
         case EXPR_LITERAL_COMPOUND_TYPED:
           return new IonExprLitCompoundTyped(node);
+        case DECL_IMPORT:
+          return new IonDeclImport(node);
+        case IMPORT_PATH:
+          return new IonImportPath(node);
+        case DECL_IMPORT_ITEM:
+          return new IonDeclImportItem(node);
       }
       return type.createPsiElement(node);
     }

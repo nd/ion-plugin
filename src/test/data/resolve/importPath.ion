@@ -1,0 +1,5 @@
+import foo.bar.<caret>baz
+
+func x() {
+  /*resolve*/baz.q;
+}
