@@ -12,8 +12,7 @@
 
     <change-notes><![CDATA[
     <ul>
-      <li>Better parse error recovery</li>
-      <li>Resolve inside a package</li>
+      <li>UI & resolve for packages from IONHOME/IONPATH</li>
     </ul>
     ]]>
     </change-notes>
