@@ -30,6 +30,10 @@
         <lineIndentProvider implementation="ion.IonLineIndentProvider"/>
         <lang.findUsagesProvider language="ion" implementationClass="ion.IonFindUsagesProvider"/>
 
+        <applicationService serviceImplementation="ion.cfg.IonConfig"/>
+        <applicationConfigurable groupId="language" instance="ion.cfg.IonConfig$UI" id="BitwiseIon" displayName="Ion"/>
+        <additionalLibraryRootsProvider implementation="ion.IonLibProvider"/>
+
         <!--<registryKey key="ion.resolve.cache.enabled" defaultValue="true"/>-->
     </extensions>
 </idea-plugin>

@@ -1,10 +1,15 @@
 package ion.psi;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.roots.SyntheticLibrary;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.VFileProperty;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.*;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.CachedValueProvider;
@@ -12,8 +17,11 @@ import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ArrayUtil;
+import com.intellij.util.EnvironmentUtil;
 import com.intellij.util.ObjectUtils;
 import com.intellij.util.Processor;
+import ion.IonLib;
+import ion.IonLibProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -718,6 +726,14 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     });
   }
 
+  @Nullable
+  private static ConcurrentMap<String, PsiDirectory> getPackageResolveCache(@NotNull PsiDirectory dir) {
+    return CachedValuesManager.getCachedValue(dir, () -> {
+      ConcurrentHashMap<String, PsiDirectory> cache = new ConcurrentHashMap<>();
+      return CachedValueProvider.Result.create(cache, dir, PsiModificationTracker.MODIFICATION_COUNT);
+    });
+  }
+
   private static boolean isRelative(@NotNull IonImportPath importPath) {
     PsiElement deepestFirst = PsiTreeUtil.getDeepestFirst(importPath);
     return deepestFirst != null && deepestFirst.getNode().getElementType() == IonToken.DOT;
@@ -740,20 +756,65 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       return null;
     }
     PsiDirectory result = null;
+    String importPathString = importPath.getText();
+    PsiDirectory originDir = file.getContainingDirectory();
+    ConcurrentMap<String, PsiDirectory> cache = getPackageResolveCache(originDir);
+    if (cache != null) {
+      result = cache.get(importPathString);
+      if (result != null) {
+        return result;
+      }
+    }
     if (isRelative(importPath)) {
-      result = file.getContainingDirectory();
-      String path = importPath.getText();
-      List<String> pathParts = StringUtil.split(path, ".");
-      for (String pathPart : pathParts) {
-        PsiDirectory subDir = result.findSubdirectory(pathPart);
-        if (subDir != null) {
-          result = subDir;
-        } else {
-          result = null;
-          break;
+      result = resolveImport(originDir, importPathString);
+    } else {
+      for (SyntheticLibrary lib : IonLibProvider.getLibs()) {
+        if (lib instanceof IonLib) {
+          IonLib ionLib = (IonLib) lib;
+          List<VirtualFile> dirs = ionLib.getDirs();
+          for (VirtualFile dir : dirs) {
+            VirtualFile pkgDir = resolveImport(dir, importPathString);
+            if (pkgDir != null) {
+              result = PsiManager.getInstance(file.getProject()).findDirectory(pkgDir);
+            }
+          }
         }
       }
     }
+    if (cache != null && result != null) {
+      cache.putIfAbsent(importPathString, result);
+    }
     return result;
+  }
+
+  @Nullable
+  private static PsiDirectory resolveImport(@NotNull PsiDirectory dir, @NotNull String importPath) {
+    List<String> pathParts = StringUtil.split(importPath, ".");
+    for (String pathPart : pathParts) {
+      PsiDirectory subDir = dir.findSubdirectory(pathPart);
+      if (subDir != null) {
+        dir = subDir;
+      } else {
+        return null;
+      }
+    }
+    return dir;
+  }
+
+  @Nullable
+  private static VirtualFile resolveImport(@NotNull VirtualFile dir, @NotNull String importPath) {
+    if (!dir.isDirectory()) {
+      dir = dir.getParent();
+    }
+    List<String> pathParts = StringUtil.split(importPath, ".");
+    for (String pathPart : pathParts) {
+      VirtualFile child = dir.findChild(pathPart);
+      if (child != null && child.isDirectory()) {
+        dir = child;
+      } else {
+        return null;
+      }
+    }
+    return dir;
   }
 }
