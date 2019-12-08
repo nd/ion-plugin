@@ -69,7 +69,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     if (importedItem != null) {
       IonDeclImport importDecl = PsiTreeUtil.getParentOfType(importedItem, IonDeclImport.class);
       IonImportPath importPath = PsiTreeUtil.getChildOfType(importDecl, IonImportPath.class);
-      PsiDirectory packageDir = resolveImport(myElement.getContainingFile(), importPath);
+      PsiDirectory packageDir = resolveImport(myElement.getContainingFile(), importPath != null ? importPath.getText() : null);
       return findDeclaration(packageDir, name);
     }
 
@@ -105,15 +105,14 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       if (stop) {
         break;
       }
-//      if (parent instanceof PsiFile) {
-//        IonDeclImport[] imports = PsiTreeUtil.getChildrenOfType(parent, IonDeclImport.class);
-//        if (imports != null) {
-//          for (IonDeclImport ionImport : imports) {
-//            // if import adds names into our namespace (dot import ?),
-//            // then resolve package and process its definitions
-//          }
-//        }
-//      }
+      if (parent instanceof PsiFile) {
+        PsiDirectory builtinPkg = resolveImport(file, "builtin");
+        PsiElement builtinDecl = findDeclaration(builtinPkg, name);
+        if (builtinDecl != null) {
+          ref.set(builtinDecl);
+          break;
+        }
+      }
       if (nearestBlock == null && parent instanceof IonBlock) {
         nearestBlock = (IonBlock) parent;
         blockCache = getBlockResolveCache(file, nearestBlock);
@@ -180,21 +179,23 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
           IonDeclImportItem[] importItems = PsiTreeUtil.getChildrenOfType(importDecl, IonDeclImportItem.class);
           if (importItems != null) {
             IonImportPath importPath = PsiTreeUtil.getChildOfType(importDecl, IonImportPath.class);
-            for (IonDeclImportItem item : importItems) {
-              PsiElement alias = getAlias(item);
-              if (alias != null && alias.textMatches(name)) {
-                return item;
-              }
-              PsiElement importedName = getName(item);
-              if (importedName != null && importedName.textMatches(name)) {
-                PsiReference importedNameReference = importedName.getReference();
-                return importedNameReference != null ? importedNameReference.resolve() : null;
-              }
-              if (item.getNode().findChildByType(IonToken.ELLIPSIS) != null) {
-                PsiDirectory packageDir = resolveImport(fieldExpr.getContainingFile(), importPath);
-                PsiElement declaration = findDeclaration(packageDir, name);
-                if (declaration != null) {
-                  return declaration;
+            if (importPath != null) {
+              for (IonDeclImportItem item : importItems) {
+                PsiElement alias = getAlias(item);
+                if (alias != null && alias.textMatches(name)) {
+                  return item;
+                }
+                PsiElement importedName = getName(item);
+                if (importedName != null && importedName.textMatches(name)) {
+                  PsiReference importedNameReference = importedName.getReference();
+                  return importedNameReference != null ? importedNameReference.resolve() : null;
+                }
+                if (item.getNode().findChildByType(IonToken.ELLIPSIS) != null) {
+                  PsiDirectory packageDir = resolveImport(fieldExpr.getContainingFile(), importPath.getText());
+                  PsiElement declaration = findDeclaration(packageDir, name);
+                  if (declaration != null) {
+                    return declaration;
+                  }
                 }
               }
             }
@@ -738,9 +739,8 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     });
   }
 
-  private static boolean isRelative(@NotNull IonImportPath importPath) {
-    PsiElement deepestFirst = PsiTreeUtil.getDeepestFirst(importPath);
-    return deepestFirst != null && deepestFirst.getNode().getElementType() == IonToken.DOT;
+  private static boolean isRelativeImportPath(@NotNull String importPath) {
+    return importPath.startsWith(".");
   }
 
   @Nullable
@@ -755,29 +755,28 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   }
 
   @Nullable
-  private static PsiDirectory resolveImport(@NotNull PsiFile file, @Nullable IonImportPath importPath) {
+  private static PsiDirectory resolveImport(@NotNull PsiFile file, @Nullable String importPath) {
     if (importPath == null) {
       return null;
     }
     PsiDirectory result = null;
-    String importPathString = importPath.getText();
     PsiDirectory originDir = file.getContainingDirectory();
     ConcurrentMap<String, PsiDirectory> cache = getPackageResolveCache(originDir);
     if (cache != null) {
-      result = cache.get(importPathString);
+      result = cache.get(importPath);
       if (result != null) {
         return result;
       }
     }
-    if (isRelative(importPath)) {
-      result = resolveImport(originDir, importPathString);
+    if (isRelativeImportPath(importPath)) {
+      result = resolveImport(originDir, importPath);
     } else {
       for (SyntheticLibrary lib : IonLibProvider.getLibs()) {
         if (lib instanceof IonLib) {
           IonLib ionLib = (IonLib) lib;
           List<VirtualFile> dirs = ionLib.getDirs();
           for (VirtualFile dir : dirs) {
-            VirtualFile pkgDir = resolveImport(dir, importPathString);
+            VirtualFile pkgDir = resolveImport(dir, importPath);
             if (pkgDir != null) {
               result = PsiManager.getInstance(file.getProject()).findDirectory(pkgDir);
             }
@@ -786,7 +785,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       }
     }
     if (cache != null && result != null) {
-      cache.putIfAbsent(importPathString, result);
+      cache.putIfAbsent(importPath, result);
     }
     return result;
   }
