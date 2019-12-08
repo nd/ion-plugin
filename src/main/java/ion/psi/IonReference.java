@@ -633,7 +633,11 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
 
   @Nullable
   private static PsiElement getExprCompoundTypedType(@NotNull IonExprLitCompoundTyped lit) {
-    return PsiTreeUtil.findChildOfType(lit, IonTypeName.class);
+    PsiElement expr = PsiTreeUtil.findChildOfType(lit, IonExprField.class);
+    if (expr == null) {
+      expr = PsiTreeUtil.findChildOfType(lit, IonExprName.class);
+    }
+    return expr;
   }
 
   @Nullable

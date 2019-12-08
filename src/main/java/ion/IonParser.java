@@ -787,7 +787,7 @@ public class IonParser implements PsiParser {
       m.drop();
       return false;
     }
-    while (match(b, LPAREN, LBRACKET, DOT, INC, DEC)) {
+    while (match(b, LPAREN, LBRACKET, LBRACE, DOT, INC, DEC)) {
       PsiBuilder.Marker outer = m.precede();
       if (consume(b, LPAREN)) {
         if (!match(b, RPAREN)) {
@@ -817,6 +817,9 @@ public class IonParser implements PsiParser {
           b.error("Exprected name, got " + b.getTokenText());
         }
         m.done(EXPR_FIELD);
+      } else if (match(b, LBRACE)) {
+        parseExprCompound(b);
+        m.done(EXPR_LITERAL_COMPOUND_TYPED);
       } else if (consume(b, INC) || consume(b, DEC)) {
         m.done(EXPR_POSTFIX);
       }
@@ -844,19 +847,9 @@ public class IonParser implements PsiParser {
       m.done(EXPR_LITERAL_CHAR);
       return true;
     }
-    if (match(b, NAME)) {
-      if (lookAhead(b, 1, LBRACE)) {
-        PsiBuilder.Marker typeName = b.mark();
-        consume(b, NAME);
-        typeName.done(TYPE_NAME);
-        parseExprCompound(b);
-        m.done(EXPR_LITERAL_COMPOUND_TYPED);
-        return true;
-      } else {
-        consume(b, NAME);
-        m.done(EXPR_NAME);
-        return true;
-      }
+    if (consume(b, NAME)) {
+      m.done(EXPR_NAME);
+      return true;
     }
     if (consume(b, NEW)) {
       if (consume(b, LPAREN)) {

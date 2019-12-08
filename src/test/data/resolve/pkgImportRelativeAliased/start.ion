@@ -1,7 +1,8 @@
-import .p1.p2.p3 {b = a, f, g = f};
+import .p1.p2.p3 {b = a, f, g = f, T};
 
 func x() {
-  p3.b./*!resolve*/f;
+  p3.b./*resolve*/f;
   p3.f()./*resolve*/f;
   p3.g()./*resolve*/f;
+  x := p3.T{/*resolve*/f = 1};
 }
