@@ -1,0 +1,9 @@
+#declare_note(<caret>language)
+
+@/*resolve*/language("C")
+var x: char*;
+
+func x() {
+  @/*resolve*/language("C")
+  y := """printf("ok")""";
+}

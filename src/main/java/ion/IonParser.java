@@ -10,6 +10,7 @@ import com.intellij.util.containers.ContainerUtil;
 import ion.psi.IonElementType;
 import ion.psi.IonToken;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -619,22 +620,38 @@ public class IonParser implements PsiParser {
   }
 
   private void parseNote(@NotNull PsiBuilder b) {
-    assert b.getTokenType() == AT || b.getTokenType() == POUND;
+    boolean isPound = b.getTokenType() == POUND;
+    assert b.getTokenType() == AT || isPound;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    expect(b, NAME);
-    if (consume(b, LPAREN)) {
-      if (!match(b, RPAREN)) {
-        do {
-          if (!parseNoteParam(b)) {
-            b.error("Expected note parameter, got " + b.getTokenText());
-            break;
-          }
-        } while (consume(b, COMMA));
+    if (isPound && "declare_note".equals(b.getTokenText())) {
+      expect(b, NAME); // declare_note
+      if (consume(b, LPAREN)) {
+        expect(b, NAME);
+        consumeUntil(b, RPAREN, TOP_LEVEL_TOKENS);
       }
-      consumeUntil(b, RPAREN, TOP_LEVEL_TOKENS);
+      m.done(DECL_NOTE);
+    } else {
+      if (match(b, NAME)) {
+        PsiBuilder.Marker nameExprMark = b.mark();
+        expect(b, NAME);
+        nameExprMark.done(EXPR_NAME);
+        if (consume(b, LPAREN)) {
+          if (!match(b, RPAREN)) {
+            do {
+              if (!parseNoteParam(b)) {
+                b.error("Expected note parameter, got " + b.getTokenText());
+                break;
+              }
+            } while (consume(b, COMMA));
+          }
+          consumeUntil(b, RPAREN, TOP_LEVEL_TOKENS);
+        }
+      } else {
+        b.error("Expected name, got " + b.getTokenText());
+      }
+      m.done(NOTE);
     }
-    m.done(NOTE);
   }
 
   private boolean parseNoteParam(@NotNull PsiBuilder b) {

@@ -13,6 +13,7 @@
     <change-notes><![CDATA[
     <ul>
       <li>UI & resolve for packages from IONHOME/IONPATH</li>
+      <li>resolve for notes</li>
     </ul>
     ]]>
     </change-notes>

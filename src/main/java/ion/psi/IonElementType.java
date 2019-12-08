@@ -18,6 +18,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType DECL_TYPEDEF = new IonElementType("typedef", TypeId.DECL_TYPEDEF);
   public static final IonElementType DECL_FUNC = new IonElementType("func", TypeId.DECL_FUNC);
   public static final IonElementType DECL_FUNC_PARAM = new IonElementType("param", TypeId.DECL_FUNC_PARAM);
+  public static final IonElementType DECL_NOTE = new IonElementType("decl_note", TypeId.DECL_NOTE);
   public static final IonElementType NOTE = new IonElementType("note");
   public static final IonElementType NOTE_PARAM = new IonElementType("note_param");
   public static final IonElementType DECL_IMPORT_ITEM = new IonElementType("import_item", TypeId.DECL_IMPORT_ITEM);
@@ -87,6 +88,7 @@ public class IonElementType extends IElementType {
     DECL_TYPEDEF,
     DECL_FUNC,
     DECL_FUNC_PARAM,
+    DECL_NOTE,
     NOTE,
     NOTE_PARAM,
     IMPORT_PATH,

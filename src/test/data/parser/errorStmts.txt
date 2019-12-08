@@ -668,7 +668,8 @@ IonFile
         IonPsiElement(stmt_note)
           IonPsiElement(note)
             PsiElement(#)('#')
-            PsiElement(name)('ok')
+            IonExprName(expr_name)
+              PsiElement(name)('ok')
           PsiErrorElement:Expected ;, got }
             <empty list>
       PsiWhiteSpace('\n')
