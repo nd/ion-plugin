@@ -8,12 +8,11 @@
 
     <idea-version since-build="191.1"/>
 
-    <version>6</version>
+    <version>7</version>
 
     <change-notes><![CDATA[
     <ul>
-      <li>UI & resolve for packages from IONHOME/IONPATH</li>
-      <li>resolve for notes</li>
+      <li>completion</li>
     </ul>
     ]]>
     </change-notes>
