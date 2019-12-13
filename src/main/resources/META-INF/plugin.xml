@@ -8,11 +8,11 @@
 
     <idea-version since-build="191.1"/>
 
-    <version>7</version>
+    <version>8</version>
 
     <change-notes><![CDATA[
     <ul>
-      <li>completion</li>
+      <li>formatter</li>
     </ul>
     ]]>
     </change-notes>
@@ -26,7 +26,8 @@
         <lang.parserDefinition language="ion" implementationClass="ion.IonParserDefinition"/>
         <lang.braceMatcher language="ion" implementationClass="ion.IonBraceMatcher"/>
         <lang.quoteHandler language="ion" implementationClass="ion.IonQuoteHandler"/>
-        <lineIndentProvider implementation="ion.IonLineIndentProvider"/>
+        <lineIndentProvider implementation="ion.fmt.IonLineIndentProvider"/>
+        <lang.formatter language="ion" implementationClass="ion.fmt.IonFmtModelBuilder"/>
         <lang.findUsagesProvider language="ion" implementationClass="ion.IonFindUsagesProvider"/>
 
         <applicationService serviceImplementation="ion.cfg.IonConfig"/>

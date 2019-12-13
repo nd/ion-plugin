@@ -106,6 +106,8 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonStmtReturn(node);
         case STMT_LABEL:
           return new IonStmtLabel(node);
+        case STMT_SWITCH_CASE_BLOCK:
+          return new IonSwitchCaseBlock(node);
         case COMPOUND_FIELD:
           return new IonCompoundField(node);
         case COMPOUND_FIELD_NAMED:

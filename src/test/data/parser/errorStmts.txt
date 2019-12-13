@@ -531,9 +531,10 @@ IonFile
           PsiWhiteSpace(' ')
           PsiElement({)('{')
           PsiWhiteSpace('\n  ')
-          PsiElement(default)('default')
-          PsiErrorElement:Expected :, got }
-            <empty list>
+          IonSwitchCaseBlock(stmt_switch_case_block)
+            PsiElement(default)('default')
+            PsiErrorElement:Expected :, got }
+              <empty list>
           PsiWhiteSpace('\n  ')
           PsiElement(})('}')
       PsiWhiteSpace('\n')
@@ -559,9 +560,10 @@ IonFile
           PsiWhiteSpace(' ')
           PsiElement({)('{')
           PsiWhiteSpace('\n  ')
-          PsiElement(case)('case')
-          PsiErrorElement:Expected expression, got }
-            <empty list>
+          IonSwitchCaseBlock(stmt_switch_case_block)
+            PsiElement(case)('case')
+            PsiErrorElement:Expected expression, got }
+              <empty list>
           PsiWhiteSpace('\n  ')
           PsiElement(})('}')
       PsiWhiteSpace('\n')
@@ -587,14 +589,15 @@ IonFile
           PsiWhiteSpace(' ')
           PsiElement({)('{')
           PsiWhiteSpace('\n  ')
-          PsiElement(case)('case')
-          PsiErrorElement:Expected expression, got ,
-            <empty list>
-          PsiWhiteSpace(' ')
-          PsiElement(,)(',')
-          PsiErrorElement:Expected expression, got :
-            <empty list>
-          PsiElement(:)(':')
+          IonSwitchCaseBlock(stmt_switch_case_block)
+            PsiElement(case)('case')
+            PsiErrorElement:Expected expression, got ,
+              <empty list>
+            PsiWhiteSpace(' ')
+            PsiElement(,)(',')
+            PsiErrorElement:Expected expression, got :
+              <empty list>
+            PsiElement(:)(':')
           PsiWhiteSpace('\n  ')
           PsiElement(})('}')
       PsiWhiteSpace('\n')

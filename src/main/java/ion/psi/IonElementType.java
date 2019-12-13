@@ -71,6 +71,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType LABEL_NAME = new IonElementType("label_name", TypeId.LABEL_NAME);
   public static final IonElementType STMT_EXPR = new IonElementType("stmt_expr");
   public static final IonElementType STMT_ASSIGN = new IonElementType("stmt_assign", TypeId.STMT_ASSIGN);
+  public static final IonElementType STMT_SWITCH_CASE_BLOCK = new IonElementType("stmt_switch_case_block", TypeId.STMT_SWITCH_CASE_BLOCK);
   public static final IonBlockElementType STMT_BLOCK = new IonBlockElementType();
 
   // to be able to write switch over element types
@@ -140,6 +141,7 @@ public class IonElementType extends IElementType {
     LABEL_NAME,
     STMT_EXPR,
     STMT_ASSIGN,
+    STMT_SWITCH_CASE_BLOCK,
     STMT_BLOCK,
   }
 

@@ -10,7 +10,6 @@ import com.intellij.util.containers.ContainerUtil;
 import ion.psi.IonElementType;
 import ion.psi.IonToken;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +55,7 @@ public class IonParser implements PsiParser {
       } else if (token == AT || token == POUND) {
         parseNote(b);
       } else {
-        b.error("Exprected declaration or note, got " + b.getTokenText());
+        b.error("Expected declaration or note, got " + b.getTokenText());
         b.advanceLexer();
       }
     }
@@ -80,7 +79,7 @@ public class IonParser implements PsiParser {
         }
         if (!consume(b, COMMA)) {
           if (!match(b, RBRACE)) {
-            b.error("Exprected ',', got " + b.getTokenText());
+            b.error("Expected ',', got " + b.getTokenText());
           }
           break;
         }
@@ -120,7 +119,7 @@ public class IonParser implements PsiParser {
       while (!b.eof() && !match(b, RBRACE)) {
         parseAggregateItem(b);
         if (!match(b, RBRACE) && !match(b, NAME) && !match(b, STRUCT) && !match(b, UNION)) {
-          b.error("Exprected '}', or aggregate item, got " + b.getTokenText());
+          b.error("Expected '}', or aggregate item, got " + b.getTokenText());
           break;
         }
       }
@@ -498,6 +497,10 @@ public class IonParser implements PsiParser {
     expectExpr(b);
     expect(b, RPAREN);
     if (expect(b, LBRACE)) {
+//      m.setCustomEdgeTokenBinders((tokens, atStreamEdge, getter) -> {
+//        int firstCommentIdx = ContainerUtil.indexOf(tokens, it -> it instanceof PsiComment);
+//        return firstCommentIdx >= 0 ? firstCommentIdx : tokens.size();
+//      }, null);
       while (!b.eof() && !match(b, RBRACE)) {
         parseStmtSwitchCase(b);
       }
@@ -507,6 +510,7 @@ public class IonParser implements PsiParser {
   }
 
   private void parseStmtSwitchCase(@NotNull PsiBuilder b) {
+    PsiBuilder.Marker m = b.mark();
     if (consume(b, DEFAULT)) {
       expect(b, COLON);
     } else if (consume(b, CASE)) {
@@ -517,6 +521,7 @@ public class IonParser implements PsiParser {
       expect(b, COLON);
     } else {
       b.error("Expected 'case' or 'default', got " + b.getTokenText());
+      m.drop();
     }
     while (!b.eof() && !match(b, RBRACE) && !match(b, CASE) && !match(b, DEFAULT)) {
       if (!parseStmt(b)) {
@@ -524,6 +529,7 @@ public class IonParser implements PsiParser {
         b.advanceLexer();
       }
     }
+    m.done(STMT_SWITCH_CASE_BLOCK);
   }
 
   private void parseStmtSwitchCasePattern(@NotNull PsiBuilder b) {
@@ -831,7 +837,7 @@ public class IonParser implements PsiParser {
           consume(b, NAME);
           nameExprMark.done(EXPR_NAME);
         } else {
-          b.error("Exprected name, got " + b.getTokenText());
+          b.error("Expected name, got " + b.getTokenText());
         }
         m.done(EXPR_FIELD);
       } else if (match(b, LBRACE)) {
@@ -960,9 +966,15 @@ public class IonParser implements PsiParser {
     PsiBuilder.Marker m = b.mark();
     if (expect(b, LBRACE)) {
       if (!consume(b, RBRACE)) {
-        parseExprCompoundField(b);
-        while (consume(b, COMMA)) {
-          parseExprCompoundField(b);
+        if (parseExprCompoundField(b)) {
+          while (consume(b, COMMA)) {
+            if (!parseExprCompoundField(b)) {
+              if (!match(b, RBRACE)) {
+                b.error("Expected expression, got " + b.getTokenText());
+              }
+              break;
+            }
+          }
         }
         consumeUntil(b, RBRACE);
       }
@@ -992,16 +1004,20 @@ public class IonParser implements PsiParser {
         m.done(COMPOUND_FIELD_NAMED);
         return true;
       } else {
-        parseExpr(b);
-        m.done(COMPOUND_FIELD);
-        return true;
+        if (parseExpr(b)) {
+          m.done(COMPOUND_FIELD);
+          return true;
+        } else {
+          m.drop();
+          return false;
+        }
       }
     }
   }
 
   private boolean expectType(@NotNull PsiBuilder b) {
     if (!parseType(b)) {
-      b.error("Exprected type, got " + b.getTokenText());
+      b.error("Expected type, got " + b.getTokenText());
       return false;
     }
     return true;

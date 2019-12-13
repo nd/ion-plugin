@@ -31,7 +31,7 @@ IonFile
     PsiWhiteSpace('\n  ')
     IonDeclEnumItem(enum_item)
       PsiElement(name)('ok')
-    PsiErrorElement:Exprected ',', got ok
+    PsiErrorElement:Expected ',', got ok
       <empty list>
     PsiWhiteSpace(' ')
     PsiElement(name)('ok')
@@ -73,7 +73,7 @@ IonFile
       IonDeclFieldName(field_name)
         PsiElement(name)('x')
       PsiElement(:)(':')
-      PsiErrorElement:Exprected type, got }
+      PsiErrorElement:Expected type, got }
         <empty list>
     PsiWhiteSpace('\n')
     PsiElement(})('}')
@@ -92,7 +92,7 @@ IonFile
       PsiErrorElement:Expected name, got :
         <empty list>
       PsiElement(:)(':')
-      PsiErrorElement:Exprected type, got }
+      PsiErrorElement:Expected type, got }
         <empty list>
     PsiWhiteSpace('\n')
     PsiElement(})('}')
@@ -110,7 +110,7 @@ IonFile
     PsiWhiteSpace(' ')
     PsiElement(name)('a')
     PsiElement(:)(':')
-    PsiErrorElement:Exprected type, got ;
+    PsiErrorElement:Expected type, got ;
       <empty list>
     PsiWhiteSpace(' ')
     PsiElement(;)(';')
@@ -140,7 +140,7 @@ IonFile
     PsiWhiteSpace(' ')
     PsiElement(name)('x')
     PsiElement(:)(':')
-    PsiErrorElement:Exprected type, got ;
+    PsiErrorElement:Expected type, got ;
       <empty list>
     PsiElement(;)(';')
   PsiWhiteSpace('\n')
@@ -149,7 +149,7 @@ IonFile
     PsiWhiteSpace(' ')
     PsiElement(name)('x')
     PsiElement(:)(':')
-    PsiErrorElement:Exprected type, got =
+    PsiErrorElement:Expected type, got =
       <empty list>
     PsiWhiteSpace(' ')
     PsiElement(=)('=')
@@ -214,7 +214,7 @@ IonFile
     PsiElement(name)('x')
     PsiWhiteSpace(' ')
     PsiElement(=)('=')
-    PsiErrorElement:Exprected type, got ;
+    PsiErrorElement:Expected type, got ;
       <empty list>
     PsiElement(;)(';')
   PsiWhiteSpace('\n\n')
@@ -259,7 +259,7 @@ IonFile
     PsiElement(()('(')
     IonDeclFuncParam(param)
       PsiElement(...)('...')
-      PsiErrorElement:Exprected type, got 1
+      PsiErrorElement:Expected type, got 1
         <empty list>
     PsiElement(int)('1')
     PsiElement())(')')
@@ -298,7 +298,7 @@ IonFile
     PsiElement(@)('@')
     IonExprName(expr_name)
       PsiElement(name)('x')
-  PsiErrorElement:Exprected declaration or note, got [
+  PsiErrorElement:Expected declaration or note, got [
     <empty list>
   PsiElement([)('[')
   PsiWhiteSpace('\n')
