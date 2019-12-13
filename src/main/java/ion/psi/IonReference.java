@@ -23,9 +23,12 @@ import ion.IonLibProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Predicate;
 
 public class IonReference extends PsiReferenceBase<IonPsiElement> {
   public IonReference(@NotNull IonPsiElement element, TextRange rangeInElement) {
@@ -35,26 +38,61 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   @NotNull
   @Override
   public Object[] getVariants() {
-    CommonProcessors.CollectProcessor<PsiElement> processor = new CommonProcessors.CollectProcessor<>(ContainerUtil.newSmartList());
+    CommonProcessors.CollectProcessor<PsiElement> processor = new CommonProcessors.CollectProcessor<PsiElement>(ContainerUtil.newSmartList()) {
+      @Override
+      public boolean process(PsiElement psiElement) {
+        if (psiElement instanceof IonDecl) {
+          if (((IonDecl) psiElement).getName() == null) {
+            return true;
+          }
+        }
+        return super.process(psiElement);
+      }
+    };
     processResolveVariants(processor);
     return processor.toArray(PsiElement.EMPTY_ARRAY);
   }
 
-  public void processResolveVariants(@NotNull Processor<PsiElement> processor) {
+  public boolean processResolveVariants(@NotNull Processor<PsiElement> processor) {
     if (myElement instanceof IonLabelName) {
-      processLabels(myElement, processor);
+      return processLabels(myElement, processor);
     }
+
+    if (myElement instanceof IonExprField) {
+      return processExprFieldVariants((IonExprField) myElement, processor);
+    }
+
+    PsiElement parent = myElement.getParent();
+    IonExprField field = ObjectUtils.tryCast(parent, IonExprField.class);
+    if (field != null && myElement == getFieldName(field)) {
+      return processExprFieldVariants(field, processor);
+    }
+
+    IonCompoundFieldNamed compoundField = ObjectUtils.tryCast(parent, IonCompoundFieldNamed.class);
+    if (compoundField != null && myElement == getCompoundFieldName(compoundField)) {
+      return processCompoundFieldVariants(compoundField, processor);
+    }
+
+    IonDeclImportItem importedItem = ObjectUtils.tryCast(parent, IonDeclImportItem.class);
+    if (importedItem != null) {
+      IonDeclImport importDecl = PsiTreeUtil.getParentOfType(importedItem, IonDeclImport.class);
+      IonImportPath importPath = PsiTreeUtil.getChildOfType(importDecl, IonImportPath.class);
+      PsiDirectory packageDir = resolveImport(myElement.getContainingFile(), importPath != null ? importPath.getText() : null);
+      return processPackageDeclarations(packageDir, processor);
+    }
+
+    return processDeclarationsUp(parent, myElement, processor);
   }
 
   @Override
   @Nullable
   public PsiElement resolve() {
-    PsiFile file = myElement.getContainingFile();
+    PsiFile file = myElement.getOriginalElement().getContainingFile();
     ConcurrentMap<PsiElement, PsiElement> resolveCache = null;
     if (true) {// Registry.is("ion.resolve.cache.enabled") doesn't work
       resolveCache = getResolveCache(file);
       PsiElement result = resolveCache != null ? resolveCache.get(myElement) : null;
-      if (result != null) {
+      if (result != null && result.isValid()) {
         return result;
       }
     }
@@ -64,18 +102,30 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       processLabels(myElement, processor);
       return processor.getElement();
     }
+
     if (myElement instanceof IonExprField) {
-      return resolveExprField((IonExprField) myElement);
+      PsiElement nameElement = getFieldName((IonExprField) myElement);
+      if (nameElement == null) {
+        return null;
+      }
+      ExactMatchProcessor processor = new ExactMatchProcessor(nameElement.getText());
+      processExprFieldVariants((IonExprField) myElement, processor);
+      return processor.getElement();
     }
+
     PsiElement parent = myElement.getParent();
     IonExprField field = ObjectUtils.tryCast(parent, IonExprField.class);
     if (field != null && myElement == getFieldName(field)) {
-      return resolveExprField(field);
+      ExactMatchProcessor processor = new ExactMatchProcessor(myElement.getText());
+      processExprFieldVariants(field, processor);
+      return processor.getElement();
     }
 
     IonCompoundFieldNamed compoundField = ObjectUtils.tryCast(parent, IonCompoundFieldNamed.class);
     if (compoundField != null && myElement == getCompoundFieldName(compoundField)) {
-      return resolveCompoundField(compoundField);
+      ExactMatchProcessor processor = new ExactMatchProcessor(myElement.getText());
+      processCompoundFieldVariants(compoundField, processor);
+      return processor.getElement();
     }
 
     CharSequence name = getRangeInElement().subSequence(myElement.getText());
@@ -84,15 +134,21 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       IonDeclImport importDecl = PsiTreeUtil.getParentOfType(importedItem, IonDeclImport.class);
       IonImportPath importPath = PsiTreeUtil.getChildOfType(importDecl, IonImportPath.class);
       PsiDirectory packageDir = resolveImport(myElement.getContainingFile(), importPath != null ? importPath.getText() : null);
-      return findDeclaration(packageDir, name);
+      ExactMatchProcessor processor = new ExactMatchProcessor(name);
+      processPackageDeclarations(packageDir, processor);
+      return processor.getElement();
     }
 
-    Ref<PsiElement> ref = Ref.create();
-    PsiElement processedChild = myElement;
-    IonBlock nearestBlock = null;
-    Ref<Pair<CharSequence, PsiElement>> blockCache = null;
-    while (parent != null) {
-      boolean stop = !processDeclarations(parent, processedChild, decl -> {
+    Ref<Ref<Pair<CharSequence, PsiElement>>> blockCacheRef = Ref.create();
+    ExactMatchProcessor processor = new ExactMatchProcessor(name) {
+      private boolean myProcessedBlock;
+
+      @Override
+      public boolean process(PsiElement element) {
+        IonDecl decl = ObjectUtils.tryCast(element, IonDecl.class);
+        if (decl == null) {
+          return true;
+        }
         if (decl instanceof IonStmtLabel) {
           return true;
         }
@@ -100,65 +156,44 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
           // ignore imports used in other files in the same package
           return true;
         }
-        PsiElement nameElement = decl.getNameIdentifier();
-        if (nameElement != null && nameElement.textMatches(name)) {
-          ref.set(decl);
-          return false;
-        }
-        if (decl instanceof IonDeclImport) {
-          IonImportPath importPath = PsiTreeUtil.getChildOfType(decl, IonImportPath.class);
-          ASTNode nameNode = importPath.getNode().findChildByType(IonToken.NAME);
-          nameElement = nameNode != null ? nameNode.getPsi() : null;
-          if (nameElement != null && nameElement.textMatches(name)) {
-            ref.set(nameElement);
+        return super.process(element);
+      }
+
+      @Override
+      public boolean childrenProcessed(@NotNull PsiElement parent) {
+        if (!myProcessedBlock && parent instanceof IonBlock) {
+          myProcessedBlock = true;
+          Ref<Pair<CharSequence, PsiElement>> blockCache = getBlockResolveCache(file, (IonBlock) parent);
+          blockCacheRef.set(blockCache);
+          Pair<CharSequence, PsiElement> cached = blockCache != null ? blockCache.get() : null;
+          PsiElement lastResolveResult = cached != null ? cached.second : null;
+          if (lastResolveResult != null && !super.process(lastResolveResult)) {
             return false;
           }
         }
         return true;
-      });
-      if (stop) {
-        break;
       }
-      if (parent instanceof PsiFile) {
-        PsiDirectory builtinPkg = resolveImport(file, "builtin");
-        PsiElement builtinDecl = findDeclaration(builtinPkg, name);
-        if (builtinDecl != null) {
-          ref.set(builtinDecl);
-          break;
-        }
-      }
-      if (nearestBlock == null && parent instanceof IonBlock) {
-        nearestBlock = (IonBlock) parent;
-        blockCache = getBlockResolveCache(file, nearestBlock);
-        Pair<CharSequence, PsiElement> cached = blockCache != null ? blockCache.get() : null;
-        if (cached != null && StringUtil.equals(name, cached.first)) {
-          return cached.second;
-        }
-      }
-      if (parent instanceof PsiDirectory) {
-        // we processed package files and didn't find a definition
-        break;
-      }
-      processedChild = parent;
-      parent = parent.getParent();
-    }
-    PsiElement result = ref.get();
+    };
+    processDeclarationsUp(parent, myElement, processor);
+
+    PsiElement result = processor.getElement();
     if (result != null) {
       if (resolveCache != null) {
-        resolveCache.putIfAbsent(myElement, result);
+        resolveCache.put(myElement, result);
       }
+      Ref<Pair<CharSequence, PsiElement>> blockCache = blockCacheRef.get();
       if (blockCache != null) {
-        blockCache.setIfNull(Pair.create(name, result));
+        blockCache.set(Pair.create(name, result));
       }
     }
     return result;
   }
 
-  @Nullable
-  public static PsiElement resolveExprField(@NotNull IonExprField fieldExpr) {
+  private static boolean processExprFieldVariants(@NotNull IonExprField fieldExpr,
+                                                  @NotNull Processor<PsiElement> processor) {
     PsiElement qualifier = getQualifier(fieldExpr);
     if (qualifier == null) {
-      return null;
+      return true;
     }
     PsiElement type = resolveType(qualifier);
     PsiElement unwrapped = unwrapParAndConstType(type);
@@ -169,20 +204,8 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     if (unwrapped != type) {
       type = resolveType(unwrapped);
     }
-    PsiElement nameElement = getFieldName(fieldExpr);
-    if (nameElement == null) {
-      return null;
-    }
-    String name = nameElement.getText();
-    if (type instanceof IonDeclAggregate) {
-      for (PsiElement child : type.getChildren()) {
-        if (child instanceof IonDeclField) {
-          PsiElement result = processDeclField((IonDeclField) child, name);
-          if (result != null) {
-            return result;
-          }
-        }
-      }
+    if (type instanceof IonDeclAggregate && !processDeclAggregate((IonDeclAggregate) type, processor)) {
+      return false;
     }
     if (type == null) {
       PsiReference reference = qualifier.getReference();
@@ -194,30 +217,35 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
           if (importItems != null) {
             IonImportPath importPath = PsiTreeUtil.getChildOfType(importDecl, IonImportPath.class);
             if (importPath != null) {
+              Set<String> importedNames = new HashSet<>();
+              boolean hasEllipsis = false;
               for (IonDeclImportItem item : importItems) {
-                PsiElement alias = getAlias(item);
-                if (alias != null && alias.textMatches(name)) {
-                  return item;
+                if (!processor.process(item)) {
+                  return false;
                 }
                 PsiElement importedName = getName(item);
-                if (importedName != null && importedName.textMatches(name)) {
-                  PsiReference importedNameReference = importedName.getReference();
-                  return importedNameReference != null ? importedNameReference.resolve() : null;
+                if (importedName != null) {
+                  importedNames.add(importedName.getText());
                 }
                 if (item.getNode().findChildByType(IonToken.ELLIPSIS) != null) {
-                  PsiDirectory packageDir = resolveImport(fieldExpr.getContainingFile(), importPath.getText());
-                  PsiElement declaration = findDeclaration(packageDir, name);
-                  if (declaration != null) {
-                    return declaration;
-                  }
+                  hasEllipsis = true;
                 }
+              }
+              if (hasEllipsis || !importedNames.isEmpty()) {
+                Predicate<String> importedNamePredicate = hasEllipsis ? it -> true : importedNames::contains;
+                PsiDirectory packageDir = resolveImport(fieldExpr.getContainingFile(), importPath.getText());
+                Processor<PsiElement> proc = it -> {
+                  IonDecl decl = ObjectUtils.tryCast(it, IonDecl.class);
+                  return decl == null || !importedNamePredicate.test(decl.getName()) || processor.process(decl);
+                };
+                return processPackageDeclarations(packageDir, proc);
               }
             }
           }
         }
       }
     }
-    return null;
+    return true;
   }
 
   @Nullable
@@ -245,29 +273,48 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     return null;
   }
 
-  @Nullable
-  public static PsiElement resolveCompoundField(@NotNull IonCompoundFieldNamed compoundField) {
+  private static boolean processDeclAggregate(@NotNull IonDeclAggregate aggregate, @NotNull Processor<PsiElement> processor) {
+    for (PsiElement child : aggregate.getChildren()) {
+      if (child instanceof IonDeclField && !processDeclField((IonDeclField) child, processor)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static boolean processDeclField(@NotNull IonDeclField field, @NotNull Processor<PsiElement> processor) {
+    IonDeclFieldName[] fieldNames = PsiTreeUtil.getChildrenOfType(field, IonDeclFieldName.class);
+    if (fieldNames != null) {
+      for (IonDeclFieldName fieldName : fieldNames) {
+        if (!processor.process(fieldName)) {
+          return false;
+        }
+      }
+    } else {
+      // anonymous field
+      IonDeclField[] innerFields = PsiTreeUtil.getChildrenOfType(field, IonDeclField.class);
+      if (innerFields != null) {
+        for (IonDeclField f : innerFields) {
+          if (!processDeclField(f, processor)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  private static boolean processCompoundFieldVariants(@NotNull IonCompoundFieldNamed compoundField,
+                                                      @NotNull Processor<PsiElement> processor) {
     PsiElement type = getLitCompoundType(ObjectUtils.tryCast(compoundField.getParent(), IonExprLitCompound.class));
     PsiElement baseType = getBaseType(type);
     if (baseType != type) {
       type = resolveType(baseType);
     }
     if (type instanceof IonDeclAggregate) {
-      PsiElement nameElement = getCompoundFieldName(compoundField);
-      if (nameElement == null) {
-        return null;
-      }
-      String name = nameElement.getText();
-      for (PsiElement child : type.getChildren()) {
-        if (child instanceof IonDeclField) {
-          PsiElement result = processDeclField((IonDeclField) child, name);
-          if (result != null) {
-            return result;
-          }
-        }
-      }
+      return processDeclAggregate(((IonDeclAggregate) type), processor);
     }
-    return null;
+    return true;
   }
 
   @Nullable
@@ -298,8 +345,13 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       return resolveType(parent);
     }
     if (parent instanceof IonCompoundFieldNamed) {
-      PsiElement resolvedField = resolveCompoundField((IonCompoundFieldNamed) parent);
-      return resolveType(resolvedField);
+      PsiElement nameElement = getCompoundFieldName((IonCompoundFieldNamed) parent);
+      if (nameElement == null) {
+        return null;
+      }
+      ExactMatchProcessor processor = new ExactMatchProcessor(nameElement.getText());
+      processCompoundFieldVariants((IonCompoundFieldNamed) parent, processor);
+      return resolveType(processor.getElement());
     }
     if (parent instanceof IonCompoundField) {
       IonExprLitCompound parentLiteral = ObjectUtils.tryCast(parent.getParent(), IonExprLitCompound.class);
@@ -334,7 +386,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       return null;
     }
     if (element instanceof IonTypeName) {
-      PsiReference reference = element != null ? element.getReference() : null;
+      PsiReference reference = element.getReference();
       return reference != null ? reference.resolve() : null;
     }
     if (element instanceof IonStmtInit) {
@@ -410,8 +462,13 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       return resolveType(resolved);
     }
     if (element instanceof IonExprField) {
-      PsiElement resolved = resolveExprField((IonExprField) element);
-      return resolveType(resolved);
+      PsiElement nameElement = getFieldName((IonExprField) element);
+      if (nameElement == null) {
+        return null;
+      }
+      ExactMatchProcessor processor = new ExactMatchProcessor(nameElement.getText());
+      processExprFieldVariants((IonExprField) element, processor);
+      return resolveType(processor.getElement());
     }
     if (element instanceof IonExprCall) {
       PsiElement name = ArrayUtil.getFirstElement(element.getChildren());
@@ -439,6 +496,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
               return resolved != null ? resolved : itemType;
             }
           } catch (NumberFormatException e) {
+            // ignore
           }
         }
       }
@@ -457,30 +515,14 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     return func == null || PsiTreeUtil.processElements(func, it -> {
       IonStmtLabel label = ObjectUtils.tryCast(it, IonStmtLabel.class);
       if (label != null) {
-        PsiElement nameIdentifier = label.getNameIdentifier();
         return processor.process(label);
       }
       return true;
     });
   }
 
-  @Nullable
-  private static PsiElement findDeclaration(@Nullable PsiDirectory packageDir,
-                                            @NotNull CharSequence name) {
-    Ref<PsiElement> ref = Ref.create();
-    boolean found = !processPackageDeclarations(packageDir, decl -> {
-      PsiElement importedDeclName = decl.getNameIdentifier();
-      if (importedDeclName != null && importedDeclName.textMatches(name)) {
-        ref.set(decl);
-        return false;
-      }
-      return true;
-    });
-    return ref.get();
-  }
-
   private static boolean processPackageDeclarations(@Nullable PsiDirectory packageDir,
-                                                    @NotNull Processor<IonDecl> processor) {
+                                                    @NotNull Processor<PsiElement> processor) {
     if (packageDir != null) {
       for (PsiFile pkgFile : packageDir.getFiles()) {
         if (pkgFile instanceof IonPsiFile) {
@@ -500,12 +542,51 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     return true;
   }
 
-  public static boolean processDeclarations(@NotNull PsiElement element,
-                                            @Nullable PsiElement processedChild,
-                                            @NotNull Processor<IonDecl> processor) {
-    boolean isFile = element instanceof IonPsiFile;
-    boolean isDir = element instanceof PsiDirectory;
-    for (PsiElement child : element.getChildren()) {
+  interface UpProcessor<T> extends Processor<T> {
+    default boolean childrenProcessed(@NotNull PsiElement parent) {
+      return true;
+    }
+  }
+
+  private static boolean processDeclarationsUp(@Nullable PsiElement parent,
+                                               @Nullable PsiElement processedChild,
+                                               @NotNull Processor<PsiElement> processor) {
+    while (parent != null) {
+      if (!processDeclarations(parent, processedChild, processor)) {
+        return false;
+      }
+
+      if (processor instanceof UpProcessor) {
+        if (!((UpProcessor) processor).childrenProcessed(parent)) {
+          return false;
+        }
+      }
+      // children processed
+
+      if (parent instanceof PsiFile) {
+        PsiDirectory builtinPkg = resolveImport((PsiFile) parent, "builtin");
+        if (!processPackageDeclarations(builtinPkg, processor)) {
+          return false;
+        }
+      }
+
+      if (parent instanceof PsiDirectory) {
+        // we processed package files and didn't find a definition
+        break;
+      }
+
+      processedChild = parent;
+      parent = parent.getParent();
+    }
+    return true;
+  }
+
+  private static boolean processDeclarations(@NotNull PsiElement parent,
+                                             @Nullable PsiElement processedChild,
+                                             @NotNull Processor<PsiElement> processor) {
+    boolean isFile = parent instanceof IonPsiFile;
+    boolean isDir = parent instanceof PsiDirectory;
+    for (PsiElement child : parent.getChildren()) {
       if (!isFile && !isDir && child.equals(processedChild)) {
         break;
       }
@@ -513,12 +594,9 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
         return false;
       }
       if (child instanceof IonPsiFile && child != processedChild) {
-        PsiElement[] topLevelElements = child.getChildren();
-        if (topLevelElements != null) {
-          for (PsiElement topLevelChild : topLevelElements) {
-            if (!processDecl(topLevelChild, processor)) {
-              return false;
-            }
+        for (PsiElement topLevelChild : child.getChildren()) {
+          if (!processDecl(topLevelChild, processor)) {
+            return false;
           }
         }
       }
@@ -526,9 +604,9 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     return true;
   }
 
-  private static boolean processDecl(@Nullable PsiElement child, @NotNull Processor<IonDecl> processor) {
+  private static boolean processDecl(@Nullable PsiElement child, @NotNull Processor<PsiElement> processor) {
     if (child instanceof IonDecl) {
-      if (!processor.process((IonDecl) child)) {
+      if (!processor.process(child)) {
         return false;
       }
       if (child instanceof IonDeclEnum) {
@@ -628,7 +706,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   private static PsiElement getDeclFuncType(@NotNull IonDeclFunc func) {
     PsiElement child = func.getFirstChild();
     while (child != null) {
-      if (child != null && child.getNode().getElementType() == IonToken.COLON) {
+      if (child.getNode().getElementType() == IonToken.COLON) {
         return PsiTreeUtil.skipWhitespacesAndCommentsForward(child);
       }
       child = PsiTreeUtil.skipWhitespacesAndCommentsForward(child);
@@ -736,8 +814,8 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   }
 
   @Nullable
-  private static ConcurrentMap<String, PsiDirectory> getPackageResolveCache(@NotNull PsiDirectory dir) {
-    return CachedValuesManager.getCachedValue(dir, () -> {
+  private static ConcurrentMap<String, PsiDirectory> getPackageResolveCache(@Nullable PsiDirectory dir) {
+    return dir == null ? null : CachedValuesManager.getCachedValue(dir, () -> {
       ConcurrentHashMap<String, PsiDirectory> cache = new ConcurrentHashMap<>();
       return CachedValueProvider.Result.create(cache, dir, PsiModificationTracker.MODIFICATION_COUNT);
     });
@@ -764,7 +842,10 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       return null;
     }
     PsiDirectory result = null;
-    PsiDirectory originDir = file.getContainingDirectory();
+    PsiDirectory originDir = file.getOriginalFile().getContainingDirectory();
+    if (originDir == null) {
+      return null;
+    }
     ConcurrentMap<String, PsiDirectory> cache = getPackageResolveCache(originDir);
     if (cache != null) {
       result = cache.get(importPath);
@@ -825,7 +906,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     return dir;
   }
 
-  private static class ExactMatchProcessor implements Processor<PsiElement> {
+  private static class ExactMatchProcessor implements UpProcessor<PsiElement> {
     private final CharSequence myName;
     private PsiElement myElement;
 
@@ -835,6 +916,9 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
 
     @Override
     public boolean process(PsiElement psiElement) {
+      if (myElement != null) {
+        return false;
+      }
       IonDecl decl = ObjectUtils.tryCast(psiElement, IonDecl.class);
       if (decl != null) {
         if (StringUtil.equals(myName, decl.getName())) {

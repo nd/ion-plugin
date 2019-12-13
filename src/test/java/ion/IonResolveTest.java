@@ -1,19 +1,14 @@
 package ion;
 
-import com.intellij.largeFilesEditor.editor.EditorManager;
 import com.intellij.openapi.actionSystem.IdeActions;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
-import com.intellij.rt.execution.junit.FileComparisonFailure;
-import com.intellij.testFramework.UsefulTestCase;
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
 
-public class IonResolveTest extends LightPlatformCodeInsightFixtureTestCase {
+public class IonResolveTest extends BasePlatformTestCase {
   public void testLocalVarSameBlock() {
     doTest();
   }

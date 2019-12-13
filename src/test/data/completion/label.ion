@@ -1,12 +1,12 @@
 func x() {
   if (a) {
     if (b) {
-      :<caret>ok
+      :ok
     }
   }
   if (a) {
     if (b) {
-      goto /*complete*/;
+      goto <caret>;
     }
   }
 }

@@ -1,0 +1,10 @@
+struct T {
+  f1 int
+  f2 int
+  f3 int
+}
+
+func x() {
+  t := T{}
+  t.<caret>
+}
