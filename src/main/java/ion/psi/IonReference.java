@@ -1,15 +1,12 @@
 package ion.psi;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.roots.SyntheticLibrary;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.VFileProperty;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.*;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.CachedValueProvider;
@@ -17,9 +14,10 @@ import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ArrayUtil;
-import com.intellij.util.EnvironmentUtil;
+import com.intellij.util.CommonProcessors;
 import com.intellij.util.ObjectUtils;
 import com.intellij.util.Processor;
+import com.intellij.util.containers.ContainerUtil;
 import ion.IonLib;
 import ion.IonLibProvider;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +30,20 @@ import java.util.concurrent.ConcurrentMap;
 public class IonReference extends PsiReferenceBase<IonPsiElement> {
   public IonReference(@NotNull IonPsiElement element, TextRange rangeInElement) {
     super(element, rangeInElement);
+  }
+
+  @NotNull
+  @Override
+  public Object[] getVariants() {
+    CommonProcessors.CollectProcessor<PsiElement> processor = new CommonProcessors.CollectProcessor<>(ContainerUtil.newSmartList());
+    processResolveVariants(processor);
+    return processor.toArray(PsiElement.EMPTY_ARRAY);
+  }
+
+  public void processResolveVariants(@NotNull Processor<PsiElement> processor) {
+    if (myElement instanceof IonLabelName) {
+      processLabels(myElement, processor);
+    }
   }
 
   @Override
@@ -48,7 +60,9 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     }
 
     if (myElement instanceof IonLabelName) {
-      return resolveLabel((IonLabelName) myElement);
+      ExactMatchProcessor processor = new ExactMatchProcessor(myElement.getText());
+      processLabels(myElement, processor);
+      return processor.getElement();
     }
     if (myElement instanceof IonExprField) {
       return resolveExprField((IonExprField) myElement);
@@ -438,26 +452,16 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     return resolveType(reference != null ? reference.resolve() : null);
   }
 
-  @Nullable
-  public static PsiElement resolveLabel(@NotNull IonLabelName labelName) {
-    IonDeclFunc func = PsiTreeUtil.getParentOfType(labelName, IonDeclFunc.class);
-    if (func == null) {
-      return null;
-    }
-    Ref<PsiElement> result = Ref.create();
-    CharSequence name = labelName.getText();
-    PsiTreeUtil.processElements(func, it -> {
+  private static boolean processLabels(@Nullable PsiElement element, @NotNull Processor<PsiElement> processor) {
+    IonDeclFunc func = PsiTreeUtil.getParentOfType(element, IonDeclFunc.class, false);
+    return func == null || PsiTreeUtil.processElements(func, it -> {
       IonStmtLabel label = ObjectUtils.tryCast(it, IonStmtLabel.class);
       if (label != null) {
         PsiElement nameIdentifier = label.getNameIdentifier();
-        if (nameIdentifier != null && nameIdentifier.textMatches(name)) {
-          result.set(label);
-          return false;
-        }
+        return processor.process(label);
       }
       return true;
     });
-    return result.get();
   }
 
   @Nullable
@@ -819,5 +823,31 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       }
     }
     return dir;
+  }
+
+  private static class ExactMatchProcessor implements Processor<PsiElement> {
+    private final CharSequence myName;
+    private PsiElement myElement;
+
+    public ExactMatchProcessor(@NotNull CharSequence name) {
+      myName = name;
+    }
+
+    @Override
+    public boolean process(PsiElement psiElement) {
+      IonDecl decl = ObjectUtils.tryCast(psiElement, IonDecl.class);
+      if (decl != null) {
+        if (StringUtil.equals(myName, decl.getName())) {
+          myElement = psiElement;
+          return false;
+        }
+      }
+      return true;
+    }
+
+    @Nullable
+    public PsiElement getElement() {
+      return myElement;
+    }
   }
 }

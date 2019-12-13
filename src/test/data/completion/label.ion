@@ -1,0 +1,12 @@
+func x() {
+  if (a) {
+    if (b) {
+      :<caret>ok
+    }
+  }
+  if (a) {
+    if (b) {
+      goto /*complete*/;
+    }
+  }
+}
