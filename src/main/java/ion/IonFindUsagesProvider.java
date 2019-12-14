@@ -63,16 +63,17 @@ public class IonFindUsagesProvider implements FindUsagesProvider {
   @Override
   public @NotNull String getDescriptiveName(@NotNull PsiElement element) {
     if (element instanceof IonDecl) {
-      return ((IonDecl) element).getName();
+      return ObjectUtils.notNull(((IonDecl) element).getName(), "");
     } else {
       return element.getText();
     }
   }
 
   @Override
-  public @NotNull String getNodeText(@NotNull PsiElement element, boolean useFullName) {
+  @NotNull
+  public String getNodeText(@NotNull PsiElement element, boolean useFullName) {
     if (element instanceof IonDecl) {
-      return ((IonDecl) element).getName();
+      return ObjectUtils.notNull(((IonDecl) element).getName(), "");
     } else {
       return element.getText();
     }
