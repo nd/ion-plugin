@@ -40,17 +40,21 @@ public class IonFmtBlock implements ASTBlock {
   @NotNull
   private static Indent getIndent(@NotNull PsiElement element) {
     IElementType elementType = element.getNode().getElementType();
-    if (element instanceof IonSwitchCaseBlock) {
-      return Indent.getNoneIndent();
+    if (elementType == IonElementType.STMT_LIST) {
+      return element.getChildren().length == 0 ? Indent.getNoneIndent() : Indent.getNormalIndent();
     }
+
+    if (element instanceof IonDeclField) {
+      return Indent.getNormalIndent();
+    }
+
+    if (element instanceof IonDeclEnumItem) {
+      return Indent.getNormalIndent();
+    }
+
     PsiElement parent = element.getParent();
-    if (parent instanceof IonBlock ||
-            parent instanceof IonExprLitCompound ||
-            parent instanceof IonExprLitCompoundTyped) {
+    if (parent instanceof IonExprLitCompound || parent instanceof IonExprLitCompoundTyped) {
       if (elementType == IonToken.LBRACE || elementType == IonToken.RBRACE) {
-        return Indent.getNoneIndent();
-      }
-      if (elementType == IonElementType.STMT_LIST && element.getChildren().length == 0) {
         return Indent.getNoneIndent();
       }
       return Indent.getNormalIndent();
@@ -63,21 +67,23 @@ public class IonFmtBlock implements ASTBlock {
       return Indent.getNormalIndent();
     }
 
-    if (parent instanceof IonDeclEnum) {
-      if (elementType == IonToken.LBRACE || elementType == IonToken.RBRACE || elementType == IonToken.ENUM) {
-        return Indent.getNoneIndent();
-      }
-      return Indent.getNormalIndent();
-    }
-
-    if (parent instanceof IonDeclAggregate) {
-      if (elementType == IonToken.LBRACE || elementType == IonToken.RBRACE || elementType == IonToken.STRUCT || elementType == IonToken.UNION) {
-        return Indent.getNoneIndent();
-      }
-      return Indent.getNormalIndent();
-    }
-
     return Indent.getNoneIndent();
+  }
+
+  @NotNull
+  @Override
+  public ChildAttributes getChildAttributes(int newChildIndex) {
+    Indent childIndent = Indent.getNoneIndent();
+    if (myElement instanceof IonBlock ||
+            myElement instanceof IonExprLitCompound ||
+            myElement instanceof IonExprLitCompoundTyped ||
+            myElement instanceof IonSwitchCaseBlock ||
+            myElement instanceof IonDeclAggregate ||
+            myElement instanceof IonDeclEnum ||
+            myElement.getNode().getElementType() == IonElementType.STMT_SWITCH) {
+      childIndent = Indent.getNormalIndent();
+    }
+    return new ChildAttributes(childIndent, null);
   }
 
   @NotNull
@@ -123,12 +129,6 @@ public class IonFmtBlock implements ASTBlock {
   @Override
   public Spacing getSpacing(@Nullable Block child1, @NotNull Block child2) {
     return mySpacingBuilder.getSpacing(this, child1, child2);
-  }
-
-  @NotNull
-  @Override
-  public ChildAttributes getChildAttributes(int newChildIndex) {
-    return new ChildAttributes(null, null);
   }
 
   @Override

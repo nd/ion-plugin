@@ -112,6 +112,8 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonCompoundField(node);
         case COMPOUND_FIELD_NAMED:
           return new IonCompoundFieldNamed(node);
+        case COMPOUND_FIELD_INDEX:
+          return new IonCompoundFieldIndex(node);
         case EXPR_LITERAL_COMPOUND:
           return new IonExprLitCompound(node);
         case EXPR_LITERAL_INT:

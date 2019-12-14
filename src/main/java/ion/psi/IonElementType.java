@@ -31,7 +31,7 @@ public class IonElementType extends IElementType {
   public static final IonElementType EXPR_LITERAL_COMPOUND_TYPED = new IonElementType("expr_literal_compound_typed", TypeId.EXPR_LITERAL_COMPOUND_TYPED);
   public static final IonElementType COMPOUND_FIELD = new IonElementType("compound_field", TypeId.COMPOUND_FIELD);
   public static final IonElementType COMPOUND_FIELD_NAMED = new IonElementType("compound_field_named", TypeId.COMPOUND_FIELD_NAMED);
-  public static final IonElementType COMPOUND_FIELD_INDEX = new IonElementType("compound_field_index");
+  public static final IonElementType COMPOUND_FIELD_INDEX = new IonElementType("compound_field_index", TypeId.COMPOUND_FIELD_INDEX);
   public static final IonElementType EXPR_NAME = new IonElementType("expr_name", TypeId.EXPR_NAME);
   public static final IonElementType EXPR_NEW = new IonElementType("expr_new");
   public static final IonElementType EXPR_PAREN = new IonElementType("expr_paren");

@@ -309,13 +309,20 @@ public class IonParser implements PsiParser {
 
   private void parseStmtList(@NotNull PsiBuilder b) {
     PsiBuilder.Marker m = b.mark();
+//    boolean empty = true;
     while (!b.eof() && !match(b, RBRACE)) {
       if (!parseStmt(b) && !match(b, RBRACE)) {
         b.error("Expected statement, got " + b.getTokenText());
         b.advanceLexer();
+//      } else {
+//        empty = false;
       }
     }
-    m.done(STMT_LIST);
+//    if (empty) {
+//      m.drop();
+//    } else {
+      m.done(STMT_LIST);
+//    }
   }
 
   private boolean parseStmt(@NotNull PsiBuilder b) {
@@ -497,20 +504,22 @@ public class IonParser implements PsiParser {
     expectExpr(b);
     expect(b, RPAREN);
     if (expect(b, LBRACE)) {
-//      m.setCustomEdgeTokenBinders((tokens, atStreamEdge, getter) -> {
-//        int firstCommentIdx = ContainerUtil.indexOf(tokens, it -> it instanceof PsiComment);
-//        return firstCommentIdx >= 0 ? firstCommentIdx : tokens.size();
-//      }, null);
       while (!b.eof() && !match(b, RBRACE)) {
-        parseStmtSwitchCase(b);
+        if (!parseStmtSwitchCase(b)) {
+          break;
+        }
       }
-      expect(b, RBRACE);
+      consumeUntil(b, RBRACE);
     }
     m.done(STMT_SWITCH);
   }
 
-  private void parseStmtSwitchCase(@NotNull PsiBuilder b) {
+  private boolean parseStmtSwitchCase(@NotNull PsiBuilder b) {
     PsiBuilder.Marker m = b.mark();
+      m.setCustomEdgeTokenBinders(null, (tokens, atStreamEdge, getter) -> {
+//        int firstCommentIdx = ContainerUtil.lastIndexOf(tokens, it -> it instanceof PsiComment);
+        return tokens.size();//firstCommentIdx >= 0 ? firstCommentIdx : tokens.size();
+      });
     if (consume(b, DEFAULT)) {
       expect(b, COLON);
     } else if (consume(b, CASE)) {
@@ -522,6 +531,7 @@ public class IonParser implements PsiParser {
     } else {
       b.error("Expected 'case' or 'default', got " + b.getTokenText());
       m.drop();
+      return false;
     }
     while (!b.eof() && !match(b, RBRACE) && !match(b, CASE) && !match(b, DEFAULT)) {
       if (!parseStmt(b)) {
@@ -530,6 +540,7 @@ public class IonParser implements PsiParser {
       }
     }
     m.done(STMT_SWITCH_CASE_BLOCK);
+    return true;
   }
 
   private void parseStmtSwitchCasePattern(@NotNull PsiBuilder b) {

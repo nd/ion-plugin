@@ -535,7 +535,7 @@ IonFile
             PsiElement(default)('default')
             PsiErrorElement:Expected :, got }
               <empty list>
-          PsiWhiteSpace('\n  ')
+            PsiWhiteSpace('\n  ')
           PsiElement(})('}')
       PsiWhiteSpace('\n')
       PsiElement(})('}')
@@ -564,7 +564,7 @@ IonFile
             PsiElement(case)('case')
             PsiErrorElement:Expected expression, got }
               <empty list>
-          PsiWhiteSpace('\n  ')
+            PsiWhiteSpace('\n  ')
           PsiElement(})('}')
       PsiWhiteSpace('\n')
       PsiElement(})('}')
@@ -598,7 +598,7 @@ IonFile
             PsiErrorElement:Expected expression, got :
               <empty list>
             PsiElement(:)(':')
-          PsiWhiteSpace('\n  ')
+            PsiWhiteSpace('\n  ')
           PsiElement(})('}')
       PsiWhiteSpace('\n')
       PsiElement(})('}')
