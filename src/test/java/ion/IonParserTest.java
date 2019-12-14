@@ -1,6 +1,5 @@
 package ion;
 
-import com.intellij.lang.ParserDefinition;
 import com.intellij.testFramework.ParsingTestCase;
 import org.jetbrains.annotations.NotNull;
 

@@ -4,6 +4,8 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.containers.ContainerUtil;
@@ -309,20 +311,19 @@ public class IonParser implements PsiParser {
 
   private void parseStmtList(@NotNull PsiBuilder b) {
     PsiBuilder.Marker m = b.mark();
-//    boolean empty = true;
+    // include all preceding spaces and comments into stmt list
+    // this gives proper indent on emacs-tab in empty block
+    // and in a block with comments only: spaces and comments
+    // are inside stmt_list, it is inside block and we return
+    // normal indent for all things inside block.
+    m.setCustomEdgeTokenBinders((tokens, atStreamEdge, getter) -> 0, null);
     while (!b.eof() && !match(b, RBRACE)) {
       if (!parseStmt(b) && !match(b, RBRACE)) {
         b.error("Expected statement, got " + b.getTokenText());
         b.advanceLexer();
-//      } else {
-//        empty = false;
       }
     }
-//    if (empty) {
-//      m.drop();
-//    } else {
-      m.done(STMT_LIST);
-//    }
+    m.done(STMT_LIST);
   }
 
   private boolean parseStmt(@NotNull PsiBuilder b) {
@@ -516,10 +517,7 @@ public class IonParser implements PsiParser {
 
   private boolean parseStmtSwitchCase(@NotNull PsiBuilder b) {
     PsiBuilder.Marker m = b.mark();
-      m.setCustomEdgeTokenBinders(null, (tokens, atStreamEdge, getter) -> {
-//        int firstCommentIdx = ContainerUtil.lastIndexOf(tokens, it -> it instanceof PsiComment);
-        return tokens.size();//firstCommentIdx >= 0 ? firstCommentIdx : tokens.size();
-      });
+    m.setCustomEdgeTokenBinders(null, (tokens, atStreamEdge, getter) -> tokens.size());
     if (consume(b, DEFAULT)) {
       expect(b, COLON);
     } else if (consume(b, CASE)) {

@@ -39,20 +39,30 @@ public class IonFmtBlock implements ASTBlock {
 
   @NotNull
   private static Indent getIndent(@NotNull PsiElement element) {
-    IElementType elementType = element.getNode().getElementType();
-    if (elementType == IonElementType.STMT_LIST) {
-      return element.getChildren().length == 0 ? Indent.getNoneIndent() : Indent.getNormalIndent();
-    }
-
-    if (element instanceof IonDeclField) {
-      return Indent.getNormalIndent();
-    }
-
-    if (element instanceof IonDeclEnumItem) {
-      return Indent.getNormalIndent();
-    }
-
+    // indent relative to parent gives proper indent to spaces and comments
     PsiElement parent = element.getParent();
+    IElementType elementType = element.getNode().getElementType();
+    if (parent instanceof IonBlock) {
+      if (elementType == IonToken.LBRACE || elementType == IonToken.RBRACE) {
+        return Indent.getNoneIndent();
+      }
+      return Indent.getNormalIndent();
+    }
+
+    if (parent instanceof IonDeclAggregate) {
+      if (elementType == IonToken.STRUCT || elementType == IonToken.UNION || elementType == IonToken.LBRACE || elementType == IonToken.RBRACE) {
+        return Indent.getNoneIndent();
+      }
+      return Indent.getNormalIndent();
+    }
+
+    if (parent instanceof IonDeclEnum) {
+      if (elementType == IonToken.ENUM || elementType == IonToken.LBRACE || elementType == IonToken.RBRACE) {
+        return Indent.getNoneIndent();
+      }
+      return Indent.getNormalIndent();
+    }
+
     if (parent instanceof IonExprLitCompound || parent instanceof IonExprLitCompoundTyped) {
       if (elementType == IonToken.LBRACE || elementType == IonToken.RBRACE) {
         return Indent.getNoneIndent();
