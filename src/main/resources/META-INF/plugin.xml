@@ -29,6 +29,7 @@
         <lineIndentProvider implementation="ion.fmt.IonLineIndentProvider"/>
         <lang.formatter language="ion" implementationClass="ion.fmt.IonFmtModelBuilder"/>
         <lang.findUsagesProvider language="ion" implementationClass="ion.IonFindUsagesProvider"/>
+        <lang.commenter language="ion" implementationClass="ion.IonCommenter"/>
 
         <applicationService serviceImplementation="ion.cfg.IonConfig"/>
         <applicationConfigurable groupId="language" instance="ion.cfg.IonConfig$UI" id="BitwiseIon" displayName="Ion"/>
