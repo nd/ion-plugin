@@ -507,7 +507,9 @@ public class IonParser implements PsiParser {
     if (expect(b, LBRACE)) {
       while (!b.eof() && !match(b, RBRACE)) {
         if (!parseStmtSwitchCase(b)) {
-          break;
+          while (!b.eof() && !match(b, RBRACE, CASE, DEFAULT)) {
+            b.advanceLexer();
+          }
         }
       }
       consumeUntil(b, RBRACE);
