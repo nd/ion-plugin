@@ -8,11 +8,13 @@
 
     <idea-version since-build="191.1"/>
 
-    <version>8</version>
+    <version>9</version>
 
     <change-notes><![CDATA[
     <ul>
-      <li>formatter</li>
+      <li>better formatter</li>
+      <li>better error recovery for switch statements</li>
+      <li>commenter</li>
     </ul>
     ]]>
     </change-notes>
