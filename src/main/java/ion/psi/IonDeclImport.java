@@ -19,7 +19,7 @@ public class IonDeclImport extends IonDecl {
       return nameNode.getPsi();
     } else {
       IonImportPath importPath = PsiTreeUtil.getChildOfType(this, IonImportPath.class);
-      nameNode = importPath.getNode().findChildByType(IonToken.NAME);
+      nameNode = importPath != null ? importPath.getNode().findChildByType(IonToken.NAME) : null;
       return nameNode != null ? nameNode.getPsi() : null;
     }
   }
