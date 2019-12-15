@@ -1,0 +1,5 @@
+import libc {<caret>x = printf}
+
+func _() {
+  libc.x();
+}

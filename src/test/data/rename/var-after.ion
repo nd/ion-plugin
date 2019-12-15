@@ -1,0 +1,7 @@
+var <caret>y = 1;
+
+func _() {
+  y;
+  printf(y);
+  a := y + y;
+}

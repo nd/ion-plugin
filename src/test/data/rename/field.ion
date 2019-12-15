@@ -1,0 +1,10 @@
+struct T {
+  <caret>x: int;
+}
+
+func _() {
+  t := T{};
+  t.x;
+  x := 1;
+  t = T{x = x};
+}

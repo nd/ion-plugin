@@ -1,10 +1,6 @@
 package ion;
 
-import com.intellij.openapi.actionSystem.IdeActions;
-import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
-import com.intellij.util.containers.ContainerUtil;
 
 import java.util.List;
 

@@ -1,0 +1,4 @@
+func _() {
+  goto y;
+  :<caret>y
+}

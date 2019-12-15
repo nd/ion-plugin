@@ -1,0 +1,10 @@
+struct T {
+  y: int;
+}
+
+func _() {
+  t := T{};
+  t.y;
+  x := 1;
+  t = T{y = x};
+}

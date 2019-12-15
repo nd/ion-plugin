@@ -1,0 +1,6 @@
+typedef <caret>y = int;
+
+func _(a: y): y {
+    b: y = 0;
+    c := (:y)0;
+}

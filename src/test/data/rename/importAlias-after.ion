@@ -1,0 +1,5 @@
+import y = libc {...}
+
+func _() {
+  y.printf();
+}

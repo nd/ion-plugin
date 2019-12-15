@@ -33,6 +33,10 @@
         <lang.findUsagesProvider language="ion" implementationClass="ion.IonFindUsagesProvider"/>
         <lang.commenter language="ion" implementationClass="ion.IonCommenter"/>
 
+        <lang.elementManipulator forClass="ion.psi.IonExprName" implementationClass="ion.psi.IonNameManipulator"/>
+        <lang.elementManipulator forClass="ion.psi.IonTypeName" implementationClass="ion.psi.IonNameManipulator"/>
+        <lang.elementManipulator forClass="ion.psi.IonLabelName" implementationClass="ion.psi.IonNameManipulator"/>
+
         <applicationService serviceImplementation="ion.cfg.IonConfig"/>
         <applicationConfigurable groupId="language" instance="ion.cfg.IonConfig$UI" id="BitwiseIon" displayName="Ion"/>
         <additionalLibraryRootsProvider implementation="ion.IonLibProvider"/>

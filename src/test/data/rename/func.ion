@@ -1,0 +1,7 @@
+func <caret>x() {
+  x();
+}
+
+func _() {
+  x();
+}

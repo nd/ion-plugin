@@ -1,0 +1,7 @@
+struct <caret>x {
+}
+
+func _(a: x) {
+  x{};
+  b := (:x)0;
+}

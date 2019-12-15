@@ -1,0 +1,5 @@
+import <caret>x = libc {...}
+
+func _() {
+  x.printf();
+}
