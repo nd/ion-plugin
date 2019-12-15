@@ -12,6 +12,11 @@ func ptr() {
   t./*resolve*/f;
 }
 
+func ptr2() {
+  t := &T{};
+  t./*resolve*/f;
+}
+
 func ptr_ptr() {
   t: T**;
   t./*-resolve*/f;

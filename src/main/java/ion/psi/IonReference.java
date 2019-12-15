@@ -392,6 +392,9 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     if (element == null) {
       return null;
     }
+    if (element instanceof IonDeclAggregate) {
+      return element;
+    }
     if (element instanceof IonTypeName) {
       PsiReference reference = element.getReference();
       return reference != null ? reference.resolve() : null;
@@ -507,6 +510,11 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
           }
         }
       }
+    }
+    if (element instanceof IonExprUnary) {
+      IonExpr expr = PsiTreeUtil.getChildOfType(element, IonExpr.class);
+      PsiElement type = resolveType(expr);
+      return type != null ? new IonTypePtrLight(type) : null;
     }
     if (element instanceof IonDeclImportItem) {
       PsiElement name = getName((IonDeclImportItem) element);
@@ -961,6 +969,21 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     @Nullable
     public PsiElement getElement() {
       return myElement;
+    }
+  }
+
+  private static class IonTypePtrLight extends IonTypePtr {
+    private final PsiElement myType;
+
+    public IonTypePtrLight(@NotNull PsiElement type) {
+      super(type.getNode());
+      myType = type;
+    }
+
+    @NotNull
+    @Override
+    public PsiElement[] getChildren() {
+      return new PsiElement[]{myType};
     }
   }
 }
