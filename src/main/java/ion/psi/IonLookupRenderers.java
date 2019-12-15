@@ -71,14 +71,15 @@ class IonLookupRenderers {
   private static LookupElementRenderer<LookupElement> FIELD = new LookupElementRenderer<LookupElement>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
-      IonDeclField decl = ObjectUtils.tryCast(element.getPsiElement(), IonDeclField.class);
+      IonDeclFieldName decl = ObjectUtils.tryCast(element.getPsiElement(), IonDeclFieldName.class);
       if (decl == null) {
         return;
       }
       String name = decl.getName();
       p.setItemText(name);
       p.setTailText(" field", true);
-      PsiElement type = IonReference.getDeclFieldType(decl);
+      IonDeclField fieldDecl = ObjectUtils.tryCast(decl.getParent(), IonDeclField.class);
+      PsiElement type = fieldDecl != null ? IonReference.getDeclFieldType(fieldDecl) : null;
       if (type != null) {
         p.setTypeText(type.getText());
       }
@@ -151,7 +152,7 @@ class IonLookupRenderers {
       return IonLookupRenderers.FUNC;
     } else if (element instanceof IonDeclTypedef) {
       return IonLookupRenderers.TYPEDEF;
-    } else if (element instanceof IonDeclField) {
+    } else if (element instanceof IonDeclFieldName) {
       return IonLookupRenderers.FIELD;
     } else if (element instanceof IonDeclAggregate) {
       return IonLookupRenderers.AGGREGATE;
