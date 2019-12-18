@@ -20,6 +20,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.ObjectUtils;
 import com.intellij.util.Processor;
+import com.intellij.util.containers.ContainerUtil;
 import ion.IonLib;
 import ion.IonLibProvider;
 import kotlin.reflect.jvm.internal.impl.utils.SmartList;
@@ -34,6 +35,12 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Predicate;
 
 public class IonReference extends PsiReferenceBase<IonPsiElement> {
+  private final static Set<String> BUILTIN_TYPES = ContainerUtil.set(
+          "void", "bool", "char", "schar", "uchar",
+          "short", "ushort", "int", "uint", "long",
+          "ulong", "llong", "ullong", "float", "double"
+  );
+
   public IonReference(@NotNull IonPsiElement element, TextRange rangeInElement) {
     super(element, rangeInElement);
   }
@@ -136,6 +143,9 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     }
 
     CharSequence name = getRangeInElement().subSequence(myElement.getText());
+    if (BUILTIN_TYPES.contains(name.toString())) {
+      return null;
+    }
     IonDeclImportItem importedItem = ObjectUtils.tryCast(parent, IonDeclImportItem.class);
     if (importedItem != null) {
       IonDeclImport importDecl = PsiTreeUtil.getParentOfType(importedItem, IonDeclImport.class);
