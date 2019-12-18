@@ -78,7 +78,7 @@ public class IonParserDefinition implements ParserDefinition {
         case LABEL_NAME:
           return new IonLabelName(node);
         case DECL_NOTE:
-          return new IonDeclNote(node);
+          return new IonDeclNotePsi(node);
         case DECL_VAR:
           return new IonDeclVarPsi(node);
         case DECL_CONST:
