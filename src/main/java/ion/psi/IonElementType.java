@@ -11,7 +11,7 @@ public class IonElementType extends IElementType implements IonElementTypeIdOwne
   public static final IonElementTypeVar DECL_VAR = new IonElementTypeVar("var", TypeId.DECL_VAR);
   public static final IonElementType DECL_ENUM = new IonElementType("enum", TypeId.DECL_ENUM);
   public static final IonElementType DECL_ENUM_ITEM = new IonElementType("enum_item", TypeId.DECL_ENUM_ITEM);
-  public static final IonElementType DECL_AGGREGATE = new IonElementType("aggregate", TypeId.DECL_AGGREGATE);
+  public static final IonElementTypeAggregate DECL_AGGREGATE = new IonElementTypeAggregate("aggregate", TypeId.DECL_AGGREGATE);
   public static final IonElementType DECL_FIELD = new IonElementType("field", TypeId.DECL_FIELD);
   public static final IonElementType DECL_FIELD_NAME = new IonElementType("field_name", TypeId.DECL_FIELD_NAME);
   public static final IonElementType DECL_IMPORT = new IonElementType("import", TypeId.DECL_IMPORT);
