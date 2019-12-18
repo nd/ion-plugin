@@ -47,9 +47,10 @@ public class IonParserDefinition implements ParserDefinition {
   @NotNull
   @Override
   public PsiElement createElement(ASTNode node) {
-    IonElementType type = ObjectUtils.tryCast(node.getElementType(), IonElementType.class);
-    if (type != null) {
-      switch (type.getTypeId()) {
+    IonElementTypeIdOwner type = ObjectUtils.tryCast(node.getElementType(), IonElementTypeIdOwner.class);
+    IonElementType.TypeId typeId = type != null ? type.getTypeId() : null;
+    if (typeId != null) {
+      switch (typeId) {
         case EXPR_NAME:
           return new IonExprName(node);
         case EXPR_FIELD:
@@ -79,7 +80,7 @@ public class IonParserDefinition implements ParserDefinition {
         case DECL_NOTE:
           return new IonDeclNote(node);
         case DECL_VAR:
-          return new IonDeclVar(node);
+          return new IonDeclVarPsi(node);
         case DECL_CONST:
           return new IonDeclConst(node);
         case DECL_FUNC:
@@ -127,7 +128,10 @@ public class IonParserDefinition implements ParserDefinition {
         case DECL_IMPORT_ITEM:
           return new IonDeclImportItem(node);
       }
-      return type.createPsiElement(node);
+    }
+    IonElementType elementType = ObjectUtils.tryCast(node.getElementType(), IonElementType.class);
+    if (elementType != null) {
+      return elementType.createPsiElement(node);
     }
     IonBlockElementType blockType = ObjectUtils.tryCast(node.getElementType(), IonBlockElementType.class);
     if (blockType != null) {

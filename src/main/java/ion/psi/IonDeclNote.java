@@ -2,11 +2,10 @@ package ion.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class IonDeclNote extends IonDecl {
+public class IonDeclNote extends IonDeclBase {
   public IonDeclNote(@NotNull ASTNode node) {
     super(node);
   }

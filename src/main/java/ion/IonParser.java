@@ -217,7 +217,7 @@ public class IonParser implements PsiParser {
 
   private void parseVarOrConst(@NotNull PsiBuilder b,
                                @NotNull IonToken varOrConst,
-                               @NotNull IonElementType elementType) {
+                               @NotNull IElementType elementType) {
     assert (varOrConst == CONST || varOrConst == VAR) && b.getTokenType() == varOrConst;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();

@@ -6,9 +6,9 @@ import com.intellij.psi.tree.IElementType;
 import ion.IonLanguage;
 import org.jetbrains.annotations.NotNull;
 
-public class IonElementType extends IElementType {
+public class IonElementType extends IElementType implements IonElementTypeIdOwner {
   public static final IonElementType DECL_CONST = new IonElementType("const", TypeId.DECL_CONST);
-  public static final IonElementType DECL_VAR = new IonElementType("var", TypeId.DECL_VAR);
+  public static final IonElementTypeVar DECL_VAR = new IonElementTypeVar("var", TypeId.DECL_VAR);
   public static final IonElementType DECL_ENUM = new IonElementType("enum", TypeId.DECL_ENUM);
   public static final IonElementType DECL_ENUM_ITEM = new IonElementType("enum_item", TypeId.DECL_ENUM_ITEM);
   public static final IonElementType DECL_AGGREGATE = new IonElementType("aggregate", TypeId.DECL_AGGREGATE);

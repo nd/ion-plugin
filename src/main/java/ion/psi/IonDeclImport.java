@@ -6,7 +6,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class IonDeclImport extends IonDecl {
+public class IonDeclImport extends IonDeclBase {
   public IonDeclImport(@NotNull ASTNode node) {
     super(node);
   }

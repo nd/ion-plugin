@@ -1,10 +1,10 @@
 package ion.psi;
 
-import com.intellij.lang.ASTNode;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class IonDeclVar extends IonDecl {
-  public IonDeclVar(@NotNull ASTNode node) {
-    super(node);
-  }
+public interface IonDeclVar extends IonDecl {
+
+  @Nullable
+  String getName();
+
 }
