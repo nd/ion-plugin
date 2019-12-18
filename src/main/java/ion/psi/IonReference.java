@@ -611,12 +611,9 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
         return false;
       }
       if (child instanceof IonDeclEnum) {
-        IonDeclEnumItem[] enumItems = PsiTreeUtil.getChildrenOfType(child, IonDeclEnumItem.class);
-        if (enumItems != null) {
-          for (IonDeclEnumItem enumItem : enumItems) {
-            if (!processor.process(enumItem)) {
-              return false;
-            }
+        for (IonDeclEnumItem enumItem : PsiTreeUtil.getStubChildrenOfTypeAsList(child, IonDeclEnumItem.class)) {
+          if (!processor.process(enumItem)) {
+            return false;
           }
         }
       }
