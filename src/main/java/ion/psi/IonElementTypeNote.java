@@ -4,38 +4,24 @@ import com.intellij.lang.LighterAST;
 import com.intellij.lang.LighterASTNode;
 import com.intellij.lang.LighterASTTokenNode;
 import com.intellij.psi.impl.source.tree.LightTreeUtil;
-import com.intellij.psi.stubs.*;
-import ion.IonLanguage;
+import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubInputStream;
+import com.intellij.psi.stubs.StubOutputStream;
 import ion.psi.stub.IonDeclStubNote;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
-public class IonElementTypeNote extends ILightStubElementType<IonDeclStubNote, IonDeclNote> implements IonElementTypeIdOwner {
-  private final IonElementType.TypeId myTypeId;
-
+public class IonElementTypeNote extends IonStubElementType<IonDeclStubNote, IonDeclNote> {
   public IonElementTypeNote(@NotNull String debugName, @NotNull IonElementType.TypeId typeId) {
-    super(debugName, IonLanguage.INSTANCE);
-    myTypeId = typeId;
-  }
-
-  @Override
-  @Nullable
-  public IonElementType.TypeId getTypeId() {
-    return myTypeId;
-  }
-
-  @Override
-  public @NotNull String getExternalId() {
-    return IonLanguage.INSTANCE.getID() + "." + toString();
+    super(debugName, typeId);
   }
 
   @NotNull
   @Override
   public IonDeclStubNote createStub(@NotNull LighterAST tree, @NotNull LighterASTNode node, @NotNull StubElement parentStub) {
     LighterASTNode nameNode = LightTreeUtil.firstChildOfType(tree, node, IonToken.NAME);
-    String name = nameNode != null ? ((LighterASTTokenNode)nameNode).getText().toString() : null;
+    String name = nameNode != null ? ((LighterASTTokenNode) nameNode).getText().toString() : null;
     return new IonDeclStubNote.Impl(parentStub, name);
   }
 
@@ -59,14 +45,6 @@ public class IonElementTypeNote extends ILightStubElementType<IonDeclStubNote, I
   @Override
   public IonDeclStubNote deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
     return new IonDeclStubNote.Impl(parentStub, dataStream.readNameString());
-  }
-
-  @Override
-  public void indexStub(@NotNull IonDeclStubNote stub, @NotNull IndexSink sink) {
-    String name = stub.getName();
-    if (name != null) {
-      sink.occurrence(IonNameIndex.KEY, name);
-    }
   }
 }
 

@@ -2,31 +2,17 @@ package ion.psi;
 
 import com.intellij.lang.LighterAST;
 import com.intellij.lang.LighterASTNode;
-import com.intellij.psi.stubs.*;
-import ion.IonLanguage;
+import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubInputStream;
+import com.intellij.psi.stubs.StubOutputStream;
 import ion.psi.stub.IonDeclStubField;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
-public class IonElementTypeField extends ILightStubElementType<IonDeclStubField, IonDeclField> implements IonElementTypeIdOwner {
-  private final IonElementType.TypeId myTypeId;
-
+public class IonElementTypeField extends IonStubElementType<IonDeclStubField, IonDeclField> {
   public IonElementTypeField(@NotNull String debugName, @NotNull IonElementType.TypeId typeId) {
-    super(debugName, IonLanguage.INSTANCE);
-    myTypeId = typeId;
-  }
-
-  @Override
-  @Nullable
-  public IonElementType.TypeId getTypeId() {
-    return myTypeId;
-  }
-
-  @Override
-  public @NotNull String getExternalId() {
-    return IonLanguage.INSTANCE.getID() + "." + toString();
+    super(debugName, typeId);
   }
 
   @NotNull
@@ -54,10 +40,6 @@ public class IonElementTypeField extends ILightStubElementType<IonDeclStubField,
   @Override
   public IonDeclStubField deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
     return new IonDeclStubField.Impl(parentStub);
-  }
-
-  @Override
-  public void indexStub(@NotNull IonDeclStubField stub, @NotNull IndexSink sink) {
   }
 }
 
