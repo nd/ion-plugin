@@ -1,0 +1,8 @@
+#declare_note(x)
+
+#x
+
+@x
+func _() {
+  @<caret>x
+}

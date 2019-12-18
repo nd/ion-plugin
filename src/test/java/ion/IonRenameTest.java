@@ -36,6 +36,10 @@ public class IonRenameTest extends BasePlatformTestCase {
     doTest();
   }
 
+  public void testNote() {
+    doTest();
+  }
+
   @Override
   protected String getTestDataPath() {
     return "src/test/data/rename";
