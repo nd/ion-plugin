@@ -19,7 +19,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.ObjectUtils;
 import com.intellij.util.Processor;
-import com.intellij.util.containers.ContainerUtil;
 import ion.IonLib;
 import ion.IonLibProvider;
 import kotlin.reflect.jvm.internal.impl.utils.SmartList;

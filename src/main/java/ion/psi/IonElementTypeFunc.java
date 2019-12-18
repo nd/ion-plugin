@@ -6,16 +6,16 @@ import com.intellij.lang.LighterASTTokenNode;
 import com.intellij.psi.impl.source.tree.LightTreeUtil;
 import com.intellij.psi.stubs.*;
 import ion.IonLanguage;
-import ion.psi.stub.IonDeclStubConst;
+import ion.psi.stub.IonDeclStubFunc;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
-public class IonElementTypeConst extends ILightStubElementType<IonDeclStubConst, IonDeclConst> implements IonElementTypeIdOwner {
+public class IonElementTypeFunc extends ILightStubElementType<IonDeclStubFunc, IonDeclFunc> implements IonElementTypeIdOwner {
   private final IonElementType.TypeId myTypeId;
 
-  public IonElementTypeConst(@NotNull String debugName, @NotNull IonElementType.TypeId typeId) {
+  public IonElementTypeFunc(@NotNull String debugName, @NotNull IonElementType.TypeId typeId) {
     super(debugName, IonLanguage.INSTANCE);
     myTypeId = typeId;
   }
@@ -33,36 +33,36 @@ public class IonElementTypeConst extends ILightStubElementType<IonDeclStubConst,
 
   @NotNull
   @Override
-  public IonDeclStubConst createStub(@NotNull LighterAST tree, @NotNull LighterASTNode node, @NotNull StubElement parentStub) {
+  public IonDeclStubFunc createStub(@NotNull LighterAST tree, @NotNull LighterASTNode node, @NotNull StubElement parentStub) {
     LighterASTNode nameNode = LightTreeUtil.firstChildOfType(tree, node, IonToken.NAME);
     String name = nameNode != null ? ((LighterASTTokenNode)nameNode).getText().toString() : null;
-    return new IonDeclStubConst.Impl(parentStub, name);
+    return new IonDeclStubFunc.Impl(parentStub, name);
   }
 
   @NotNull
   @Override
-  public IonDeclStubConst createStub(@NotNull IonDeclConst psi, StubElement parentStub) {
-    return new IonDeclStubConst.Impl(parentStub, psi.getName());
+  public IonDeclStubFunc createStub(@NotNull IonDeclFunc psi, StubElement parentStub) {
+    return new IonDeclStubFunc.Impl(parentStub, psi.getName());
   }
 
   @Override
-  public IonDeclConst createPsi(@NotNull IonDeclStubConst stub) {
-    return new IonDeclConstPsi(stub, this);
+  public IonDeclFuncPsi createPsi(@NotNull IonDeclStubFunc stub) {
+    return new IonDeclFuncPsi(stub, this);
   }
 
   @Override
-  public void serialize(@NotNull IonDeclStubConst stub, @NotNull StubOutputStream dataStream) throws IOException {
+  public void serialize(@NotNull IonDeclStubFunc stub, @NotNull StubOutputStream dataStream) throws IOException {
     dataStream.writeName(stub.getName());
   }
 
   @NotNull
   @Override
-  public IonDeclStubConst deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-    return new IonDeclStubConst.Impl(parentStub, dataStream.readNameString());
+  public IonDeclStubFunc deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
+    return new IonDeclStubFunc.Impl(parentStub, dataStream.readNameString());
   }
 
   @Override
-  public void indexStub(@NotNull IonDeclStubConst stub, @NotNull IndexSink sink) {
+  public void indexStub(@NotNull IonDeclStubFunc stub, @NotNull IndexSink sink) {
     String name = stub.getName();
     if (name != null) {
       sink.occurrence(IonNameIndex.KEY, name);

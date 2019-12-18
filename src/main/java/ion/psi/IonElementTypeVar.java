@@ -7,7 +7,6 @@ import com.intellij.psi.impl.source.tree.LightTreeUtil;
 import com.intellij.psi.stubs.*;
 import ion.IonLanguage;
 import ion.psi.stub.IonDeclStubVar;
-import ion.psi.stub.IonDeclStubVarImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,13 +37,13 @@ public class IonElementTypeVar extends ILightStubElementType<IonDeclStubVar, Ion
   public IonDeclStubVar createStub(@NotNull LighterAST tree, @NotNull LighterASTNode node, @NotNull StubElement parentStub) {
     LighterASTNode nameNode = LightTreeUtil.firstChildOfType(tree, node, IonToken.NAME);
     String name = nameNode != null ? ((LighterASTTokenNode)nameNode).getText().toString() : null;
-    return new IonDeclStubVarImpl(parentStub, name);
+    return new IonDeclStubVar.Impl(parentStub, name);
   }
 
   @NotNull
   @Override
   public IonDeclStubVar createStub(@NotNull IonDeclVar psi, StubElement parentStub) {
-    return new IonDeclStubVarImpl(parentStub, psi.getName());
+    return new IonDeclStubVar.Impl(parentStub, psi.getName());
   }
 
   @Override
@@ -60,7 +59,7 @@ public class IonElementTypeVar extends ILightStubElementType<IonDeclStubVar, Ion
   @NotNull
   @Override
   public IonDeclStubVar deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-    return new IonDeclStubVarImpl(parentStub, dataStream.readNameString());
+    return new IonDeclStubVar.Impl(parentStub, dataStream.readNameString());
   }
 
   @Override
