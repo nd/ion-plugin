@@ -265,8 +265,8 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   }
 
   private static boolean processDeclField(@NotNull IonDeclField field, @NotNull Processor<PsiElement> processor) {
-    IonDeclFieldName[] fieldNames = PsiTreeUtil.getChildrenOfType(field, IonDeclFieldName.class);
-    if (fieldNames != null) {
+    List<IonDeclFieldName> fieldNames = PsiTreeUtil.getStubChildrenOfTypeAsList(field, IonDeclFieldName.class);
+    if (!fieldNames.isEmpty()) {
       for (IonDeclFieldName fieldName : fieldNames) {
         if (!processor.process(fieldName)) {
           return false;
@@ -274,12 +274,9 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       }
     } else {
       // anonymous field
-      IonDeclField[] innerFields = PsiTreeUtil.getChildrenOfType(field, IonDeclField.class);
-      if (innerFields != null) {
-        for (IonDeclField f : innerFields) {
-          if (!processDeclField(f, processor)) {
-            return false;
-          }
+      for (IonDeclField f : PsiTreeUtil.getStubChildrenOfTypeAsList(field, IonDeclField.class)) {
+        if (!processDeclField(f, processor)) {
+          return false;
         }
       }
     }
@@ -406,7 +403,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       return reference != null ? reference.resolve() : type;
     }
     if (element instanceof IonDeclFieldName) {
-      IonDeclField field = ObjectUtils.tryCast(element.getParent(), IonDeclField.class);
+      IonDeclField field = PsiTreeUtil.getStubOrPsiParentOfType(element, IonDeclField.class);
       PsiElement type = field != null ? getDeclFieldType(field) : null;
       PsiReference reference = type != null ? type.getReference() : null;
       return reference != null ? reference.resolve() : type;

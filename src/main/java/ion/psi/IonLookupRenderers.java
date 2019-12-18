@@ -6,6 +6,7 @@ import com.intellij.codeInsight.lookup.LookupElementRenderer;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -78,7 +79,7 @@ class IonLookupRenderers {
       String name = decl.getName();
       p.setItemText(name);
       p.setTailText(" field", true);
-      IonDeclField fieldDecl = ObjectUtils.tryCast(decl.getParent(), IonDeclField.class);
+      IonDeclField fieldDecl = PsiTreeUtil.getStubOrPsiParentOfType(decl, IonDeclField.class);
       PsiElement type = fieldDecl != null ? IonReference.getDeclFieldType(fieldDecl) : null;
       if (type != null) {
         p.setTypeText(type.getText());
