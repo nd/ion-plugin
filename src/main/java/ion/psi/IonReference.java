@@ -11,6 +11,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
@@ -540,15 +541,26 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     if (packageDir != null) {
       for (PsiFile pkgFile : packageDir.getFiles()) {
         if (pkgFile instanceof IonPsiFile) {
-          Ref<PsiElement> ref = Ref.create();
-          boolean shouldContinue = processDeclarations(pkgFile, null, decl -> {
-            if (!(decl instanceof IonDeclImport)) {
-              return processor.process(decl);
+          StubElement<?> stub = ((IonPsiFile) pkgFile).getGreenStub();
+          if (stub != null) {
+            for (StubElement<?> child : stub.getChildrenStubs()) {
+              PsiElement psi = child.getPsi();
+              if (psi instanceof IonDecl && !(psi instanceof IonDeclImport)) {
+                if (!processDecl(psi, processor)) {
+                  return false;
+                }
+              }
             }
-            return true;
-          });
-          if (!shouldContinue) {
-            return false;
+          } else {
+            boolean shouldContinue = processDeclarations(pkgFile, null, decl -> {
+              if (!(decl instanceof IonDeclImport)) {
+                return processor.process(decl);
+              }
+              return true;
+            });
+            if (!shouldContinue) {
+              return false;
+            }
           }
         }
       }
