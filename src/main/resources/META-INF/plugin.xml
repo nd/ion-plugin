@@ -41,6 +41,8 @@
         <applicationConfigurable groupId="language" instance="ion.cfg.IonConfig$UI" id="BitwiseIon" displayName="Ion"/>
         <additionalLibraryRootsProvider implementation="ion.IonLibProvider"/>
 
+        <stubElementTypeHolder class="ion.psi.IonElementType"/>
+
         <!--<registryKey key="ion.resolve.cache.enabled" defaultValue="true"/>-->
     </extensions>
 </idea-plugin>
