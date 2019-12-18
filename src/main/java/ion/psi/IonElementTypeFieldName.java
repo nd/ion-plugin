@@ -4,6 +4,7 @@ import com.intellij.lang.LighterAST;
 import com.intellij.lang.LighterASTNode;
 import com.intellij.lang.LighterASTTokenNode;
 import com.intellij.psi.impl.source.tree.LightTreeUtil;
+import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
@@ -45,5 +46,10 @@ public class IonElementTypeFieldName extends IonStubElementType<IonDeclStubField
   @Override
   public IonDeclStubFieldName deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
     return new IonDeclStubFieldName.Impl(parentStub, dataStream.readNameString());
+  }
+
+  @Override
+  public void indexStub(@NotNull IonDeclStubFieldName stub, @NotNull IndexSink sink) {
+    // do not include field names into index
   }
 }
