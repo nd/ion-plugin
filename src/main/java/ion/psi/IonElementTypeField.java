@@ -1,7 +1,5 @@
 package ion.psi;
 
-import com.intellij.lang.LighterAST;
-import com.intellij.lang.LighterASTNode;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
@@ -13,12 +11,6 @@ import java.io.IOException;
 public class IonElementTypeField extends IonStubElementType<IonDeclStubField, IonDeclField> {
   public IonElementTypeField(@NotNull String debugName, @NotNull IonElementType.TypeId typeId) {
     super(debugName, typeId);
-  }
-
-  @NotNull
-  @Override
-  public IonDeclStubField createStub(@NotNull LighterAST tree, @NotNull LighterASTNode node, @NotNull StubElement parentStub) {
-    return new IonDeclStubField.Impl(parentStub);
   }
 
   @NotNull
