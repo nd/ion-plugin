@@ -255,31 +255,6 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     return true;
   }
 
-  @Nullable
-  private static PsiElement processDeclField(@NotNull IonDeclField field, @NotNull String name) {
-    IonDeclFieldName[] fieldNames = PsiTreeUtil.getChildrenOfType(field, IonDeclFieldName.class);
-    if (fieldNames != null) {
-      for (IonDeclFieldName fieldName : fieldNames) {
-        PsiElement nameIdentifier = fieldName.getNameIdentifier();
-        if (nameIdentifier != null && nameIdentifier.textMatches(name)) {
-          return fieldName;
-        }
-      }
-    } else {
-      // anonymous field
-      IonDeclField[] innerFields = PsiTreeUtil.getChildrenOfType(field, IonDeclField.class);
-      if (innerFields != null) {
-        for (IonDeclField f : innerFields) {
-          PsiElement result = processDeclField(f, name);
-          if (result != null) {
-            return result;
-          }
-        }
-      }
-    }
-    return null;
-  }
-
   private static boolean processDeclAggregate(@NotNull IonDeclAggregate aggregate, @NotNull Processor<PsiElement> processor) {
     for (PsiElement child : aggregate.getChildren()) {
       if (child instanceof IonDeclField && !processDeclField((IonDeclField) child, processor)) {
@@ -335,7 +310,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     }
     if (parent instanceof IonExprUnary) {
       PsiElement operator = getOperator((IonExprUnary) parent);
-      if (operator != null && operator.getNode().getElementType() == IonToken.AND) {
+      if (operator.getNode().getElementType() == IonToken.AND) {
         parent = parent.getParent();
       }
     }
@@ -365,7 +340,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       if (parentLiteral != null) {
         PsiElement parentType = getLitCompoundType(parentLiteral);
         IonCompoundField[] fields = PsiTreeUtil.getChildrenOfType(parentLiteral, IonCompoundField.class);
-        int n = ArrayUtil.indexOf(fields, parent);
+        int n = fields != null ? ArrayUtil.indexOf(fields, parent) : -1;
         if (n >= 0) {
           if (parentType instanceof IonTypeArray) {
             PsiElement baseType = getUnderlyingType(parentType);
@@ -374,7 +349,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
           }
           if (parentType instanceof IonDeclAggregate) {
             IonDeclField[] fieldDecls = PsiTreeUtil.getChildrenOfType(parentType, IonDeclField.class);
-            IonDeclField fieldDecl = n < fieldDecls.length ? fieldDecls[n] : null;
+            IonDeclField fieldDecl = fieldDecls != null && n < fieldDecls.length ? fieldDecls[n] : null;
             return resolveType(fieldDecl);
           }
         }
@@ -459,9 +434,9 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       PsiElement resolved = ref != null ? ref.resolve() : null;
       if (resolved instanceof IonDeclFunc) {
         IonExprCallArg[] args = PsiTreeUtil.getChildrenOfType(call, IonExprCallArg.class);
-        int n = ArrayUtil.indexOf(args, element);
+        int n = args != null ? ArrayUtil.indexOf(args, element) : -1;
         IonDeclFuncParam[] params = PsiTreeUtil.getChildrenOfType(resolved, IonDeclFuncParam.class);
-        if (n >= 0 && n < params.length) {
+        if (n >= 0 && params != null && n < params.length) {
           return resolveType(params[n]);
         }
       }
@@ -483,7 +458,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     if (element instanceof IonExprCall) {
       PsiElement name = ArrayUtil.getFirstElement(element.getChildren());
       PsiReference reference = name != null ? name.getReference() : null;
-      return resolveType(reference.resolve());
+      return resolveType(reference != null ? reference.resolve() : null);
     }
     if (element instanceof IonExprIndex) {
       PsiElement indexedExpr = getExprIndexExpr((IonExprIndex) element);
