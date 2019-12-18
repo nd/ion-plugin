@@ -6,10 +6,10 @@ import ion.psi.IonDeclVar;
 import ion.psi.IonElementType;
 import org.jetbrains.annotations.Nullable;
 
-public class IonDeclVarStubImpl extends StubBase<IonDeclVar> implements IonDeclVarStub {
+public class IonDeclStubVarImpl extends StubBase<IonDeclVar> implements IonDeclStubVar {
   private final String myName;
 
-  public IonDeclVarStubImpl(StubElement parent, @Nullable String name) {
+  public IonDeclStubVarImpl(StubElement parent, @Nullable String name) {
     super(parent, IonElementType.DECL_VAR);
     myName = name;
   }

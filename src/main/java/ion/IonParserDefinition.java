@@ -82,7 +82,7 @@ public class IonParserDefinition implements ParserDefinition {
         case DECL_VAR:
           return new IonDeclVarPsi(node);
         case DECL_CONST:
-          return new IonDeclConst(node);
+          return new IonDeclConstPsi(node);
         case DECL_FUNC:
           return new IonDeclFunc(node);
         case DECL_FUNC_PARAM:

@@ -22,6 +22,7 @@ import com.intellij.util.Processor;
 import com.intellij.util.containers.ContainerUtil;
 import ion.IonLib;
 import ion.IonLibProvider;
+import kotlin.reflect.jvm.internal.impl.utils.SmartList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,8 +41,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   @NotNull
   @Override
   public Object[] getVariants() {
-    List<LookupElement> items = ContainerUtil.newSmartList();
-
+    List<LookupElement> items = new SmartList<>();
     processResolveVariants(it -> {
       IonDecl decl = ObjectUtils.tryCast(it, IonDecl.class);
       if (decl != null) {

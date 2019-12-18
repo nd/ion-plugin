@@ -5,22 +5,22 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.IncorrectOperationException;
-import ion.psi.stub.IonDeclStubVar;
+import ion.psi.stub.IonDeclStubConst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class IonDeclVarPsi extends IonStubBasedPsiElement<IonDeclStubVar> implements IonDeclVar {
-  public IonDeclVarPsi(@NotNull ASTNode node) {
+public class IonDeclConstPsi extends IonStubBasedPsiElement<IonDeclStubConst> implements IonDeclConst {
+  public IonDeclConstPsi(@NotNull ASTNode node) {
     super(node);
   }
 
-  public IonDeclVarPsi(@NotNull IonDeclStubVar stub, @NotNull IStubElementType nodeType) {
+  public IonDeclConstPsi(@NotNull IonDeclStubConst stub, @NotNull IStubElementType nodeType) {
     super(stub, nodeType);
   }
 
   @Override
   public String toString() {
-    return "IonDeclVar(var)";
+    return "IonDeclConst(const)";
   }
 
   @Override
@@ -38,7 +38,7 @@ public class IonDeclVarPsi extends IonStubBasedPsiElement<IonDeclStubVar> implem
 
   @Override
   public String getName() {
-    IonDeclStubVar stub = getGreenStub();
+    IonDeclStubConst stub = getGreenStub();
     if (stub != null) {
       return stub.getName();
     }

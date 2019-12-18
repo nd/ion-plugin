@@ -10,4 +10,9 @@ public class IonFileElementType extends IStubFileElementType<PsiFileStub<?>> {
   public IonFileElementType() {
     super("IonFile", IonLanguage.INSTANCE);
   }
+
+  @Override
+  public int getStubVersion() {
+    return super.getStubVersion();
+  }
 }
