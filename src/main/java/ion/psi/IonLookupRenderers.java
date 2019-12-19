@@ -8,8 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ObjectUtils;
+import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 class IonLookupRenderers {
   private static LookupElementRenderer<LookupElement> FUNC = new LookupElementRenderer<>() {
@@ -176,6 +179,10 @@ class IonLookupRenderers {
     if (type instanceof IonTypePar) {
       IonType underlying = PsiTreeUtil.getStubChildOfType(type, IonType.class);
       return "(" + getTypePresentation(underlying) + ")";
+    }
+    if (type instanceof IonTypeTuple) {
+      List<IonType> items = PsiTreeUtil.getStubChildrenOfTypeAsList(type, IonType.class);
+      return "{" + StringUtil.join(ContainerUtil.map(items, IonLookupRenderers::getTypePresentation), ", ") + "}";
     }
     return type.getText();
   }
