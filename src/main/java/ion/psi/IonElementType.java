@@ -47,7 +47,7 @@ public class IonElementType extends IElementType implements IonElementTypeIdOwne
   public static final IonElementTypeTypeName TYPE_NAME = new IonElementTypeTypeName("type_name", TypeId.TYPE_NAME);
   public static final IonElementType TYPE_QNAME = new IonElementType("type_qname", TypeId.TYPE_QNAME);
   public static final IonElementType TYPE_PAR = new IonElementType("type_par", TypeId.TYPE_PAR);
-  public static final IonElementType TYPE_PTR = new IonElementType("type_ptr", TypeId.TYPE_PTR);
+  public static final IonElementTypeTypePtr TYPE_PTR = new IonElementTypeTypePtr("type_ptr", TypeId.TYPE_PTR);
   public static final IonElementType TYPE_CONST = new IonElementType("type_const", TypeId.TYPE_CONST);
   public static final IonElementType TYPE_ARRAY = new IonElementType("type_array", TypeId.TYPE_ARRAY);
   public static final IonElementType TYPE_TUPLE = new IonElementType("type_tuple", TypeId.TYPE_TUPLE);

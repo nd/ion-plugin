@@ -889,7 +889,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     }
   }
 
-  private static class IonTypePtrLight extends IonTypePtr {
+  private static class IonTypePtrLight extends IonTypePtrPsi {
     private final PsiElement myType;
 
     public IonTypePtrLight(@NotNull PsiElement type) {
