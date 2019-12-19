@@ -165,6 +165,10 @@ class IonLookupRenderers {
       IonType underlying = PsiTreeUtil.getStubChildOfType(type, IonType.class);
       return getTypePresentation(underlying) + "*";
     }
+    if (type instanceof IonTypeArray) {
+      IonType underlying = PsiTreeUtil.getStubChildOfType(type, IonType.class);
+      return getTypePresentation(underlying) + "[]";
+    }
     return type.getText();
   }
 
