@@ -8,13 +8,11 @@
 
     <idea-version since-build="191.1"/>
 
-    <version>11</version>
+    <version>12</version>
 
     <change-notes><![CDATA[
     <ul>
-      <li>rename</li>
-      <li>more details in completion</li>
-      <li>fixes in fields resolve</li>
+      <li>faster completion and resolve</li>
     </ul>
     ]]>
     </change-notes>
