@@ -3,6 +3,8 @@ package ion.psi;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.lookup.LookupElementRenderer;
+import com.intellij.openapi.project.DumbService;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.SyntheticLibrary;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
@@ -10,7 +12,9 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubIndex;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiModificationTracker;
@@ -25,9 +29,7 @@ import kotlin.reflect.jvm.internal.impl.utils.SmartList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Predicate;
@@ -149,9 +151,22 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       IonDeclImport importDecl = PsiTreeUtil.getParentOfType(importedItem, IonDeclImport.class);
       IonImportPath importPath = PsiTreeUtil.getChildOfType(importDecl, IonImportPath.class);
       PsiDirectory packageDir = resolveImport(myElement.getContainingFile(), importPath != null ? importPath.getText() : null);
-      ExactMatchProcessor processor = new ExactMatchProcessor(name);
-      processPackageDeclarations(packageDir, processor);
-      return processor.getElement();
+      if (packageDir != null) {
+        Project project = myElement.getProject();
+        ExactMatchProcessor processor = new ExactMatchProcessor(name);
+        if (!DumbService.isDumb(project)) {
+          GlobalSearchScope scope = GlobalSearchScope.filesScope(project, Arrays.asList(packageDir.getVirtualFile().getChildren()));
+          for (IonDecl element : StubIndex.getElements(IonNameIndex.KEY, name.toString(), project, scope, IonDecl.class)) {
+            if (!processor.process(element)) {
+              break;
+            }
+          }
+        } else {
+          processPackageDeclarations(packageDir, processor);
+        }
+        return processor.getElement();
+      }
+      return null;
     }
 
     Ref<Ref<Pair<CharSequence, PsiElement>>> blockCacheRef = Ref.create();
@@ -247,13 +262,30 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
                 }
               }
               if (hasEllipsis || !importedNames.isEmpty()) {
-                Predicate<String> importedNamePredicate = hasEllipsis ? it -> true : importedNames::contains;
+                Project project = importDecl.getProject();
                 PsiDirectory packageDir = resolveImport(fieldExpr.getContainingFile(), importPath.getText());
-                Processor<PsiElement> proc = it -> {
-                  IonDecl decl = ObjectUtils.tryCast(it, IonDecl.class);
-                  return decl == null || !importedNamePredicate.test(decl.getName()) || processor.process(decl);
-                };
-                return processPackageDeclarations(packageDir, proc);
+                if (packageDir == null) {
+                  return true;
+                }
+                Predicate<String> importedNamePredicate = hasEllipsis ? it -> true : importedNames::contains;
+                if (!DumbService.isDumb(project) && processor instanceof ExactMatchProcessor) {
+                  String name = ((ExactMatchProcessor) processor).myName.toString();
+                  if (!importedNamePredicate.test(name)) {
+                    return true;
+                  }
+                  GlobalSearchScope scope = GlobalSearchScope.filesScope(project, Arrays.asList(packageDir.getVirtualFile().getChildren()));
+                  for (IonDecl element : StubIndex.getElements(IonNameIndex.KEY, name, project, scope, IonDecl.class)) {
+                    if (!processor.process(element)) {
+                      return false;
+                    }
+                  }
+                } else {
+                  Processor<PsiElement> proc = it -> {
+                    IonDecl decl = ObjectUtils.tryCast(it, IonDecl.class);
+                    return decl == null || !importedNamePredicate.test(decl.getName()) || processor.process(decl);
+                  };
+                  return processPackageDeclarations(packageDir, proc);
+                }
               }
             }
           }
