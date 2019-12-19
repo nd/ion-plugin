@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 class IonLookupRenderers {
-  private static LookupElementRenderer<LookupElement> FUNC = new LookupElementRenderer<LookupElement>() {
+  private static LookupElementRenderer<LookupElement> FUNC = new LookupElementRenderer<>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
       IonDeclFunc decl = ObjectUtils.tryCast(element.getPsiElement(), IonDeclFunc.class);
@@ -21,14 +21,19 @@ class IonLookupRenderers {
       }
       String name = decl.getName();
       p.setItemText(name + "()");
-      PsiElement type = IonReference.getDeclFuncType(decl);
+      PsiElement type = decl.getType();
       if (type != null) {
-        p.setTypeText(type.getText());
+        String typePresentation = getTypePresentation(type);
+        if (typePresentation != null) {
+          p.setTypeText(typePresentation);
+        }
+      } else {
+        p.setTypeText("void");
       }
     }
   };
 
-  private static LookupElementRenderer<LookupElement> VAR = new LookupElementRenderer<LookupElement>() {
+  private static LookupElementRenderer<LookupElement> VAR = new LookupElementRenderer<>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
       IonDecl decl = ObjectUtils.tryCast(element.getPsiElement(), IonDecl.class);
@@ -40,19 +45,20 @@ class IonLookupRenderers {
       if (decl instanceof IonDeclVar) {
         p.setItemText(name);
         p.setTailText(" var", true);
-        type = IonReference.getDeclVarType((IonDeclVar) decl);
+        type = ((IonDeclVar) decl).getType();
       } else if (decl instanceof IonDeclConst) {
         p.setItemText(name);
         p.setTailText(" const", true);
-        type = IonReference.getDeclConstType((IonDeclConst) decl);
+        type = ((IonDeclConst) decl).getType();
       }
-      if (type != null) {
-        p.setTypeText(type.getText());
+      String typePresentation = getTypePresentation(type);
+      if (typePresentation != null) {
+        p.setTypeText(typePresentation);
       }
     }
   };
 
-  private static LookupElementRenderer<LookupElement> TYPEDEF = new LookupElementRenderer<LookupElement>() {
+  private static LookupElementRenderer<LookupElement> TYPEDEF = new LookupElementRenderer<>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
       IonDeclTypedef decl = ObjectUtils.tryCast(element.getPsiElement(), IonDeclTypedef.class);
@@ -62,14 +68,15 @@ class IonLookupRenderers {
       String name = decl.getName();
       p.setItemText(name);
       p.setTailText(" type", true);
-      PsiElement type = IonReference.getDeclTypedefType(decl);
-      if (type != null) {
-        p.setTypeText(type.getText());
+      PsiElement type = decl.getType();
+      String typePresentation = getTypePresentation(type);
+      if (typePresentation != null) {
+        p.setTypeText(typePresentation);
       }
     }
   };
 
-  private static LookupElementRenderer<LookupElement> FIELD = new LookupElementRenderer<LookupElement>() {
+  private static LookupElementRenderer<LookupElement> FIELD = new LookupElementRenderer<>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
       IonDeclFieldName decl = ObjectUtils.tryCast(element.getPsiElement(), IonDeclFieldName.class);
@@ -80,14 +87,15 @@ class IonLookupRenderers {
       p.setItemText(name);
       p.setTailText(" field", true);
       IonDeclField fieldDecl = PsiTreeUtil.getStubOrPsiParentOfType(decl, IonDeclField.class);
-      PsiElement type = fieldDecl != null ? IonReference.getDeclFieldType(fieldDecl) : null;
-      if (type != null) {
-        p.setTypeText(type.getText());
+      PsiElement type = fieldDecl != null ? fieldDecl.getType() : null;
+      String typePresentation = getTypePresentation(type);
+      if (typePresentation != null) {
+        p.setTypeText(typePresentation);
       }
     }
   };
 
-  private static LookupElementRenderer<LookupElement> AGGREGATE = new LookupElementRenderer<LookupElement>() {
+  private static LookupElementRenderer<LookupElement> AGGREGATE = new LookupElementRenderer<>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
       IonDeclAggregate decl = ObjectUtils.tryCast(element.getPsiElement(), IonDeclAggregate.class);
@@ -113,7 +121,7 @@ class IonLookupRenderers {
     }
   };
 
-  private static LookupElementRenderer<LookupElement> ENUM = new LookupElementRenderer<LookupElement>() {
+  private static LookupElementRenderer<LookupElement> ENUM = new LookupElementRenderer<>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
       IonDeclEnum decl = ObjectUtils.tryCast(element.getPsiElement(), IonDeclEnum.class);
@@ -126,7 +134,7 @@ class IonLookupRenderers {
     }
   };
 
-  private static LookupElementRenderer<LookupElement> ENUM_ITEM = new LookupElementRenderer<LookupElement>() {
+  private static LookupElementRenderer<LookupElement> ENUM_ITEM = new LookupElementRenderer<>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
       IonDeclEnumItem decl = ObjectUtils.tryCast(element.getPsiElement(), IonDeclEnumItem.class);
@@ -144,6 +152,14 @@ class IonLookupRenderers {
       }
     }
   };
+
+  @Nullable
+  private static String getTypePresentation(@Nullable PsiElement type) {
+    if (type == null) {
+      return null;
+    }
+    return type.getText();
+  }
 
   @Nullable
   static LookupElementRenderer<LookupElement> getRenderer(@NotNull PsiElement element) {

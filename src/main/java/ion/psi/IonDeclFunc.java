@@ -1,4 +1,4 @@
 package ion.psi;
 
-public interface IonDeclFunc extends IonDecl {
+public interface IonDeclFunc extends IonDecl, IonTypeOwner {
 }

@@ -398,7 +398,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       return resolveType(resolvedLhs);
     }
     if (element instanceof IonDeclVar) {
-      PsiElement type = getDeclVarType((IonDeclVar) element);
+      PsiElement type = ((IonDeclVar) element).getType();
       if (type != null) {
         return resolveType(type);
       } else {
@@ -408,23 +408,23 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     }
     // todo IonDeclConst
     if (element instanceof IonDeclField) {
-      PsiElement type = getDeclFieldType((IonDeclField) element);
+      PsiElement type = ((IonDeclField) element).getType();
       PsiReference reference = type != null ? type.getReference() : null;
       return reference != null ? reference.resolve() : type;
     }
     if (element instanceof IonDeclFieldName) {
       IonDeclField field = PsiTreeUtil.getStubOrPsiParentOfType(element, IonDeclField.class);
-      PsiElement type = field != null ? getDeclFieldType(field) : null;
+      PsiElement type = field != null ? field.getType() : null;
       PsiReference reference = type != null ? type.getReference() : null;
       return reference != null ? reference.resolve() : type;
     }
     if (element instanceof IonDeclFuncParam) {
-      PsiElement type = getDeclFuncParamType((IonDeclFuncParam) element);
+      PsiElement type = ((IonDeclFuncParam) element).getType();
       PsiReference reference = type != null ? type.getReference() : null;
       return reference != null ? reference.resolve() : type;
     }
     if (element instanceof IonDeclFunc) {
-      PsiElement type = getDeclFuncType((IonDeclFunc) element);
+      PsiElement type = ((IonDeclFunc) element).getType();
       PsiReference reference = type != null ? type.getReference() : null;
       return reference != null ? reference.resolve() : type;
     }
@@ -666,39 +666,6 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   }
 
   @Nullable
-  static PsiElement getDeclVarType(@NotNull IonDeclVar decl) {
-    PsiElement var = decl.getFirstChild();
-    PsiElement name = PsiTreeUtil.skipWhitespacesAndCommentsForward(var);
-    PsiElement element = PsiTreeUtil.skipWhitespacesAndCommentsForward(name);
-    if (element != null && element.getNode().getElementType() == IonToken.COLON) {
-      return PsiTreeUtil.skipWhitespacesAndCommentsForward(element);
-    }
-    return null;
-  }
-
-  @Nullable
-  static PsiElement getDeclConstType(@NotNull IonDeclConst decl) {
-    PsiElement constKeyword = decl.getFirstChild();
-    PsiElement name = PsiTreeUtil.skipWhitespacesAndCommentsForward(constKeyword);
-    PsiElement element = PsiTreeUtil.skipWhitespacesAndCommentsForward(name);
-    if (element != null && element.getNode().getElementType() == IonToken.COLON) {
-      return PsiTreeUtil.skipWhitespacesAndCommentsForward(element);
-    }
-    return null;
-  }
-
-  @Nullable
-  static PsiElement getDeclTypedefType(@NotNull IonDeclTypedef decl) {
-    PsiElement typedef = decl.getFirstChild();
-    PsiElement name = PsiTreeUtil.skipWhitespacesAndCommentsForward(typedef);
-    PsiElement element = PsiTreeUtil.skipWhitespacesAndCommentsForward(name);
-    if (element != null && element.getNode().getElementType() == IonToken.ASSIGN) {
-      return PsiTreeUtil.skipWhitespacesAndCommentsForward(element);
-    }
-    return null;
-  }
-
-  @Nullable
   private static PsiElement getDeclVarExpr(@NotNull IonDeclVar decl) {
     return PsiTreeUtil.getChildOfType(decl, IonExpr.class);
   }
@@ -707,38 +674,6 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   private static PsiElement getExprIndexExpr(@NotNull IonExprIndex element) {
     IonExpr[] children = PsiTreeUtil.getChildrenOfType(element, IonExpr.class);
     return children != null && children.length > 0 ? children[0] : null;
-  }
-
-  @Nullable
-  static PsiElement getDeclFieldType(@NotNull IonDeclField field) {
-    PsiElement name = field.getFirstChild();
-    PsiElement element = PsiTreeUtil.skipWhitespacesAndCommentsForward(name);
-    if (element != null && element.getNode().getElementType() == IonToken.COLON) {
-      return PsiTreeUtil.skipWhitespacesAndCommentsForward(element);
-    }
-    return null;
-  }
-
-  @Nullable
-  private static PsiElement getDeclFuncParamType(@NotNull IonDeclFuncParam param) {
-    PsiElement name = param.getFirstChild();
-    PsiElement element = PsiTreeUtil.skipWhitespacesAndCommentsForward(name);
-    if (element != null && element.getNode().getElementType() == IonToken.COLON) {
-      return PsiTreeUtil.skipWhitespacesAndCommentsForward(element);
-    }
-    return null;
-  }
-
-  @Nullable
-  static PsiElement getDeclFuncType(@NotNull IonDeclFunc func) {
-    PsiElement child = func.getFirstChild();
-    while (child != null) {
-      if (child.getNode().getElementType() == IonToken.COLON) {
-        return PsiTreeUtil.skipWhitespacesAndCommentsForward(child);
-      }
-      child = PsiTreeUtil.skipWhitespacesAndCommentsForward(child);
-    }
-    return null;
   }
 
   @Nullable
@@ -850,12 +785,6 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
 
   private static boolean isRelativeImportPath(@NotNull String importPath) {
     return importPath.startsWith(".");
-  }
-
-  @Nullable
-  private static PsiElement getAlias(@NotNull IonDeclImportItem importItem) {
-    ASTNode[] names = importItem.getNode().getChildren(TokenSet.create(IonToken.NAME));
-    return names != null && names.length == 1 ? names[0].getPsi() : null;
   }
 
   @Nullable

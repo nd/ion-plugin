@@ -75,6 +75,8 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonTypeArray(node);
         case TYPE_TUPLE:
           return new IonTypeTuple(node);
+        case TYPE_FUNC:
+          return new IonTypeFunc(node);
         case LABEL_NAME:
           return new IonLabelName(node);
         case DECL_NOTE:
