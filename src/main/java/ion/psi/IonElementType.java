@@ -51,8 +51,7 @@ public class IonElementType extends IElementType implements IonElementTypeIdOwne
   public static final IonElementTypeTypeConst TYPE_CONST = new IonElementTypeTypeConst("type_const", TypeId.TYPE_CONST);
   public static final IonElementTypeTypeArray TYPE_ARRAY = new IonElementTypeTypeArray("type_array", TypeId.TYPE_ARRAY);
   public static final IonElementTypeTypeTuple TYPE_TUPLE = new IonElementTypeTypeTuple("type_tuple", TypeId.TYPE_TUPLE);
-  public static final IonElementType TYPE_FUNC = new IonElementType("type_func");
-  public static final IonElementType TYPE_FUNC_PARAM = new IonElementType("type_func_param");
+  public static final IonElementTypeTypeFunc TYPE_FUNC = new IonElementTypeTypeFunc("type_func", TypeId.TYPE_FUNC);
   public static final IonElementType STMT_LIST = new IonElementType("stmt_list");
   public static final IonElementType STMT_IF = new IonElementType("if");
   public static final IonElementType STMT_ELSE = new IonElementType("else");
@@ -122,7 +121,6 @@ public class IonElementType extends IElementType implements IonElementTypeIdOwne
     TYPE_ARRAY,
     TYPE_TUPLE,
     TYPE_FUNC,
-    TYPE_FUNC_PARAM,
     STMT_LIST,
     STMT_IF,
     STMT_ELSE,

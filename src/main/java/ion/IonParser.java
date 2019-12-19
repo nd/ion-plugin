@@ -1144,7 +1144,7 @@ public class IonParser implements PsiParser {
   private boolean parseTypeFuncParam(@NotNull PsiBuilder b) {
     PsiBuilder.Marker m = b.mark();
     if (consume(b, ELLIPSIS)) {
-      m.done(TYPE_FUNC_PARAM);
+      m.done(DECL_FUNC_PARAM);
       return true;
     }
     if (match(b, NAME) && lookAhead(b, 1, COLON)) {
@@ -1153,11 +1153,11 @@ public class IonParser implements PsiParser {
       if (!parseType(b)) {
         b.error("Expected type, got: " + b.getTokenText());
       }
-      m.done(TYPE_FUNC_PARAM);
+      m.done(DECL_FUNC_PARAM);
       return true;
     } else {
       if (parseType(b)) {
-        m.done(TYPE_FUNC_PARAM);
+        m.done(DECL_FUNC_PARAM);
         return true;
       } else {
         b.error("Expected type, got: " + b.getTokenText());

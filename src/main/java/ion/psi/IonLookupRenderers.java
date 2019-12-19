@@ -184,6 +184,22 @@ class IonLookupRenderers {
       List<IonType> items = PsiTreeUtil.getStubChildrenOfTypeAsList(type, IonType.class);
       return "{" + StringUtil.join(ContainerUtil.map(items, IonLookupRenderers::getTypePresentation), ", ") + "}";
     }
+    if (type instanceof IonTypeFunc) {
+      List<IonDeclFuncParam> params = PsiTreeUtil.getStubChildrenOfTypeAsList(type, IonDeclFuncParam.class);
+      String paramsStr = StringUtil.join(ContainerUtil.map(params, param -> {
+        String paramName = param.getName();
+        String paramType = getTypePresentation(param.getType());
+        if (paramName == null && paramType == null) {
+          return "...";
+        }
+        if (paramType == null) {
+          return null;
+        }
+        return paramName != null ? paramName + ": " + paramType : paramType;
+      }), ", ");
+      IonType returnType = PsiTreeUtil.getStubChildOfType(type, IonType.class);
+      return "func(" + paramsStr + ")" + (returnType != null ? ": " + getTypePresentation(returnType) : "");
+    }
     return type.getText();
   }
 
