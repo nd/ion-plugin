@@ -200,6 +200,10 @@ class IonLookupRenderers {
       IonType returnType = PsiTreeUtil.getStubChildOfType(type, IonType.class);
       return "func(" + paramsStr + ")" + (returnType != null ? ": " + getTypePresentation(returnType) : "");
     }
+    if (type instanceof IonTypeQName) {
+      List<IonTypeName> names = PsiTreeUtil.getStubChildrenOfTypeAsList(type, IonTypeName.class);
+      return names.isEmpty() ? null : getTypePresentation(ContainerUtil.getLastItem(names));
+    }
     return type.getText();
   }
 

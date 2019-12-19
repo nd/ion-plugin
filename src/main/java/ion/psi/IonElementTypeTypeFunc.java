@@ -38,5 +38,3 @@ public class IonElementTypeTypeFunc extends IonStubElementType<IonTypeStubFunc, 
     // don't index
   }
 }
-
-

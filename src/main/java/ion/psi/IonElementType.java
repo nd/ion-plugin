@@ -45,7 +45,7 @@ public class IonElementType extends IElementType implements IonElementTypeIdOwne
   public static final IonElementType EXPR_BINARY = new IonElementType("expr_binary");
   public static final IonElementType EXPR_TERNARY = new IonElementType("expr_ternary");
   public static final IonElementTypeTypeName TYPE_NAME = new IonElementTypeTypeName("type_name", TypeId.TYPE_NAME);
-  public static final IonElementType TYPE_QNAME = new IonElementType("type_qname", TypeId.TYPE_QNAME);
+  public static final IonElementTypeTypeQName TYPE_QNAME = new IonElementTypeTypeQName("type_qname", TypeId.TYPE_QNAME);
   public static final IonElementTypeTypePar TYPE_PAR = new IonElementTypeTypePar("type_par", TypeId.TYPE_PAR);
   public static final IonElementTypeTypePtr TYPE_PTR = new IonElementTypeTypePtr("type_ptr", TypeId.TYPE_PTR);
   public static final IonElementTypeTypeConst TYPE_CONST = new IonElementTypeTypeConst("type_const", TypeId.TYPE_CONST);
