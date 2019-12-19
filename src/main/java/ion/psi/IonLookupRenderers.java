@@ -5,7 +5,6 @@ import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.codeInsight.lookup.LookupElementRenderer;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ObjectUtils;
 import com.intellij.util.containers.ContainerUtil;
@@ -15,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 class IonLookupRenderers {
-  private static LookupElementRenderer<LookupElement> FUNC = new LookupElementRenderer<>() {
+  private static LookupElementRenderer<LookupElement> FUNC = new LookupElementRenderer<LookupElement>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
       IonDeclFunc decl = ObjectUtils.tryCast(element.getPsiElement(), IonDeclFunc.class);
@@ -36,7 +35,7 @@ class IonLookupRenderers {
     }
   };
 
-  private static LookupElementRenderer<LookupElement> VAR = new LookupElementRenderer<>() {
+  private static LookupElementRenderer<LookupElement> VAR = new LookupElementRenderer<LookupElement>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
       IonDecl decl = ObjectUtils.tryCast(element.getPsiElement(), IonDecl.class);
@@ -61,7 +60,7 @@ class IonLookupRenderers {
     }
   };
 
-  private static LookupElementRenderer<LookupElement> TYPEDEF = new LookupElementRenderer<>() {
+  private static LookupElementRenderer<LookupElement> TYPEDEF = new LookupElementRenderer<LookupElement>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
       IonDeclTypedef decl = ObjectUtils.tryCast(element.getPsiElement(), IonDeclTypedef.class);
@@ -79,7 +78,7 @@ class IonLookupRenderers {
     }
   };
 
-  private static LookupElementRenderer<LookupElement> FIELD = new LookupElementRenderer<>() {
+  private static LookupElementRenderer<LookupElement> FIELD = new LookupElementRenderer<LookupElement>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
       IonDeclFieldName decl = ObjectUtils.tryCast(element.getPsiElement(), IonDeclFieldName.class);
@@ -98,7 +97,7 @@ class IonLookupRenderers {
     }
   };
 
-  private static LookupElementRenderer<LookupElement> AGGREGATE = new LookupElementRenderer<>() {
+  private static LookupElementRenderer<LookupElement> AGGREGATE = new LookupElementRenderer<LookupElement>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
       IonDeclAggregate decl = ObjectUtils.tryCast(element.getPsiElement(), IonDeclAggregate.class);
@@ -123,7 +122,7 @@ class IonLookupRenderers {
     }
   };
 
-  private static LookupElementRenderer<LookupElement> ENUM = new LookupElementRenderer<>() {
+  private static LookupElementRenderer<LookupElement> ENUM = new LookupElementRenderer<LookupElement>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
       IonDeclEnum decl = ObjectUtils.tryCast(element.getPsiElement(), IonDeclEnum.class);
@@ -136,7 +135,7 @@ class IonLookupRenderers {
     }
   };
 
-  private static LookupElementRenderer<LookupElement> ENUM_ITEM = new LookupElementRenderer<>() {
+  private static LookupElementRenderer<LookupElement> ENUM_ITEM = new LookupElementRenderer<LookupElement>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
       IonDeclEnumItem decl = ObjectUtils.tryCast(element.getPsiElement(), IonDeclEnumItem.class);
