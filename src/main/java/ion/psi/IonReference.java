@@ -264,8 +264,8 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   }
 
   private static boolean processDeclAggregate(@NotNull IonDeclAggregate aggregate, @NotNull Processor<PsiElement> processor) {
-    for (PsiElement child : aggregate.getChildren()) {
-      if (child instanceof IonDeclField && !processDeclField((IonDeclField) child, processor)) {
+    for (IonDeclField field : PsiTreeUtil.getStubChildrenOfTypeAsList(aggregate, IonDeclField.class)) {
+      if (!processDeclField(field, processor)) {
         return false;
       }
     }
@@ -353,8 +353,8 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
             return reference != null ? reference.resolve() : baseType;
           }
           if (parentType instanceof IonDeclAggregate) {
-            IonDeclField[] fieldDecls = PsiTreeUtil.getChildrenOfType(parentType, IonDeclField.class);
-            IonDeclField fieldDecl = fieldDecls != null && n < fieldDecls.length ? fieldDecls[n] : null;
+            List<IonDeclField> fieldDecls = PsiTreeUtil.getStubChildrenOfTypeAsList(parentType, IonDeclField.class);
+            IonDeclField fieldDecl = n < fieldDecls.size() ? fieldDecls.get(n) : null;
             return resolveType(fieldDecl);
           }
         }
@@ -440,11 +440,23 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       if (resolved instanceof IonDeclFunc) {
         IonExprCallArg[] args = PsiTreeUtil.getChildrenOfType(call, IonExprCallArg.class);
         int n = args != null ? ArrayUtil.indexOf(args, element) : -1;
-        IonDeclFuncParam[] params = PsiTreeUtil.getChildrenOfType(resolved, IonDeclFuncParam.class);
-        if (n >= 0 && params != null && n < params.length) {
-          return resolveType(params[n]);
+        List<IonDeclFuncParam> params = PsiTreeUtil.getStubChildrenOfTypeAsList(resolved, IonDeclFuncParam.class);
+        if (n >= 0 && n < params.size()) {
+          return resolveType(params.get(n));
         }
       }
+      if (resolved instanceof IonTypeOwner) {
+        PsiElement type = ((IonTypeOwner) resolved).getType();
+        if (type instanceof IonTypeFunc) {
+          IonExprCallArg[] args = PsiTreeUtil.getChildrenOfType(call, IonExprCallArg.class);
+          int n = args != null ? ArrayUtil.indexOf(args, element) : -1;
+          List<IonDeclFuncParam> params = PsiTreeUtil.getStubChildrenOfTypeAsList(type, IonDeclFuncParam.class);
+          if (n >= 0 && n < params.size()) {
+            return resolveType(params.get(n));
+          }
+        }
+      }
+      return null;
     }
     if (element instanceof IonExprName) {
       PsiReference reference = element.getReference();
@@ -479,9 +491,9 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
           String text = index.getText();
           try {
             int idx = Integer.parseInt(text);
-            IonType[] tupleItems = PsiTreeUtil.getChildrenOfType(type, IonType.class);
-            if (tupleItems != null && idx < tupleItems.length) {
-              IonType itemType = tupleItems[idx];
+            List<IonType> tupleItems = PsiTreeUtil.getStubChildrenOfTypeAsList(type, IonType.class);
+            if (idx < tupleItems.size()) {
+              IonType itemType = tupleItems.get(idx);
               PsiElement resolved = resolveType(itemType);
               return resolved != null ? resolved : itemType;
             }
@@ -600,7 +612,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
         return false;
       }
       if (child instanceof IonPsiFile && child != processedChild) {
-        for (PsiElement topLevelChild : child.getChildren()) {
+        for (PsiElement topLevelChild : PsiTreeUtil.getStubChildrenOfTypeAsList(child, PsiElement.class)) {
           if (!processDecl(topLevelChild, processor)) {
             return false;
           }
@@ -649,12 +661,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
 
   @Nullable
   private static PsiElement getStmtInitType(@NotNull IonStmtInit stmt) {
-    PsiElement name = stmt.getFirstChild();
-    PsiElement element = PsiTreeUtil.skipWhitespacesAndCommentsForward(name);
-    if (element != null && element.getNode().getElementType() == IonToken.COLON) {
-      return PsiTreeUtil.skipWhitespacesAndCommentsForward(element);
-    }
-    return null;
+    return PsiTreeUtil.getChildOfType(stmt, IonType.class);
   }
 
   @Nullable
@@ -729,22 +736,25 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
 
   @Nullable
   private static PsiElement getUnderlyingPtrType(@NotNull IonTypePtr type) {
-    return type.getChildren()[0];
+    if (type instanceof IonTypePtrLight) {
+      return ((IonTypePtrLight) type).myType;
+    }
+    return PsiTreeUtil.getStubChildOfType(type, IonType.class);
   }
 
   @Nullable
   private static PsiElement getUnderlyingArrayType(@NotNull IonTypeArray type) {
-    return type.getChildren()[0];
+    return PsiTreeUtil.getStubChildOfType(type, IonType.class);
   }
 
   @Nullable
   private static PsiElement getUnderlyingConstType(@NotNull IonTypeConst type) {
-    return type.getChildren()[0];
+    return PsiTreeUtil.getStubChildOfType(type, IonType.class);
   }
 
   @Nullable
   private static PsiElement getUnderlyingParType(@NotNull IonTypePar type) {
-    return type.getChildren()[0];
+    return PsiTreeUtil.getStubChildOfType(type, IonType.class);
   }
 
   @NotNull

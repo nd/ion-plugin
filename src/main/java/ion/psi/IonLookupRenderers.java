@@ -106,21 +106,20 @@ class IonLookupRenderers {
         return;
       }
       String name = decl.getName();
-      PsiElement firstChild = decl.getFirstChild();
-      IElementType elementType = firstChild != null ? firstChild.getNode().getElementType() : null;
       String type = null;
-      if (elementType == IonToken.STRUCT) {
-        p.setItemText(name);
-        p.setTailText(" type", true);
-        type = "struct{}";
-      } else if (elementType == IonToken.UNION) {
-        p.setItemText(name);
-        p.setTailText(" type", true);
-        type = "union{}";
+      switch (decl.getKind()) {
+        case STRUCT:
+          p.setItemText(name);
+          p.setTailText(" type", true);
+          type = "struct{}";
+          break;
+        case UNION:
+          p.setItemText(name);
+          p.setTailText(" type", true);
+          type = "union{}";
+          break;
       }
-      if (type != null) {
-        p.setTypeText(type);
-      }
+      p.setTypeText(type);
     }
   };
 

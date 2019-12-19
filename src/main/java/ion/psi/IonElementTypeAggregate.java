@@ -16,7 +16,7 @@ public class IonElementTypeAggregate extends IonStubElementType<IonDeclStubAggre
   @NotNull
   @Override
   public IonDeclStubAggregate createStub(@NotNull IonDeclAggregate psi, StubElement parentStub) {
-    return new IonDeclStubAggregate.Impl(parentStub, psi.getName());
+    return new IonDeclStubAggregate.Impl(parentStub, psi.getName(), psi.getKind());
   }
 
   @Override
@@ -27,12 +27,16 @@ public class IonElementTypeAggregate extends IonStubElementType<IonDeclStubAggre
   @Override
   public void serialize(@NotNull IonDeclStubAggregate stub, @NotNull StubOutputStream dataStream) throws IOException {
     dataStream.writeName(stub.getName());
+    dataStream.writeInt(stub.getKind().ordinal());
   }
 
   @NotNull
   @Override
   public IonDeclStubAggregate deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-    return new IonDeclStubAggregate.Impl(parentStub, dataStream.readNameString());
+    String name = dataStream.readNameString();
+    int kindOrdinal = dataStream.readInt();
+    IonDeclAggregate.Kind kind = IonDeclAggregate.Kind.values()[kindOrdinal];
+    return new IonDeclStubAggregate.Impl(parentStub, name, kind);
   }
 }
 

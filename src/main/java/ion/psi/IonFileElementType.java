@@ -5,6 +5,8 @@ import com.intellij.psi.tree.IStubFileElementType;
 import ion.IonLanguage;
 
 public class IonFileElementType extends IStubFileElementType<PsiFileStub<?>> {
+  private static final int VERSION = 1;
+
   public static final IonFileElementType INSTANCE = new IonFileElementType();
 
   public IonFileElementType() {
@@ -13,6 +15,6 @@ public class IonFileElementType extends IStubFileElementType<PsiFileStub<?>> {
 
   @Override
   public int getStubVersion() {
-    return super.getStubVersion();
+    return super.getStubVersion() + VERSION;
   }
 }

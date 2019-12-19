@@ -2,12 +2,11 @@ package ion.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.impl.source.tree.LeafElement;
 import com.intellij.psi.stubs.IStubElementType;
-import com.intellij.util.IncorrectOperationException;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.util.ObjectUtils;
 import ion.psi.stub.IonDeclStubAggregate;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class IonDeclAggregatePsi extends IonStubBasedPsiElement<IonDeclStubAggregate> implements IonDeclAggregate {
   public IonDeclAggregatePsi(@NotNull ASTNode node) {
@@ -21,5 +20,17 @@ public class IonDeclAggregatePsi extends IonStubBasedPsiElement<IonDeclStubAggre
   @Override
   public String toString() {
     return "IonDeclAggregate(aggregate)";
+  }
+
+  @Override
+  @NotNull
+  public Kind getKind() {
+    IonDeclStubAggregate stub = getGreenStub();
+    if (stub != null) {
+      return stub.getKind();
+    }
+    PsiElement firstChild = ObjectUtils.notNull(getFirstChild());
+    IElementType elementType = firstChild.getNode().getElementType();
+    return elementType == IonToken.STRUCT ? Kind.STRUCT : Kind.UNION;
   }
 }

@@ -36,4 +36,10 @@ func ptr_array() {
   };
 }
 
-var t: T2 = {t1 = {/*!resolve*/f = 1}};
+var t: T2 = {t1 = {/*resolve*/f = 1}};
+
+var f: func(t: T);
+
+func func_arg() {
+  f({/*resolve*/f = 1});
+}
