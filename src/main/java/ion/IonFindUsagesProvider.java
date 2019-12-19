@@ -25,8 +25,9 @@ public class IonFindUsagesProvider implements FindUsagesProvider {
   @Override
   public @NotNull String getType(@NotNull PsiElement element) {
     IonElementType type = ObjectUtils.tryCast(element.getNode().getElementType(), IonElementType.class);
-    if (type != null) {
-      switch (type.getTypeId()) {
+    IonElementType.TypeId typeId = type != null ? type.getTypeId() : null;
+    if (typeId != null) {
+      switch (typeId) {
         case DECL_AGGREGATE:
           PsiElement firstChild = element.getFirstChild();
           return firstChild != null ? firstChild.getText() : "aggregate";

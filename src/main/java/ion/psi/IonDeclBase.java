@@ -7,7 +7,7 @@ import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class IonDeclBase extends IonPsiElement implements IonDecl {
+public class IonDeclBase extends IonPsiElementBase implements IonDecl {
   public IonDeclBase(@NotNull ASTNode node) {
     super(node);
   }

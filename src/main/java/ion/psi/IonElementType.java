@@ -44,7 +44,7 @@ public class IonElementType extends IElementType implements IonElementTypeIdOwne
   public static final IonElementType EXPR_UNARY = new IonElementType("expr_unary", TypeId.EXPR_UNARY);
   public static final IonElementType EXPR_BINARY = new IonElementType("expr_binary");
   public static final IonElementType EXPR_TERNARY = new IonElementType("expr_ternary");
-  public static final IonElementType TYPE_NAME = new IonElementType("type_name", TypeId.TYPE_NAME);
+  public static final IonElementTypeTypeName TYPE_NAME = new IonElementTypeTypeName("type_name", TypeId.TYPE_NAME);
   public static final IonElementType TYPE_QNAME = new IonElementType("type_qname", TypeId.TYPE_QNAME);
   public static final IonElementType TYPE_PAR = new IonElementType("type_par", TypeId.TYPE_PAR);
   public static final IonElementType TYPE_PTR = new IonElementType("type_ptr", TypeId.TYPE_PTR);
@@ -162,6 +162,6 @@ public class IonElementType extends IElementType implements IonElementTypeIdOwne
 
   @NotNull
   public PsiElement createPsiElement(ASTNode node) {
-    return new IonPsiElement(node);
+    return new IonPsiElementBase(node);
   }
 }

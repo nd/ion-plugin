@@ -64,7 +64,7 @@ public class IonParserDefinition implements ParserDefinition {
         case EXPR_INDEX:
           return new IonExprIndex(node);
         case TYPE_NAME:
-          return new IonTypeName(node);
+          return new IonTypeNamePsi(node);
         case TYPE_PAR:
           return new IonTypePar(node);
         case TYPE_PTR:

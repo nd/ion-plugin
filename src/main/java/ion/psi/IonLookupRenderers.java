@@ -158,6 +158,9 @@ class IonLookupRenderers {
     if (type == null) {
       return null;
     }
+    if (type instanceof IonTypeName) {
+      return ((IonTypeName) type).getName();
+    }
     return type.getText();
   }
 

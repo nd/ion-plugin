@@ -6,7 +6,7 @@ IonFile
     PsiWhiteSpace(' ')
     PsiElement(=)('=')
     PsiWhiteSpace(' ')
-    IonPsiElement(expr_literal_float)
+    IonPsiElementBase(expr_literal_float)
       PsiElement(float)('3.14')
     PsiElement(;)(';')
   PsiWhiteSpace('\n')

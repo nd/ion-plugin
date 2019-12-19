@@ -3,8 +3,8 @@ package ion.psi;
 import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
 
-public class IonSwitchCaseBlock extends IonPsiElementBase {
-  public IonSwitchCaseBlock(@NotNull ASTNode node) {
+public class IonTypeBase extends IonPsiElementBase implements IonType {
+  public IonTypeBase(@NotNull ASTNode node) {
     super(node);
   }
 }

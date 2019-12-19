@@ -280,13 +280,13 @@ IonFile
     PsiElement())(')')
     PsiElement(;)(';')
   PsiWhiteSpace('\n\n')
-  IonPsiElement(note)
+  IonPsiElementBase(note)
     PsiElement(@)('@')
     PsiErrorElement:Expected name, got 1
       <empty list>
   PsiElement(int)('1')
   PsiWhiteSpace('\n')
-  IonPsiElement(note)
+  IonPsiElementBase(note)
     PsiElement(@)('@')
     IonExprName(expr_name)
       PsiElement(name)('x')
@@ -294,7 +294,7 @@ IonFile
     PsiErrorElement:Expected note parameter, got @
       <empty list>
   PsiWhiteSpace('\n')
-  IonPsiElement(note)
+  IonPsiElementBase(note)
     PsiElement(@)('@')
     IonExprName(expr_name)
       PsiElement(name)('x')
@@ -302,7 +302,7 @@ IonFile
     <empty list>
   PsiElement([)('[')
   PsiWhiteSpace('\n')
-  IonPsiElement(note)
+  IonPsiElementBase(note)
     PsiElement(@)('@')
     IonExprName(expr_name)
       PsiElement(name)('x')
@@ -312,12 +312,12 @@ IonFile
     PsiElement(=)('=')
     PsiElement())(')')
   PsiWhiteSpace('\n')
-  IonPsiElement(note)
+  IonPsiElementBase(note)
     PsiElement(@)('@')
     IonExprName(expr_name)
       PsiElement(name)('x')
     PsiElement(()('(')
-    IonPsiElement(note_param)
+    IonPsiElementBase(note_param)
       PsiElement(name)('a')
       PsiElement(=)('=')
       PsiErrorElement:Expected expression, got )

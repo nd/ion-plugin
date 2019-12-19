@@ -9,7 +9,7 @@ import ion.psi.stub.IonDeclStub;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-abstract class IonStubElementType<StubType extends StubElement<?>, PsiType extends PsiElement> extends IStubElementType<StubType, PsiType> implements IonElementTypeIdOwner  {
+abstract class IonStubElementType<StubType extends StubElement<?>, PsiType extends PsiElement> extends IStubElementType<StubType, PsiType> implements IonElementTypeIdOwner {
 
   protected final IonElementType.TypeId myTypeId;
 
