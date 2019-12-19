@@ -20,7 +20,7 @@ public class IonElementTypeFunc extends IonStubElementType<IonDeclStubFunc, IonD
   }
 
   @Override
-  public IonDeclFuncPsi createPsi(@NotNull IonDeclStubFunc stub) {
+  public IonDeclFunc createPsi(@NotNull IonDeclStubFunc stub) {
     return new IonDeclFuncPsi(stub, this);
   }
 

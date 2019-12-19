@@ -96,7 +96,7 @@ public class IonParserDefinition implements ParserDefinition {
         case DECL_FIELD_NAME:
           return new IonDeclFieldNamePsi(node);
         case DECL_TYPEDEF:
-          return new IonDeclTypedef(node);
+          return new IonDeclTypedefPsi(node);
         case DECL_ENUM:
           return new IonDeclEnumPsi(node);
         case DECL_ENUM_ITEM:
