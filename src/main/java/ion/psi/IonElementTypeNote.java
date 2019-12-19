@@ -20,7 +20,7 @@ public class IonElementTypeNote extends IonStubElementType<IonDeclStubNote, IonD
   }
 
   @Override
-  public IonDeclNotePsi createPsi(@NotNull IonDeclStubNote stub) {
+  public IonDeclNote createPsi(@NotNull IonDeclStubNote stub) {
     return new IonDeclNotePsi(stub, this);
   }
 

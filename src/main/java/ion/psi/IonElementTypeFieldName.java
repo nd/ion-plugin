@@ -21,7 +21,7 @@ public class IonElementTypeFieldName extends IonStubElementType<IonDeclStubField
   }
 
   @Override
-  public IonDeclFieldNamePsi createPsi(@NotNull IonDeclStubFieldName stub) {
+  public IonDeclFieldName createPsi(@NotNull IonDeclStubFieldName stub) {
     return new IonDeclFieldNamePsi(stub, this);
   }
 

@@ -20,7 +20,7 @@ public class IonElementTypeAggregate extends IonStubElementType<IonDeclStubAggre
   }
 
   @Override
-  public IonDeclAggregatePsi createPsi(@NotNull IonDeclStubAggregate stub) {
+  public IonDeclAggregate createPsi(@NotNull IonDeclStubAggregate stub) {
     return new IonDeclAggregatePsi(stub, this);
   }
 
