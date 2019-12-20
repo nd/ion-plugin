@@ -184,6 +184,14 @@ public class IonStructureView implements PsiStructureViewFactory {
         }
         return result.toArray(StructureViewTreeElement.EMPTY_ARRAY);
       }
+      if (myElement instanceof IonDeclEnum) {
+        List<IonDeclEnumItem> items = PsiTreeUtil.getStubChildrenOfTypeAsList(myElement, IonDeclEnumItem.class);
+        List<StructureViewTreeElement> result = new ArrayList<>(items.size());
+        for (IonDeclEnumItem item : items) {
+          result.add(new IonDeclTreeElement(item));
+        }
+        return result.toArray(StructureViewTreeElement.EMPTY_ARRAY);
+      }
       return new TreeElement[0];
     }
 
@@ -272,7 +280,7 @@ public class IonStructureView implements PsiStructureViewFactory {
       } else if (myElement instanceof IonDeclEnum) {
         return "enum";
       } else if (myElement instanceof IonDeclEnumItem) {
-        return "enum const";
+        return null; // clear from indent
       }
       return null;
     }
