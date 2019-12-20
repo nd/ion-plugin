@@ -43,3 +43,8 @@ var f: func(t: T);
 func func_arg() {
   f({/*resolve*/f = 1});
 }
+
+func func_result() {
+  g: func(): T2 = NULL;
+  g().t1./*resolve*/f;
+}

@@ -512,7 +512,13 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     if (element instanceof IonExprCall) {
       PsiElement name = ArrayUtil.getFirstElement(element.getChildren());
       PsiReference reference = name != null ? name.getReference() : null;
-      return resolveType(reference != null ? reference.resolve() : null);
+      PsiElement resolved = reference != null ? reference.resolve() : null;
+      PsiElement type = resolveType(resolved);
+      if (!(resolved instanceof IonDeclFunc) && type instanceof IonTypeFunc) {
+        IonType returnType = PsiTreeUtil.getChildOfType(type, IonType.class);
+        return resolveType(returnType);
+      }
+      return type;
     }
     if (element instanceof IonExprIndex) {
       PsiElement indexedExpr = getExprIndexExpr((IonExprIndex) element);
