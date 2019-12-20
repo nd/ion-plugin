@@ -42,6 +42,7 @@
         <stubElementTypeHolder class="ion.psi.IonElementType"/>
         <stubIndex implementation="ion.psi.IonNameIndex"/>
 
+        <lang.psiStructureViewFactory language="ion" implementationClass="ion.IonStructureView"/>
         <!--<registryKey key="ion.resolve.cache.enabled" defaultValue="true"/>-->
     </extensions>
 </idea-plugin>

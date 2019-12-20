@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-class IonCompletion {
+public class IonCompletion {
   private static LookupElementRenderer<LookupElement> FUNC = new LookupElementRenderer<LookupElement>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
@@ -159,7 +159,7 @@ class IonCompletion {
   };
 
   @Nullable
-  private static String getTypePresentation(@Nullable PsiElement type) {
+  public static String getTypePresentation(@Nullable PsiElement type) {
     if (type == null) {
       return null;
     }
@@ -228,7 +228,7 @@ class IonCompletion {
   }
 
   @NotNull
-  private static String getParamsString(@NotNull List<IonDeclFuncParam> params) {
+  public static String getParamsString(@NotNull List<IonDeclFuncParam> params) {
     return StringUtil.join(ContainerUtil.map(params, param -> {
       String paramName = param.getName();
       String paramType = getTypePresentation(param.getType());
