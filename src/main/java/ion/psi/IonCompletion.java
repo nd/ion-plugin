@@ -1,5 +1,7 @@
 package ion.psi;
 
+import com.intellij.codeInsight.completion.InsertHandler;
+import com.intellij.codeInsight.completion.util.ParenthesesInsertHandler;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.codeInsight.lookup.LookupElementRenderer;
@@ -13,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-class IonLookupRenderers {
+class IonCompletion {
   private static LookupElementRenderer<LookupElement> FUNC = new LookupElementRenderer<LookupElement>() {
     @Override
     public void renderElement(LookupElement element, LookupElementPresentation p) {
@@ -182,7 +184,7 @@ class IonLookupRenderers {
     }
     if (type instanceof IonTypeTuple) {
       List<IonType> items = PsiTreeUtil.getStubChildrenOfTypeAsList(type, IonType.class);
-      return "{" + StringUtil.join(ContainerUtil.map(items, IonLookupRenderers::getTypePresentation), ", ") + "}";
+      return "{" + StringUtil.join(ContainerUtil.map(items, IonCompletion::getTypePresentation), ", ") + "}";
     }
     if (type instanceof IonTypeFunc) {
       String paramsStr = getParamsString(PsiTreeUtil.getStubChildrenOfTypeAsList(type, IonDeclFuncParam.class));
@@ -199,19 +201,28 @@ class IonLookupRenderers {
   @Nullable
   static LookupElementRenderer<LookupElement> getRenderer(@NotNull PsiElement element) {
     if (element instanceof IonDeclVar || element instanceof IonDeclConst) {
-      return IonLookupRenderers.VAR;
+      return VAR;
     } else if (element instanceof IonDeclFunc) {
-      return IonLookupRenderers.FUNC;
+      return FUNC;
     } else if (element instanceof IonDeclTypedef) {
-      return IonLookupRenderers.TYPEDEF;
+      return TYPEDEF;
     } else if (element instanceof IonDeclFieldName) {
-      return IonLookupRenderers.FIELD;
+      return FIELD;
     } else if (element instanceof IonDeclAggregate) {
-      return IonLookupRenderers.AGGREGATE;
+      return AGGREGATE;
     } else if (element instanceof IonDeclEnum) {
-      return IonLookupRenderers.ENUM;
+      return ENUM;
     } else if (element instanceof IonDeclEnumItem) {
-      return IonLookupRenderers.ENUM_ITEM;
+      return ENUM_ITEM;
+    }
+    return null;
+  }
+
+  @Nullable
+  static InsertHandler<LookupElement> getInsertHandler(@NotNull PsiElement element) {
+    if (element instanceof IonDeclFunc) {
+      int paramsCount = PsiTreeUtil.getStubChildrenOfTypeAsList(element, IonDeclFuncParam.class).size();
+      return paramsCount == 0 ? ParenthesesInsertHandler.NO_PARAMETERS : ParenthesesInsertHandler.WITH_PARAMETERS;
     }
     return null;
   }

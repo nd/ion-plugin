@@ -1,5 +1,6 @@
 package ion.psi;
 
+import com.intellij.codeInsight.completion.InsertHandler;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.lookup.LookupElementRenderer;
@@ -55,9 +56,13 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
         String name = decl.getName();
         if (!StringUtil.isEmpty(name)) {
           LookupElementBuilder builder = LookupElementBuilder.create(decl).withLookupString(name);
-          LookupElementRenderer<LookupElement> renderer = IonLookupRenderers.getRenderer(decl);
+          LookupElementRenderer<LookupElement> renderer = IonCompletion.getRenderer(decl);
           if (renderer != null) {
             builder = builder.withRenderer(renderer);
+          }
+          InsertHandler<LookupElement> insertHandler = IonCompletion.getInsertHandler(decl);
+          if (insertHandler != null) {
+            builder = builder.withInsertHandler(insertHandler);
           }
           items.add(builder);
         }
