@@ -4,7 +4,7 @@ import com.intellij.psi.PsiNameIdentifierOwner;
 
 import javax.annotation.Nullable;
 
-public interface IonDecl extends PsiNameIdentifierOwner {
+public interface IonDecl extends IonPsiElement, PsiNameIdentifierOwner {
 
   @Nullable
   String getName();
