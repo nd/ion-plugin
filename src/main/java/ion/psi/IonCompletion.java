@@ -92,8 +92,7 @@ public class IonCompletion {
       String name = decl.getName();
       p.setItemText(name);
       p.setTailText(" field", true);
-      IonDeclField fieldDecl = PsiTreeUtil.getStubOrPsiParentOfType(decl, IonDeclField.class);
-      PsiElement type = fieldDecl != null ? fieldDecl.getType() : null;
+      PsiElement type = decl.getType();
       String typePresentation = getTypePresentation(type);
       if (typePresentation != null) {
         p.setTypeText(typePresentation);

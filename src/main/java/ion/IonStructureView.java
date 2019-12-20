@@ -173,6 +173,17 @@ public class IonStructureView implements PsiStructureViewFactory {
     @NotNull
     @Override
     public TreeElement[] getChildren() {
+      if (myElement instanceof IonDeclAggregate || myElement instanceof IonDeclField) {
+        List<IonDeclField> fields = PsiTreeUtil.getStubChildrenOfTypeAsList(myElement, IonDeclField.class);
+        List<StructureViewTreeElement> result = new ArrayList<>(fields.size());
+        for (IonDeclField field : fields) {
+          List<IonDeclFieldName> fieldNames = PsiTreeUtil.getStubChildrenOfTypeAsList(field, IonDeclFieldName.class);
+          for (IonDeclFieldName fieldName : fieldNames) {
+            result.add(new IonDeclTreeElement(fieldName));
+          }
+        }
+        return result.toArray(StructureViewTreeElement.EMPTY_ARRAY);
+      }
       return new TreeElement[0];
     }
 
@@ -255,7 +266,7 @@ public class IonStructureView implements PsiStructureViewFactory {
       } else if (myElement instanceof IonDeclTypedef) {
         return "typedef";
       } else if (myElement instanceof IonDeclFieldName) {
-        return "field";
+        return null; // clear from indent
       } else if (myElement instanceof IonDeclAggregate) {
         return ((IonDeclAggregate) myElement).getKind().toString().toLowerCase();
       } else if (myElement instanceof IonDeclEnum) {
