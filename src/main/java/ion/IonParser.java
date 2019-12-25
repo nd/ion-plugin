@@ -162,8 +162,10 @@ public class IonParser implements PsiParser {
     assert b.getTokenType() == IMPORT;
     PsiBuilder.Marker m = b.mark();
     b.advanceLexer();
-    if (match(b, NAME) && lookAhead(b, 1, ASSIGN)) {
-      consume(b, NAME);
+    if (match(b, NAME, DOT) && lookAhead(b, 1, ASSIGN)) {
+      if (!consume(b, NAME)) {
+        expect(b, DOT);
+      }
       consume(b, ASSIGN);
     }
     if (match(b, NAME, DOT)) {
@@ -192,7 +194,6 @@ public class IonParser implements PsiParser {
       }
     }
     m.done(DECL_IMPORT);
-    return;
   }
 
   private void parseImportItem(@NotNull PsiBuilder b) {
