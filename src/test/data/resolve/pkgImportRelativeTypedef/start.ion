@@ -1,0 +1,5 @@
+import .pkg
+
+func x() {
+  t: pkg./*resolve*/T;
+}

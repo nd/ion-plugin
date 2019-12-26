@@ -92,6 +92,11 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
       return processCompoundFieldVariants(compoundField, processor);
     }
 
+    IonTypeQName typeQName = ObjectUtils.tryCast(parent, IonTypeQName.class);
+    if (typeQName != null && myElement == getTypeName(typeQName)) {
+      return processTypeQNameVariants(typeQName, processor);
+    }
+
     IonDeclImportItem importedItem = ObjectUtils.tryCast(parent, IonDeclImportItem.class);
     if (importedItem != null) {
       IonDeclImport importDecl = PsiTreeUtil.getParentOfType(importedItem, IonDeclImport.class);
@@ -144,6 +149,13 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     if (compoundField != null && myElement == getCompoundFieldName(compoundField)) {
       ExactMatchProcessor processor = new ExactMatchProcessor(myElement.getText());
       processCompoundFieldVariants(compoundField, processor);
+      return processor.getElement();
+    }
+
+    IonTypeQName typeQName = ObjectUtils.tryCast(parent, IonTypeQName.class);
+    if (typeQName != null && myElement == getTypeName(typeQName)) {
+      ExactMatchProcessor processor = new ExactMatchProcessor(myElement.getText());
+      processTypeQNameVariants(typeQName, processor);
       return processor.getElement();
     }
 
@@ -250,6 +262,18 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
           return processImport(PsiTreeUtil.getParentOfType(resolvedQualifier, IonDeclImport.class, false), processor);
         }
       }
+    }
+    return true;
+  }
+
+  private static boolean processTypeQNameVariants(@NotNull IonTypeQName typeQName,
+                                                  @NotNull Processor<PsiElement> processor) {
+
+    PsiElement qualifier = getQualifier(typeQName);
+    PsiReference ref = qualifier != null ? qualifier.getReference() : null;
+    PsiElement resolvedQualifier = ref != null ? ref.resolve() : null;
+    if (resolvedQualifier != null && (resolvedQualifier instanceof IonDeclImport || resolvedQualifier.getParent() instanceof IonImportPath)) {
+      return processImport(PsiTreeUtil.getParentOfType(resolvedQualifier, IonDeclImport.class, false), processor);
     }
     return true;
   }
@@ -697,8 +721,19 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   }
 
   @Nullable
+  private static PsiElement getQualifier(@NotNull IonTypeQName typeQName) {
+    return typeQName.getFirstChild();
+  }
+
+  @Nullable
   static PsiElement getFieldName(@NotNull IonExprField field) {
     PsiElement[] children = field.getChildren();
+    return children.length == 2 ? children[1] : null;
+  }
+
+  @Nullable
+  static PsiElement getTypeName(@NotNull IonTypeQName typeQName) {
+    PsiElement[] children = typeQName.getChildren();
     return children.length == 2 ? children[1] : null;
   }
 
