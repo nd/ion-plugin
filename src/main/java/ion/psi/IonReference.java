@@ -621,26 +621,29 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
   }
 
   private static boolean processImport(@Nullable IonDeclImport importDecl, @NotNull Processor<PsiElement> processor) {
-    IonDeclImportItem[] importItems = PsiTreeUtil.getChildrenOfType(importDecl, IonDeclImportItem.class);
-    if (importItems == null) {
+    if (importDecl == null) {
       return true;
     }
+    boolean hasSpec = importDecl.hasImportSpec();
+    IonDeclImportItem[] importItems = PsiTreeUtil.getChildrenOfType(importDecl, IonDeclImportItem.class);
     IonImportPath importPath = PsiTreeUtil.getChildOfType(importDecl, IonImportPath.class);
     if (importPath == null) {
       return true;
     }
     Set<String> importedNames = new HashSet<>();
-    boolean hasEllipsis = false;
-    for (IonDeclImportItem item : importItems) {
-      if (!processor.process(item)) {
-        return false;
-      }
-      PsiElement importedName = getImportedName(item);
-      String alias = item.getName();
-      if (alias == null && importedName != null) {
-        importedNames.add(importedName.getText());
-      } else if (item.getNode().findChildByType(IonToken.ELLIPSIS) != null) {
-        hasEllipsis = true;
+    boolean hasEllipsis = !hasSpec; // treat `import x` as `import x {...}`, see std/std.ion
+    if (importItems != null) {
+      for (IonDeclImportItem item : importItems) {
+        if (!processor.process(item)) {
+          return false;
+        }
+        PsiElement importedName = getImportedName(item);
+        String alias = item.getName();
+        if (alias == null && importedName != null) {
+          importedNames.add(importedName.getText());
+        } else if (item.getNode().findChildByType(IonToken.ELLIPSIS) != null) {
+          hasEllipsis = true;
+        }
       }
     }
     if (hasEllipsis || !importedNames.isEmpty()) {

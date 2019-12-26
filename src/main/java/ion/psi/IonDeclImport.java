@@ -27,4 +27,8 @@ public class IonDeclImport extends IonDeclBase {
   public boolean isDotImport() {
     return getNode().findChildByType(IonToken.DOT) != null;
   }
+
+  public boolean hasImportSpec() {
+    return getNode().findChildByType(IonToken.LBRACE) != null;
+  }
 }
