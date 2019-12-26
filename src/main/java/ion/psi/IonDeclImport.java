@@ -23,4 +23,8 @@ public class IonDeclImport extends IonDeclBase {
       return nameNode != null ? nameNode.getPsi() : null;
     }
   }
+
+  public boolean isDotImport() {
+    return getNode().findChildByType(IonToken.DOT) != null;
+  }
 }

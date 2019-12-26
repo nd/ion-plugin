@@ -1,0 +1,8 @@
+import .=.p1.p2.p3 {b = a, f, g = f, T};
+
+func x() {
+  b./*resolve*/f;
+  f()./*resolve*/f;
+  g()./*resolve*/f;
+  x := T{/*resolve*/f = 1};
+}

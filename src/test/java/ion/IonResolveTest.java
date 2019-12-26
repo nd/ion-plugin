@@ -173,6 +173,10 @@ public class IonResolveTest extends BasePlatformTestCase {
     doPackageTest("p1/p2/p3/expected.ion");
   }
 
+  public void testPkgImportRelativeDotAliased() {
+    doPackageTest("p1/p2/p3/expected.ion");
+  }
+
   @Override
   protected String getTestDataPath() {
     return "src/test/data/resolve";
