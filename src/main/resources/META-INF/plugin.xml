@@ -8,13 +8,12 @@
 
     <idea-version since-build="191.1"/>
 
-    <version>13</version>
+    <version>14</version>
 
     <change-notes><![CDATA[
     <ul>
-      <li>file structure view</li>
-      <li>resolve for vars/fields of functional type</li>
-      <li>completion shows function signature</li>
+      <li>support dot imports</li>
+      <li>resolve for qualified type names</li>
     </ul>
     ]]>
     </change-notes>
