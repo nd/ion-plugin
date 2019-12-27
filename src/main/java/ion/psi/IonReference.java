@@ -696,7 +696,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
         return processPackageDeclarations(packageDir, proc);
       }
     }
-    return false;
+    return true;
   }
 
   private static boolean processDecl(@Nullable PsiElement child, @NotNull Processor<PsiElement> processor) {

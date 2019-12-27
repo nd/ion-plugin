@@ -181,6 +181,11 @@ public class IonResolveTest extends BasePlatformTestCase {
     doPackageTest("pkg/expected.ion");
   }
 
+  public void testPkgImportLocalSymbol() {
+    myFixture.configureByFile(getTestName(true) + "/pkg/f.ion");
+    doPackageTest("start.ion");
+  }
+
   @Override
   protected String getTestDataPath() {
     return "src/test/data/resolve";

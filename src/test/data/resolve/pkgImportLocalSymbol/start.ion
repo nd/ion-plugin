@@ -1,0 +1,8 @@
+import .=.pkg {...};
+
+struct <caret>T {
+}
+
+func x() {
+  t: /*resolve*/T;
+}
