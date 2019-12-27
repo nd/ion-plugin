@@ -19,13 +19,13 @@ public class IonElementType extends IElementType implements IonElementTypeIdOwne
   public static final IonElementTypeFunc DECL_FUNC = new IonElementTypeFunc("func", TypeId.DECL_FUNC);
   public static final IonElementTypeFuncParam DECL_FUNC_PARAM = new IonElementTypeFuncParam("param", TypeId.DECL_FUNC_PARAM);
   public static final IonElementTypeNote DECL_NOTE = new IonElementTypeNote("decl_note", TypeId.DECL_NOTE);
-  public static final IonElementType NOTE = new IonElementType("note");
-  public static final IonElementType NOTE_PARAM = new IonElementType("note_param");
+  public static final IonElementType NOTE = new IonElementType("note", TypeId.NOTE);
+  public static final IonElementType NOTE_PARAM = new IonElementType("note_param", TypeId.NOTE_PARAM);
   public static final IonElementType DECL_IMPORT_ITEM = new IonElementType("import_item", TypeId.DECL_IMPORT_ITEM);
   public static final IonElementType IMPORT_PATH = new IonElementType("import_path", TypeId.IMPORT_PATH);
   public static final IonElementType EXPR_LITERAL_INT = new IonElementType("expr_literal_int", TypeId.EXPR_LITERAL_INT);
   public static final IonElementType EXPR_LITERAL_FLOAT = new IonElementType("expr_literal_float");
-  public static final IonElementType EXPR_LITERAL_STR = new IonElementType("expr_literal_str");
+  public static final IonElementType EXPR_LITERAL_STR = new IonElementType("expr_literal_str", TypeId.EXPR_LITERAL_STR);
   public static final IonElementType EXPR_LITERAL_CHAR = new IonElementType("expr_literal_char");
   public static final IonElementType EXPR_LITERAL_COMPOUND = new IonElementType("expr_literal_compound", TypeId.EXPR_LITERAL_COMPOUND);
   public static final IonElementType EXPR_LITERAL_COMPOUND_TYPED = new IonElementType("expr_literal_compound_typed", TypeId.EXPR_LITERAL_COMPOUND_TYPED);

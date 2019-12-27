@@ -45,5 +45,7 @@
 
         <lang.psiStructureViewFactory language="ion" implementationClass="ion.IonStructureView"/>
         <!--<registryKey key="ion.resolve.cache.enabled" defaultValue="true"/>-->
+
+        <multiHostInjector implementation="ion.IonForeignInjector"/>
     </extensions>
 </idea-plugin>

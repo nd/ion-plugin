@@ -669,7 +669,7 @@ IonFile
       IonPsiElementBase(stmt_list)
         PsiWhiteSpace('\n  ')
         IonPsiElementBase(stmt_note)
-          IonPsiElementBase(note)
+          IonNote(note)
             PsiElement(#)('#')
             IonExprName(expr_name)
               PsiElement(name)('ok')

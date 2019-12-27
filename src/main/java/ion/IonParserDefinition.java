@@ -41,7 +41,7 @@ public class IonParserDefinition implements ParserDefinition {
   @NotNull
   @Override
   public TokenSet getStringLiteralElements() {
-    return TokenSet.create();
+    return IonToken.STRINGS;
   }
 
   @NotNull
@@ -123,6 +123,8 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonExprLitCompound(node);
         case EXPR_LITERAL_INT:
           return new IonExprLitInt(node);
+        case EXPR_LITERAL_STR:
+          return new IonExprLitString(node);
         case EXPR_LITERAL_COMPOUND_TYPED:
           return new IonExprLitCompoundTyped(node);
         case DECL_IMPORT:
@@ -131,6 +133,10 @@ public class IonParserDefinition implements ParserDefinition {
           return new IonImportPath(node);
         case DECL_IMPORT_ITEM:
           return new IonDeclImportItem(node);
+        case NOTE:
+          return new IonNote(node);
+        case NOTE_PARAM:
+          return new IonNoteParam(node);
       }
     }
     IonElementType elementType = ObjectUtils.tryCast(node.getElementType(), IonElementType.class);
