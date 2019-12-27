@@ -8,12 +8,12 @@
 
     <idea-version since-build="191.1"/>
 
-    <version>14</version>
+    <version>15</version>
 
     <change-notes><![CDATA[
     <ul>
-      <li>support dot imports</li>
-      <li>resolve for qualified type names</li>
+      <li>c language injection for @foreign note preamble/postamble (multiline strings only)</li>
+      <li>fixed resolve for local symbols when imports are present</li>
     </ul>
     ]]>
     </change-notes>
