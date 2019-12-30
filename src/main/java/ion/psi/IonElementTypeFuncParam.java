@@ -1,5 +1,6 @@
 package ion.psi;
 
+import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
@@ -33,6 +34,11 @@ public class IonElementTypeFuncParam extends IonStubElementType<IonDeclStubFuncP
   @Override
   public IonDeclStubFuncParam deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
     return new IonDeclStubFuncParam.Impl(parentStub, dataStream.readNameString());
+  }
+
+  @Override
+  public void indexStub(@NotNull IonDeclStubFuncParam stub, @NotNull IndexSink sink) {
+    // don't include parameter name into index
   }
 }
 
