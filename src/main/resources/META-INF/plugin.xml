@@ -8,12 +8,11 @@
 
     <idea-version since-build="191.1"/>
 
-    <version>15</version>
+    <version>16</version>
 
     <change-notes><![CDATA[
     <ul>
-      <li>c language injection for @foreign note preamble/postamble (multiline strings only)</li>
-      <li>fixed resolve for local symbols when imports are present</li>
+      <li>func params are not indexed/resolved to by name</li>
     </ul>
     ]]>
     </change-notes>
