@@ -36,7 +36,7 @@ public class IonLib extends SyntheticLibrary implements ItemPresentation {
   @Nullable
   @Override
   public Icon getIcon(boolean unused) {
-    return AllIcons.Modules.Library;
+    return AllIcons.Nodes.PpLib;
   }
 
   @NotNull
