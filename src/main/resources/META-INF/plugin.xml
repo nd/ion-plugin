@@ -6,13 +6,14 @@
       <a href="https://github.com/pervognsen/bitwise">Bitwise</a> ion language support
     ]]></description>
 
-    <idea-version since-build="191.1"/>
+    <idea-version since-build="191.3"/>
 
-    <version>16</version>
+    <version>17</version>
 
     <change-notes><![CDATA[
     <ul>
-      <li>func params are not indexed/resolved to by name</li>
+      <li>icons in completion and file structure</li>
+      <li>plugin made compatible with 2020.1</li>
     </ul>
     ]]>
     </change-notes>
