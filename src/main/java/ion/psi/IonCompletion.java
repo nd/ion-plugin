@@ -10,6 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ObjectUtils;
 import com.intellij.util.containers.ContainerUtil;
+import ion.IonIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +37,7 @@ public class IonCompletion {
       } else {
         p.setTypeText("void");
       }
+      p.setIcon(IonIcons.FUNC);
     }
   };
 
@@ -61,6 +63,7 @@ public class IonCompletion {
       if (typePresentation != null) {
         p.setTypeText(typePresentation);
       }
+      p.setIcon(IonIcons.VAR);
     }
   };
 
@@ -79,6 +82,7 @@ public class IonCompletion {
       if (typePresentation != null) {
         p.setTypeText(typePresentation);
       }
+      p.setIcon(IonIcons.TYPE);
     }
   };
 
@@ -97,6 +101,7 @@ public class IonCompletion {
       if (typePresentation != null) {
         p.setTypeText(typePresentation);
       }
+      p.setIcon(IonIcons.FIELD);
     }
   };
 
@@ -114,11 +119,13 @@ public class IonCompletion {
           p.setItemText(name);
           p.setTailText(" type", true);
           type = "struct{}";
+          p.setIcon(IonIcons.STRUCT);
           break;
         case UNION:
           p.setItemText(name);
           p.setTailText(" type", true);
           type = "union{}";
+          p.setIcon(IonIcons.UNION);
           break;
       }
       p.setTypeText(type);
@@ -135,8 +142,10 @@ public class IonCompletion {
       p.setItemText(decl.getName());
       p.setTailText(" type", true);
       p.setTypeText("enum");
+      p.setIcon(IonIcons.ENUM);
     }
   };
+
 
   private static LookupElementRenderer<LookupElement> ENUM_ITEM = new LookupElementRenderer<LookupElement>() {
     @Override
@@ -154,6 +163,7 @@ public class IonCompletion {
           p.setTypeText(name);
         }
       }
+      p.setIcon(IonIcons.ENUM_ITEM);
     }
   };
 

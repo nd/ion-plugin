@@ -288,6 +288,23 @@ public class IonStructureView implements PsiStructureViewFactory {
     @Override
     @Nullable
     public Icon getIcon(boolean unused) {
+      if (myElement instanceof IonDeclVar) {
+        return IonIcons.VAR;
+      } else if (myElement instanceof IonDeclConst) {
+        return IonIcons.CONST;
+      } else if (myElement instanceof IonDeclFunc) {
+        return IonIcons.FUNC;
+      } else if (myElement instanceof IonDeclTypedef) {
+        return IonIcons.TYPE;
+      } else if (myElement instanceof IonDeclFieldName) {
+        return IonIcons.FIELD;
+      } else if (myElement instanceof IonDeclAggregate) {
+        return ((IonDeclAggregate) myElement).getKind() == IonDeclAggregate.Kind.STRUCT ? IonIcons.STRUCT : IonIcons.UNION;
+      } else if (myElement instanceof IonDeclEnum) {
+        return IonIcons.ENUM;
+      } else if (myElement instanceof IonDeclEnumItem) {
+        return IonIcons.ENUM_ITEM;
+      }
       return null;
     }
   }
