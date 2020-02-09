@@ -16,7 +16,7 @@ public class IonElementTypeEnumItem extends IonStubElementType<IonDeclStubEnumIt
   @NotNull
   @Override
   public IonDeclStubEnumItem createStub(@NotNull IonDeclEnumItem psi, StubElement parentStub) {
-    return new IonDeclStubEnumItem.Impl(parentStub, psi.getName());
+    return new IonDeclStubEnumItem(parentStub, psi.getName());
   }
 
   @Override
@@ -32,6 +32,6 @@ public class IonElementTypeEnumItem extends IonStubElementType<IonDeclStubEnumIt
   @NotNull
   @Override
   public IonDeclStubEnumItem deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-    return new IonDeclStubEnumItem.Impl(parentStub, dataStream.readNameString());
+    return new IonDeclStubEnumItem(parentStub, dataStream.readNameString());
   }
 }

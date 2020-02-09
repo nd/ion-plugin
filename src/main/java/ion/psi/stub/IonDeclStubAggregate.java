@@ -6,23 +6,15 @@ import ion.psi.IonElementType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface IonDeclStubAggregate extends IonDeclStub<IonDeclAggregate> {
+public class IonDeclStubAggregate extends IonDeclStubBase<IonDeclAggregate> implements IonDeclStub<IonDeclAggregate> {
+  private final IonDeclAggregate.Kind myKind;
 
-  @NotNull
-  IonDeclAggregate.Kind getKind();
-
-  class Impl extends IonDeclStubBase<IonDeclAggregate> implements IonDeclStubAggregate {
-    private final IonDeclAggregate.Kind myKind;
-
-    public Impl(StubElement parent, @Nullable String name, @NotNull IonDeclAggregate.Kind kind) {
-      super(parent, IonElementType.DECL_AGGREGATE, name);
-      myKind = kind;
-    }
-
-    @Override
-    public @NotNull IonDeclAggregate.Kind getKind() {
-      return myKind;
-    }
+  public IonDeclStubAggregate(StubElement parent, @Nullable String name, @NotNull IonDeclAggregate.Kind kind) {
+    super(parent, IonElementType.DECL_AGGREGATE, name);
+    myKind = kind;
   }
 
+  public @NotNull IonDeclAggregate.Kind getKind() {
+    return myKind;
+  }
 }

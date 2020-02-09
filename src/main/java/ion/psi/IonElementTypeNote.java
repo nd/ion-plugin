@@ -16,7 +16,7 @@ public class IonElementTypeNote extends IonStubElementType<IonDeclStubNote, IonD
   @NotNull
   @Override
   public IonDeclStubNote createStub(@NotNull IonDeclNote psi, StubElement parentStub) {
-    return new IonDeclStubNote.Impl(parentStub, psi.getName());
+    return new IonDeclStubNote(parentStub, psi.getName());
   }
 
   @Override
@@ -32,7 +32,7 @@ public class IonElementTypeNote extends IonStubElementType<IonDeclStubNote, IonD
   @NotNull
   @Override
   public IonDeclStubNote deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-    return new IonDeclStubNote.Impl(parentStub, dataStream.readNameString());
+    return new IonDeclStubNote(parentStub, dataStream.readNameString());
   }
 }
 

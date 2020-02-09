@@ -16,7 +16,7 @@ public class IonElementTypeFunc extends IonStubElementType<IonDeclStubFunc, IonD
   @NotNull
   @Override
   public IonDeclStubFunc createStub(@NotNull IonDeclFunc psi, StubElement parentStub) {
-    return new IonDeclStubFunc.Impl(parentStub, psi.getName());
+    return new IonDeclStubFunc(parentStub, psi.getName());
   }
 
   @Override
@@ -32,6 +32,6 @@ public class IonElementTypeFunc extends IonStubElementType<IonDeclStubFunc, IonD
   @NotNull
   @Override
   public IonDeclStubFunc deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-    return new IonDeclStubFunc.Impl(parentStub, dataStream.readNameString());
+    return new IonDeclStubFunc(parentStub, dataStream.readNameString());
   }
 }

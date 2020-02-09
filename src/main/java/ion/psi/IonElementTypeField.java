@@ -16,7 +16,7 @@ public class IonElementTypeField extends IonStubElementType<IonDeclStubField, Io
   @NotNull
   @Override
   public IonDeclStubField createStub(@NotNull IonDeclField psi, StubElement parentStub) {
-    return new IonDeclStubField.Impl(parentStub);
+    return new IonDeclStubField(parentStub);
   }
 
   @Override
@@ -25,13 +25,13 @@ public class IonElementTypeField extends IonStubElementType<IonDeclStubField, Io
   }
 
   @Override
-  public void serialize(@NotNull IonDeclStubField stub, @NotNull StubOutputStream dataStream) throws IOException {
+  public void serialize(@NotNull IonDeclStubField stub, @NotNull StubOutputStream dataStream) {
   }
 
   @NotNull
   @Override
-  public IonDeclStubField deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-    return new IonDeclStubField.Impl(parentStub);
+  public IonDeclStubField deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) {
+    return new IonDeclStubField(parentStub);
   }
 }
 

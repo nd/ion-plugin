@@ -5,12 +5,8 @@ import ion.psi.IonDeclFieldName;
 import ion.psi.IonElementType;
 import org.jetbrains.annotations.Nullable;
 
-public interface IonDeclStubFieldName extends IonDeclStub<IonDeclFieldName> {
-
-  class Impl extends IonDeclStubBase<IonDeclFieldName> implements IonDeclStubFieldName {
-    public Impl(StubElement parent, @Nullable String name) {
-      super(parent, IonElementType.DECL_FIELD_NAME, name);
-    }
+public class IonDeclStubFieldName extends IonDeclStubBase<IonDeclFieldName> implements IonDeclStub<IonDeclFieldName> {
+  public IonDeclStubFieldName(StubElement parent, @Nullable String name) {
+    super(parent, IonElementType.DECL_FIELD_NAME, name);
   }
-
 }

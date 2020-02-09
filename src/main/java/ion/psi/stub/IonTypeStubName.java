@@ -5,22 +5,15 @@ import ion.psi.IonElementType;
 import ion.psi.IonTypeName;
 import org.jetbrains.annotations.Nullable;
 
-public interface IonTypeStubName extends IonTypeStub<IonTypeName> {
+public class IonTypeStubName extends IonTypeStubBase<IonTypeName> implements IonTypeStub<IonTypeName> {
+  private final String myName;
 
-  @Nullable
-  String getName();
-
-  class Impl extends IonTypeStubBase<IonTypeName> implements IonTypeStubName {
-    private final String myName;
-    public Impl(StubElement parent, @Nullable String name) {
-      super(parent, IonElementType.TYPE_NAME);
-      myName = name;
-    }
-
-    @Override
-    public @Nullable String getName() {
-      return myName;
-    }
+  public IonTypeStubName(StubElement parent, @Nullable String name) {
+    super(parent, IonElementType.TYPE_NAME);
+    myName = name;
   }
 
+  public @Nullable String getName() {
+    return myName;
+  }
 }

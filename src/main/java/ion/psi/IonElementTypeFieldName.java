@@ -17,7 +17,7 @@ public class IonElementTypeFieldName extends IonStubElementType<IonDeclStubField
   @NotNull
   @Override
   public IonDeclStubFieldName createStub(@NotNull IonDeclFieldName psi, StubElement parentStub) {
-    return new IonDeclStubFieldName.Impl(parentStub, psi.getName());
+    return new IonDeclStubFieldName(parentStub, psi.getName());
   }
 
   @Override
@@ -33,7 +33,7 @@ public class IonElementTypeFieldName extends IonStubElementType<IonDeclStubField
   @NotNull
   @Override
   public IonDeclStubFieldName deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-    return new IonDeclStubFieldName.Impl(parentStub, dataStream.readNameString());
+    return new IonDeclStubFieldName(parentStub, dataStream.readNameString());
   }
 
   @Override

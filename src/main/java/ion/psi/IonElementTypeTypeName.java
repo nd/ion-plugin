@@ -17,7 +17,7 @@ public class IonElementTypeTypeName extends IonStubElementType<IonTypeStubName, 
   @NotNull
   @Override
   public IonTypeStubName createStub(@NotNull IonTypeName psi, StubElement parentStub) {
-    return new IonTypeStubName.Impl(parentStub, psi.getName());
+    return new IonTypeStubName(parentStub, psi.getName());
   }
 
   @Override
@@ -33,7 +33,7 @@ public class IonElementTypeTypeName extends IonStubElementType<IonTypeStubName, 
   @NotNull
   @Override
   public IonTypeStubName deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-    return new IonTypeStubName.Impl(parentStub, dataStream.readNameString());
+    return new IonTypeStubName(parentStub, dataStream.readNameString());
   }
 
   @Override

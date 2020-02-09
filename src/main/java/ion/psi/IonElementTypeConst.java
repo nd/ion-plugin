@@ -16,7 +16,7 @@ public class IonElementTypeConst extends IonStubElementType<IonDeclStubConst, Io
   @NotNull
   @Override
   public IonDeclStubConst createStub(@NotNull IonDeclConst psi, StubElement parentStub) {
-    return new IonDeclStubConst.Impl(parentStub, psi.getName());
+    return new IonDeclStubConst(parentStub, psi.getName());
   }
 
   @Override
@@ -32,6 +32,6 @@ public class IonElementTypeConst extends IonStubElementType<IonDeclStubConst, Io
   @NotNull
   @Override
   public IonDeclStubConst deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-    return new IonDeclStubConst.Impl(parentStub, dataStream.readNameString());
+    return new IonDeclStubConst(parentStub, dataStream.readNameString());
   }
 }

@@ -4,12 +4,8 @@ import com.intellij.psi.stubs.StubElement;
 import ion.psi.IonElementType;
 import ion.psi.IonTypeConst;
 
-public interface IonTypeStubConst extends IonTypeStub<IonTypeConst> {
-
-  class Impl extends IonTypeStubBase<IonTypeConst> implements IonTypeStubConst {
-    public Impl(StubElement parent) {
-      super(parent, IonElementType.TYPE_CONST);
-    }
+public class IonTypeStubConst extends IonTypeStubBase<IonTypeConst> implements IonTypeStub<IonTypeConst> {
+  public IonTypeStubConst(StubElement parent) {
+    super(parent, IonElementType.TYPE_CONST);
   }
-
 }

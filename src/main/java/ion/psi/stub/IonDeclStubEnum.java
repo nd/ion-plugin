@@ -5,13 +5,9 @@ import ion.psi.IonDeclEnum;
 import ion.psi.IonElementType;
 import org.jetbrains.annotations.Nullable;
 
-public interface IonDeclStubEnum extends IonDeclStub<IonDeclEnum> {
-
-  class Impl extends IonDeclStubBase<IonDeclEnum> implements IonDeclStubEnum {
-    public Impl(StubElement parent, @Nullable String name) {
-      super(parent, IonElementType.DECL_ENUM, name);
-    }
+public class IonDeclStubEnum extends IonDeclStubBase<IonDeclEnum> implements IonDeclStub<IonDeclEnum> {
+  public IonDeclStubEnum(StubElement parent, @Nullable String name) {
+    super(parent, IonElementType.DECL_ENUM, name);
   }
-
 }
 

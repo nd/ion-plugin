@@ -15,7 +15,7 @@ public class IonElementTypeTypeArray extends IonStubElementType<IonTypeStubArray
   @NotNull
   @Override
   public IonTypeStubArray createStub(@NotNull IonTypeArray psi, StubElement parentStub) {
-    return new IonTypeStubArray.Impl(parentStub);
+    return new IonTypeStubArray(parentStub);
   }
 
   @Override
@@ -30,7 +30,7 @@ public class IonElementTypeTypeArray extends IonStubElementType<IonTypeStubArray
   @NotNull
   @Override
   public IonTypeStubArray deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) {
-    return new IonTypeStubArray.Impl(parentStub);
+    return new IonTypeStubArray(parentStub);
   }
 
   @Override

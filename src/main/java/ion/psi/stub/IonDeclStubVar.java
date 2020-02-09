@@ -5,12 +5,8 @@ import ion.psi.IonDeclVar;
 import ion.psi.IonElementType;
 import org.jetbrains.annotations.Nullable;
 
-public interface IonDeclStubVar extends IonDeclStub<IonDeclVar> {
-
-  class Impl extends IonDeclStubBase<IonDeclVar> implements IonDeclStubVar {
-    public Impl(StubElement parent, @Nullable String name) {
-      super(parent, IonElementType.DECL_VAR, name);
-    }
+public class IonDeclStubVar extends IonDeclStubBase<IonDeclVar> {
+  public IonDeclStubVar(StubElement parent, @Nullable String name) {
+    super(parent, IonElementType.DECL_VAR, name);
   }
-
 }

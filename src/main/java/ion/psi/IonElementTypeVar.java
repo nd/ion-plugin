@@ -16,7 +16,7 @@ public class IonElementTypeVar extends IonStubElementType<IonDeclStubVar, IonDec
   @NotNull
   @Override
   public IonDeclStubVar createStub(@NotNull IonDeclVar psi, StubElement parentStub) {
-    return new IonDeclStubVar.Impl(parentStub, psi.getName());
+    return new IonDeclStubVar(parentStub, psi.getName());
   }
 
   @Override
@@ -32,6 +32,6 @@ public class IonElementTypeVar extends IonStubElementType<IonDeclStubVar, IonDec
   @NotNull
   @Override
   public IonDeclStubVar deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-    return new IonDeclStubVar.Impl(parentStub, dataStream.readNameString());
+    return new IonDeclStubVar(parentStub, dataStream.readNameString());
   }
 }

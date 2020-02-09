@@ -15,7 +15,7 @@ public class IonElementTypeTypePtr extends IonStubElementType<IonTypeStubPtr, Io
   @NotNull
   @Override
   public IonTypeStubPtr createStub(@NotNull IonTypePtr psi, StubElement parentStub) {
-    return new IonTypeStubPtr.Impl(parentStub);
+    return new IonTypeStubPtr(parentStub);
   }
 
   @Override
@@ -30,7 +30,7 @@ public class IonElementTypeTypePtr extends IonStubElementType<IonTypeStubPtr, Io
   @NotNull
   @Override
   public IonTypeStubPtr deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) {
-    return new IonTypeStubPtr.Impl(parentStub);
+    return new IonTypeStubPtr(parentStub);
   }
 
   @Override

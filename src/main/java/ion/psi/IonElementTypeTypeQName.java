@@ -15,7 +15,7 @@ public class IonElementTypeTypeQName extends IonStubElementType<IonTypeStubQName
   @NotNull
   @Override
   public IonTypeStubQName createStub(@NotNull IonTypeQName psi, StubElement parentStub) {
-    return new IonTypeStubQName.Impl(parentStub);
+    return new IonTypeStubQName(parentStub);
   }
 
   @Override
@@ -30,7 +30,7 @@ public class IonElementTypeTypeQName extends IonStubElementType<IonTypeStubQName
   @NotNull
   @Override
   public IonTypeStubQName deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) {
-    return new IonTypeStubQName.Impl(parentStub);
+    return new IonTypeStubQName(parentStub);
   }
 
   @Override
