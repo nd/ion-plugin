@@ -8,12 +8,11 @@
 
     <idea-version since-build="191.3"/>
 
-    <version>17</version>
+    <version>18</version>
 
     <change-notes><![CDATA[
     <ul>
-      <li>icons in completion and file structure</li>
-      <li>plugin made compatible with 2020.1</li>
+      <li>Ion run configuration</li>
     </ul>
     ]]>
     </change-notes>
