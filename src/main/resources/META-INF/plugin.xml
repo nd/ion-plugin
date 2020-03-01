@@ -47,5 +47,7 @@
         <!--<registryKey key="ion.resolve.cache.enabled" defaultValue="true"/>-->
 
         <multiHostInjector implementation="ion.IonForeignInjector"/>
+        
+        <configurationType implementation="ion.run.IonRunConfigType"/>
     </extensions>
 </idea-plugin>
