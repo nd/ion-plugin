@@ -15,22 +15,26 @@ import ion.cfg.IonConfig;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.print.PrinterJob;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class IonLibProvider extends AdditionalLibraryRootsProvider {
-  private final static AtomicReference<List<SyntheticLibrary>> ourLibs = new AtomicReference<>();
+//  private final static AtomicReference<List<SyntheticLibrary>> ourLibs = new AtomicReference<>();
+  private final static ConcurrentMap<Project, List<SyntheticLibrary>> ourLibs = new ConcurrentHashMap<>();
 
   @Override
   @NotNull
   public Collection<SyntheticLibrary> getAdditionalProjectLibraries(@NotNull Project project) {
-    computeIfNeeded();
-    Collection<SyntheticLibrary> result = ourLibs.get();
+    computeIfNeeded(project);
+    Collection<SyntheticLibrary> result = ourLibs.get(project);
     return result != null ? result : Collections.emptyList();
   }
 
   public static void reset() {
-    ourLibs.set(null);
+    ourLibs.clear();
     Project[] projects = ProjectManager.getInstance().getOpenProjects();
     ApplicationManager.getApplication().invokeLater(() -> {
       WriteAction.run(() -> {
@@ -42,8 +46,8 @@ public class IonLibProvider extends AdditionalLibraryRootsProvider {
     });
   }
 
-  private static void computeIfNeeded() {
-    if (ourLibs.get() == null) {
+  private static void computeIfNeeded(@NotNull Project project) {
+    if (ourLibs.get(project) == null) {
       List<SyntheticLibrary> libs = new ArrayList<>();
 
       IonConfig config = IonConfig.getConfig();
@@ -56,7 +60,7 @@ public class IonLibProvider extends AdditionalLibraryRootsProvider {
         if (ionHomeDir != null && ionHomeDir.isDirectory()) {
           VirtualFile systemPackages = ionHomeDir.findChild("system_packages");
           if (systemPackages != null && systemPackages.isDirectory()) {
-            libs.add(new IonLib("IONHOME", Arrays.asList(systemPackages)));
+            libs.add(new IonLib(project, "IONHOME", Arrays.asList(systemPackages)));
           }
         }
       }
@@ -75,20 +79,20 @@ public class IonLibProvider extends AdditionalLibraryRootsProvider {
           }
         }
         if (!dirs.isEmpty()) {
-          libs.add(new IonLib("IONPATH", dirs));
+          libs.add(new IonLib(project, "IONPATH", dirs));
         }
       }
 
-      ourLibs.compareAndSet(null, libs);
+      ourLibs.putIfAbsent(project, libs);
     }
   }
 
   @NotNull
   @Override
   public Collection<VirtualFile> getRootsToWatch(@NotNull Project project) {
-    computeIfNeeded();
+    computeIfNeeded(project);
     List<VirtualFile> result = new ArrayList<>();
-    List<SyntheticLibrary> libs = ourLibs.get();
+    List<SyntheticLibrary> libs = ourLibs.get(project);
     for (SyntheticLibrary lib : libs) {
       if (lib instanceof IonLib) {
         result.addAll(((IonLib) lib).getDirs());
@@ -98,8 +102,8 @@ public class IonLibProvider extends AdditionalLibraryRootsProvider {
   }
 
   @NotNull
-  public static List<SyntheticLibrary> getLibs() {
-    computeIfNeeded();
-    return ourLibs.get();
+  public static List<SyntheticLibrary> getLibs(@NotNull Project project) {
+    computeIfNeeded(project);
+    return ourLibs.get(project);
   }
 }

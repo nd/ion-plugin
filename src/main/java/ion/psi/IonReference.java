@@ -908,7 +908,7 @@ public class IonReference extends PsiReferenceBase<IonPsiElement> {
     if (isRelativeImportPath(importPath)) {
       result = resolveImport(originDir, importPath);
     } else {
-      for (SyntheticLibrary lib : IonLibProvider.getLibs()) {
+      for (SyntheticLibrary lib : IonLibProvider.getLibs(file.getProject())) {
         if (lib instanceof IonLib) {
           IonLib ionLib = (IonLib) lib;
           List<VirtualFile> dirs = ionLib.getDirs();
